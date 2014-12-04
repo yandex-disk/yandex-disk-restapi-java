@@ -1,7 +1,6 @@
 package com.yandex.disk.rest;
 
 import com.android.exchange.utility.UriCodec;
-import com.google.gson.Gson;
 import com.yandex.disk.rest.exceptions.CancelledDownloadException;
 import com.yandex.disk.rest.exceptions.DownloadNoSpaceAvailableException;
 import com.yandex.disk.rest.exceptions.FileModifiedException;
@@ -16,27 +15,23 @@ import com.yandex.disk.rest.exceptions.WebdavException;
 import com.yandex.disk.rest.exceptions.WebdavIOException;
 import com.yandex.disk.rest.exceptions.WebdavNotAuthorizedException;
 import com.yandex.disk.rest.exceptions.WebdavUserNotInitialized;
-import com.yandex.disk.rest.json.ApiError;
+import com.yandex.disk.rest.json.DiskMeta;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Resource;
 import com.yandex.disk.rest.json.ResourceList;
 import com.yandex.disk.rest.retrofit.CloudApi;
 import com.yandex.disk.rest.retrofit.RetrofitLocationException;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,9 +50,9 @@ import retrofit.RetrofitError;
 import retrofit.client.Header;
 import retrofit.mime.TypedInput;
 
-public class TransportClientOkhttp {
+public class TransportClient {
 
-    private static final String TAG = "TransportClientOkhttp";
+    private static final String TAG = "TransportClient";
 
     private static final RestAdapter.LogLevel LOG_LEVEL = RestAdapter.LogLevel.FULL;
 
@@ -80,15 +75,15 @@ public class TransportClientOkhttp {
     private Credentials creds;
     private MyOkClient client;
 
-    public TransportClientOkhttp(final Credentials credentials, final int networkTimeout)
+    public TransportClient(final Credentials credentials, final int networkTimeout)
             throws WebdavClientInitException {
         this.creds = credentials;
         this.client = new MyOkClient();
     }
 
-    public static TransportClientOkhttp getInstance(final Credentials credentials)
+    public static TransportClient getInstance(final Credentials credentials)
             throws WebdavClientInitException {
-        return new TransportClientOkhttp(credentials, NETWORK_TIMEOUT);
+        return new TransportClient(credentials, NETWORK_TIMEOUT);
     }
 
     private String getUrl() {
@@ -108,34 +103,21 @@ public class TransportClientOkhttp {
                 .setClient(client)
                 .setEndpoint(getUrl())
                 .setRequestInterceptor(requestInterceptor)
-                .setErrorHandler(errorHandler)
+                .setErrorHandler(new ErrorHandlerImpl())
                 .setLogLevel(LOG_LEVEL);
     }
 
-    private ErrorHandler errorHandler = new ErrorHandler() {
-        @Override
-        public Throwable handleError(RetrofitError retrofitError) {
-//            retrofit.client.Response r = retrofitError.getResponse();
-//            if (r != null && r.getStatus() == 401) {
-//                return new UnauthorizedException(cause);
-//            }
-            try {
-                Log.d(TAG, "isNetworkError=" + retrofitError.isNetworkError() + " getStatus=" + retrofitError.getResponse().getStatus());
-                if (retrofitError.isNetworkError()) {
-                    return new WebdavIOException(retrofitError.getMessage());
-                } else {
-                    Reader reader = new InputStreamReader(retrofitError.getResponse().getBody().in());
-                    ApiError apiError = new Gson().fromJson(reader, ApiError.class);
-                    return new WebdavIOException(apiError != null
-                            ? apiError.getDescription()
-                            : "HTTP Error code "+retrofitError.getResponse().getStatus());
-                }
-            } catch (IOException ex) {
-                Log.d(TAG, "errorHandler", retrofitError);
-                return new WebdavIOException(ex);
-            }
-        }
-    };
+    public DiskMeta getMeta()
+            throws IOException, WebdavIOException {
+        return getMeta(null);
+    }
+
+    public DiskMeta getMeta(final String fields)
+            throws IOException, WebdavIOException {
+        return getRestAdapterBuilder().build()
+                .create(CloudApi.class)
+                .getMeta(fields);
+    }
 
     public void getList(final String path, final int itemsPerPage, final ListParsingHandler handler)
             throws IOException, WebdavIOException {
@@ -650,26 +632,5 @@ public class TransportClientOkhttp {
                 || (c >= '0' && c <= '9')
                 || "_-!.~'()*".indexOf(c) != NOT_FOUND
                 || (allow != null && allow.indexOf(c) != NOT_FOUND);
-    }
-
-    private static class Log {
-
-        public static void d(String tag, String s, Throwable ex) {
-            System.err.println(tag + " " + s);
-            ex.printStackTrace(System.err);
-        }
-
-        public static void d(String tag, String s) {
-            System.err.println(tag+" "+s);
-        }
-
-        public static void i(String tag, String s) {
-            System.err.println(tag+" "+s);
-        }
-
-        public static void w(String tag, Throwable ex) {
-            System.err.println(tag);
-            ex.printStackTrace(System.err);
-        }
     }
 }

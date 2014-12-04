@@ -3,10 +3,10 @@ package com.yandex.disk.rest;
 import com.yandex.disk.rest.exceptions.WebdavClientInitException;
 import com.yandex.disk.rest.exceptions.WebdavException;
 import com.yandex.disk.rest.exceptions.WebdavIOException;
+import com.yandex.disk.rest.json.DiskMeta;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 
 public class Main {
 
@@ -14,18 +14,27 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            list("/");
+            meta();
 
-            downloadFile("/yac-qr.png");
+//            list("/");
+
+//            downloadFile("/yac-qr.png");
 
         } catch (Throwable ex) {
             ex.printStackTrace();
         }
     }
 
+    private static void meta()
+            throws WebdavClientInitException, IOException, WebdavIOException {
+        TransportClient client = TransportClient.getInstance(credentials);
+        DiskMeta meta = client.getMeta();
+        System.out.println("meta: "+meta);
+    }
+
     private static void list(String dir)
             throws WebdavClientInitException, IOException, WebdavIOException {
-        TransportClientOkhttp client = TransportClientOkhttp.getInstance(credentials);
+        TransportClient client = TransportClient.getInstance(credentials);
         client.getList(dir, 0, new ListParsingHandler() {
             @Override
             public boolean handleItem(ListItem item) {
@@ -37,7 +46,7 @@ public class Main {
 
     private static void downloadFile(String path)
             throws WebdavException, IOException {
-        TransportClientOkhttp client = TransportClientOkhttp.getInstance(credentials);
+        TransportClient client = TransportClient.getInstance(credentials);
         client.downloadFile(path, new File("/tmp/"+path), new ProgressListener() {
             @Override
             public void updateProgress(long loaded, long total) {

@@ -5,6 +5,7 @@ import com.yandex.disk.rest.exceptions.RangeNotSatisfiableException;
 import com.yandex.disk.rest.exceptions.RemoteFileNotFoundException;
 import com.yandex.disk.rest.exceptions.ServerWebdavException;
 import com.yandex.disk.rest.exceptions.WebdavIOException;
+import com.yandex.disk.rest.json.DiskMeta;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Resource;
 
@@ -17,6 +18,10 @@ import retrofit.http.QueryMap;
 import retrofit.http.Streaming;
 
 public interface CloudApi {
+
+    @GET("/v1/disk")
+    DiskMeta getMeta(@Query("fields") String fields)
+            throws WebdavIOException;
 
     @GET("/v1/disk/resources?limit=0")
     Resource listResources(@Query("path") String path)

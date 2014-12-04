@@ -14,7 +14,7 @@ public class WebdavIOException extends WebdavException {
         super(message);
     }
 
-    public WebdavIOException(IOException e) {
+    public WebdavIOException(Throwable e) {
         super(e);
     }
 
