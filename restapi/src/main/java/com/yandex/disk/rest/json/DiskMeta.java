@@ -7,24 +7,40 @@ import java.util.Map;
 public class DiskMeta {
 
     @SerializedName("trash_size")
-    long trash_size;
+    long trashSize;
 
     @SerializedName("total_space")
-    long total_space;
+    long totalSpace;
 
     @SerializedName("used_space")
-    long used_space;
+    long usedSpace;
 
     @SerializedName("system_folders")
-    Map<String,String> system_folders;
+    Map<String,String> systemFolders;
+
+    public long getTrashSize() {
+        return trashSize;
+    }
+
+    public long getTotalSpace() {
+        return totalSpace;
+    }
+
+    public long getUsedSpace() {
+        return usedSpace;
+    }
+
+    public Map<String, String> getSystemFolders() {
+        return systemFolders;
+    }
 
     @Override
     public String toString() {
         return "DiskMeta{" +
-                "trash_size=" + trash_size +
-                ", total_space=" + total_space +
-                ", used_space=" + used_space +
-                ", system_folders=" + system_folders +
+                "trashSize=" + trashSize +
+                ", totalSpace=" + totalSpace +
+                ", usedSpace=" + usedSpace +
+                ", systemFolders=" + systemFolders +
                 '}';
     }
 }

@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 public class Resource {
 
     @SerializedName("public_key")
-    String public_key;
+    String publicKey;
 
     @SerializedName("_embedded")
     ResourceList resourceList;
@@ -20,10 +20,10 @@ public class Resource {
     String created;
 
     @SerializedName("public_url")
-    String public_url;
+    String publicUrl;
 
     @SerializedName("origin_path")
-    String origin_path;
+    String originPath;
 
     @SerializedName("modified")
     String modified;
@@ -38,13 +38,13 @@ public class Resource {
     String type;
 
     @SerializedName("mime_type")
-    String mime_type;
+    String mimeType;
 
     @SerializedName("size")
     int size;
 
     public String getPublicKey() {
-        return public_key;
+        return publicKey;
     }
 
     public ResourceList getItems() {
@@ -60,11 +60,11 @@ public class Resource {
     }
 
     public String getPublicUrl() {
-        return public_url;
+        return publicUrl;
     }
 
     public String getOriginPath() {
-        return origin_path;
+        return originPath;
     }
 
     public String getModified() {
@@ -84,7 +84,7 @@ public class Resource {
     }
 
     public String getMimeType() {
-        return mime_type;
+        return mimeType;
     }
 
     public int getSize() {
@@ -94,17 +94,17 @@ public class Resource {
     @Override
     public String toString() {
         return "Resource{" +
-                "public_key='" + public_key + '\'' +
-                ", resourceList(_embedded)=" + resourceList +
+                "publicKey='" + publicKey + '\'' +
+                ", resourceList=" + resourceList +
                 ", name='" + name + '\'' +
                 ", created='" + created + '\'' +
-                ", public_url='" + public_url + '\'' +
-                ", origin_path='" + origin_path + '\'' +
+                ", publicUrl='" + publicUrl + '\'' +
+                ", originPath='" + originPath + '\'' +
                 ", modified='" + modified + '\'' +
                 ", path='" + path + '\'' +
                 ", md5='" + md5 + '\'' +
                 ", type='" + type + '\'' +
-                ", mime_type='" + mime_type + '\'' +
+                ", mimeType='" + mimeType + '\'' +
                 ", size=" + size +
                 '}';
     }

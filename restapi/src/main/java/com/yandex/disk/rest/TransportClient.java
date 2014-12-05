@@ -17,6 +17,7 @@ import com.yandex.disk.rest.exceptions.WebdavNotAuthorizedException;
 import com.yandex.disk.rest.exceptions.WebdavUserNotInitialized;
 import com.yandex.disk.rest.json.DiskMeta;
 import com.yandex.disk.rest.json.Link;
+import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
 import com.yandex.disk.rest.json.ResourceList;
 import com.yandex.disk.rest.retrofit.CloudApi;
@@ -107,24 +108,58 @@ public class TransportClient {
                 .setLogLevel(LOG_LEVEL);
     }
 
-    public DiskMeta getMeta()
-            throws IOException, WebdavIOException {
-        return getMeta(null);
-    }
-
-    public DiskMeta getMeta(final String fields)
+    public Operation getOperation(final String operationId)
             throws IOException, WebdavIOException {
         return getRestAdapterBuilder().build()
                 .create(CloudApi.class)
-                .getMeta(fields);
+                .getOperation(operationId);
     }
 
-    public void getList(final String path, final int itemsPerPage, final ListParsingHandler handler)
+    public DiskMeta getDiskMeta()
             throws IOException, WebdavIOException {
-        RestAdapter restAdapter = getRestAdapterBuilder().build();
-        CloudApi service = restAdapter.create(CloudApi.class);
-        Resource resource = service.listResources(path /*, itemsPerPage, 0, null*/ );
+        return getDiskMeta(null);
+    }
+
+    public DiskMeta getDiskMeta(final String fields)
+            throws IOException, WebdavIOException {
+        return getRestAdapterBuilder().build()
+                .create(CloudApi.class)
+                .getDiskMeta(fields);
+    }
+
+    public void listResources(final String path, final ListParsingHandler handler)
+            throws IOException, WebdavIOException {
+        listResources(path, 0, 0, null, handler);
+    }
+
+    // TODO make test with limit, offset and sort
+    public void listResources(final String path, final int limit, final int offset, final String sort, final ListParsingHandler handler)
+            throws IOException, WebdavIOException {
+        Resource resource = getRestAdapterBuilder().build()
+                .create(CloudApi.class)
+                .listResources(path, limit, offset, sort);
         parseListResponse(resource, handler);
+    }
+
+    public void listTrash(final String path, final ListParsingHandler handler)
+            throws IOException, WebdavIOException {
+        listTrash(path, null, 0, 0, null, null, handler);
+    }
+
+    public void listTrash(final String path, final String fields, final int limit, final int offset,
+                          final String sort, final String previewSize, final ListParsingHandler handler)
+            throws IOException, WebdavIOException {
+        Resource resource = getRestAdapterBuilder().build()
+                .create(CloudApi.class)
+                .listTrash(path, fields, limit, offset, sort, previewSize);
+        parseListResponse(resource, handler);
+    }
+
+    public Link dropTrash(final String path, final String fields)
+            throws IOException, WebdavIOException {
+        return getRestAdapterBuilder().build()
+                .create(CloudApi.class)
+                .dropTrash(path, fields);
     }
 
     private void parseListResponse(final Resource resource, final ListParsingHandler handler) {

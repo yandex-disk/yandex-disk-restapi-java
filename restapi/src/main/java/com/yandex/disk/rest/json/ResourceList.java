@@ -13,7 +13,7 @@ public class ResourceList {
     String sort;
 
     @SerializedName("public_key")
-    String public_key;
+    String publicKey;
 
     @SerializedName("items")
     List<Resource> items;
@@ -35,7 +35,7 @@ public class ResourceList {
     }
 
     public String getPublicKey() {
-        return public_key;
+        return publicKey;
     }
 
     public List<Resource> getItems() {
@@ -62,7 +62,7 @@ public class ResourceList {
     public String toString() {
         return "ResourceList{" +
                 "sort='" + sort + '\'' +
-                ", public_key='" + public_key + '\'' +
+                ", publicKey='" + publicKey + '\'' +
                 ", items=" + items +
                 ", path='" + path + '\'' +
                 ", limit=" + limit +
