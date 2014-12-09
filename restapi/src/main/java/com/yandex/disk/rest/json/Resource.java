@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName;
 import com.yandex.disk.rest.conv.ISO8601;
 import com.yandex.disk.rest.conv.ResourcePath;
 
+import java.util.Date;
+
 /**
  * @see <a href="http://api.yandex.ru/disk/api/reference/response-objects.xml">API reference</a>
  */
@@ -57,8 +59,8 @@ public class Resource {
         return name;
     }
 
-    public long getCreated() {
-        return created != null ? ISO8601.parse(created) : 0;
+    public Date getCreated() {
+        return created != null ? ISO8601.parse(created) : null;
     }
 
     public String getPublicUrl() {
@@ -69,8 +71,8 @@ public class Resource {
         return originPath != null ? new ResourcePath(originPath) : null;
     }
 
-    public long getModified() {
-        return modified != null ? ISO8601.parse(modified) : 0;
+    public Date getModified() {
+        return modified != null ? ISO8601.parse(modified) : null;
     }
 
     public ResourcePath getPath() {

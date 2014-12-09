@@ -28,8 +28,10 @@ public class ISO8601 {
     /**
      * Get current date and time formatted as ISO 8601 string.
      */
-    public static String now() {
-        return fromCalendar(GregorianCalendar.getInstance());
+    public static String nowInSeconds() {
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTimeInMillis(calendar.getTimeInMillis() - calendar.getTimeInMillis() % 1000L);
+        return fromCalendar(calendar);
     }
 
     /**
@@ -49,11 +51,11 @@ public class ISO8601 {
         return calendar;
     }
 
-    public static long parse(final String iso8601string) {
+    public static Date parse(final String iso8601string) {
         try {
-            return toCalendar(iso8601string).getTimeInMillis();
+            return toCalendar(iso8601string).getTime();
         } catch (ParseException e) {
-            return 0;
+            return null;
         }
     }
 }
