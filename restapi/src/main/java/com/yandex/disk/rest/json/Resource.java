@@ -1,6 +1,8 @@
 package com.yandex.disk.rest.json;
 
 import com.google.gson.annotations.SerializedName;
+import com.yandex.disk.rest.conv.ISO8601;
+import com.yandex.disk.rest.conv.ResourcePath;
 
 /**
  * @see <a href="http://api.yandex.ru/disk/api/reference/response-objects.xml">API reference</a>
@@ -41,7 +43,7 @@ public class Resource {
     String mimeType;
 
     @SerializedName("size")
-    int size;
+    long size;
 
     public String getPublicKey() {
         return publicKey;
@@ -55,24 +57,24 @@ public class Resource {
         return name;
     }
 
-    public String getCreated() {
-        return created;
+    public long getCreated() {
+        return created != null ? ISO8601.parse(created) : 0;
     }
 
     public String getPublicUrl() {
         return publicUrl;
     }
 
-    public String getOriginPath() {
-        return originPath;
+    public ResourcePath getOriginPath() {
+        return originPath != null ? new ResourcePath(originPath) : null;
     }
 
-    public String getModified() {
-        return modified;
+    public long getModified() {
+        return modified != null ? ISO8601.parse(modified) : 0;
     }
 
-    public String getPath() {
-        return path;
+    public ResourcePath getPath() {
+        return path != null ? new ResourcePath(path) : null;
     }
 
     public String getMd5() {
@@ -87,7 +89,7 @@ public class Resource {
         return mimeType;
     }
 
-    public int getSize() {
+    public long getSize() {
         return size;
     }
 
@@ -97,11 +99,11 @@ public class Resource {
                 "publicKey='" + publicKey + '\'' +
                 ", resourceList=" + resourceList +
                 ", name='" + name + '\'' +
-                ", created='" + created + '\'' +
+                ", created='" + getCreated() + '\'' +
                 ", publicUrl='" + publicUrl + '\'' +
-                ", originPath='" + originPath + '\'' +
-                ", modified='" + modified + '\'' +
-                ", path='" + path + '\'' +
+                ", originPath='" + getOriginPath() + '\'' +
+                ", modified='" + getModified() + '\'' +
+                ", path='" + getPath() + '\'' +
                 ", md5='" + md5 + '\'' +
                 ", type='" + type + '\'' +
                 ", mimeType='" + mimeType + '\'' +

@@ -5,6 +5,8 @@ package com.yandex.disk.rest;
 //import org.apache.http.entity.AbstractHttpEntity;
 //import org.apache.http.protocol.HttpContext;
 
+import com.yandex.disk.rest.json.Resource;
+
 public abstract class ListParsingHandler {
 
 //    public HttpContext onCreateRequest(HttpPost post, AbstractHttpEntity entity) {
@@ -19,5 +21,5 @@ public abstract class ListParsingHandler {
         return false;
     }
 
-    public abstract boolean handleItem(ListItem item);
+    public abstract boolean handleItem(Resource item);
 }

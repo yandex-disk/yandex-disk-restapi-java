@@ -3,6 +3,7 @@ package com.yandex.disk.rest;
 import com.yandex.disk.rest.json.DiskMeta;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
+import com.yandex.disk.rest.json.Resource;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -29,7 +30,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 
 @RunWith(JUnit4.class)
-public class Test1 {
+public class TransportClientTest {
 
     private TransportClient client;
 
@@ -73,14 +74,15 @@ public class Test1 {
         assertThat(meta.getSystemFolders(), hasKey("downloads"));
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testListResources() throws Exception {
-        final List<ListItem> items = new ArrayList<>();
+        final List<Resource> items = new ArrayList<>();
         client.listResources("/", new ListParsingHandler() {
             @Override
-            public boolean handleItem(ListItem item) {
+            public boolean handleItem(Resource item) {
                 items.add(item);
+                System.out.println("item: " + item);
                 return true;
             }
 
@@ -92,12 +94,13 @@ public class Test1 {
         });
     }
 
+    @Ignore
     @Test
     public void testTrash() throws Exception {
-        final List<ListItem> items = new ArrayList<>();
+        final List<Resource> items = new ArrayList<>();
         client.listTrash("/", new ListParsingHandler() {
             @Override
-            public boolean handleItem(ListItem item) {
+            public boolean handleItem(Resource item) {
                 items.add(item);
                 return true;
             }

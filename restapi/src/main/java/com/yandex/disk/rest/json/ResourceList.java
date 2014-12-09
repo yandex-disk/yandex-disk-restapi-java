@@ -22,13 +22,13 @@ public class ResourceList {
     String path;
 
     @SerializedName("limit")
-    int limit;
+    long limit;
 
     @SerializedName("offset")
-    int offset;
+    long offset;
 
     @SerializedName("total")
-    int total;
+    long total;
 
     public String getSort() {
         return sort;
@@ -46,15 +46,15 @@ public class ResourceList {
         return path;
     }
 
-    public int getLimit() {
+    public long getLimit() {
         return limit;
     }
 
-    public int getOffset() {
+    public long getOffset() {
         return offset;
     }
 
-    public int getTotal() {
+    public long getTotal() {
         return total;
     }
 

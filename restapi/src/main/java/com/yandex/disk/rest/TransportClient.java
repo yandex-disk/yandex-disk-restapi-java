@@ -167,13 +167,18 @@ public class TransportClient {
         int size = items.getItems().size();
         Log.d(TAG, "parseListResponse: size=" + size);
         for (Resource item : items.getItems()) {
-            parseListResponseItem(item, handler);
+//            if (handler.hasCancelled()) { TODO
+//                return;
+//            }
+            handler.handleItem(item);
+//            parseListResponseItem(item, handler);
         }
         handler.onPageFinished(size);
     }
 
     private void parseListResponseItem(final Resource item, final ListParsingHandler handler) {
         Log.d(TAG, "parseListResponseItem: " + item);
+/*
         ListItem.Builder builder = new ListItem.Builder();
         builder.setDisplayName(item.getName());
         builder.setFullPath(item.getPath().substring("disk:".length()));
@@ -187,7 +192,8 @@ public class TransportClient {
         builder.setVisible(true);
         ListItem listItem = builder.build();
         Log.d(TAG, "parseListResponseItem: " + listItem);
-        handler.handleItem(listItem);
+*/
+        handler.handleItem(item);
     }
 
     public void downloadFile(final String path, final File saveTo, final ProgressListener progressListener)
