@@ -1,6 +1,4 @@
-package com.yandex.disk.rest;
-
-import com.yandex.disk.rest.conv.ResourcePath;
+package com.yandex.disk.rest.conv;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

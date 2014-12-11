@@ -26,15 +26,6 @@ public class ISO8601 {
     }
 
     /**
-     * Get current date and time formatted as ISO 8601 string.
-     */
-    public static String nowInSeconds() {
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTimeInMillis(calendar.getTimeInMillis() - calendar.getTimeInMillis() % 1000L);
-        return fromCalendar(calendar);
-    }
-
-    /**
      * Transform ISO 8601 string to Calendar.
      */
     public static Calendar toCalendar(final String iso8601string)

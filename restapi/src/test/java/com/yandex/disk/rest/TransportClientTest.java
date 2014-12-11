@@ -74,7 +74,7 @@ public class TransportClientTest {
         assertThat(meta.getSystemFolders(), hasKey("downloads"));
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testListResources() throws Exception {
         final List<Resource> items = new ArrayList<>();
@@ -120,7 +120,7 @@ public class TransportClientTest {
 
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testDownloadFile() throws Exception {
         String path = "/yac-qr.png";

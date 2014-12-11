@@ -1,8 +1,5 @@
-package com.yandex.disk.rest;
+package com.yandex.disk.rest.conv;
 
-import com.yandex.disk.rest.conv.ISO8601;
-
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -17,14 +14,6 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(JUnit4.class)
 public class ISO8601Test {
-
-    @Ignore
-    @Test
-    public void testNow() throws Exception {
-        // TODO
-//        String str = ISO8601.nowInSeconds();
-//        ISO8601.toCalendar(str);
-    }
 
     @Test
     public void testFromTo() throws Exception {
