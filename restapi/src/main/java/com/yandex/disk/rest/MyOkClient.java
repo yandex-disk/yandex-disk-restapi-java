@@ -20,6 +20,7 @@ public class MyOkClient extends UrlConnectionClient {
     private static final int READ_TIMEOUT_MILLIS = 30 * 1000;
 
     private final OkUrlFactory urlFactory;
+    private final OkHttpClient client;
 
     private static OkHttpClient makeClient() {
         OkHttpClient client = new OkHttpClient();
@@ -42,6 +43,11 @@ public class MyOkClient extends UrlConnectionClient {
 
     public MyOkClient(OkHttpClient client) {
         this.urlFactory = new OkUrlFactory(client);
+        this.client = client;
+    }
+
+    public OkHttpClient getClient() {
+        return client;
     }
 
     @Override

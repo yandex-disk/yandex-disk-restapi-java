@@ -125,7 +125,7 @@ public class TransportClientTest {
     public void testDownloadFile() throws Exception {
         String path = "/yac-qr.png";
         File local = new File("/tmp/"+path);
-        client.downloadFile(path, local, new ProgressListener() {
+        client.downloadFile(path, null, local, new ProgressListener() {
             @Override
             public void updateProgress(long loaded, long total) {
                 System.out.println("updateProgress: " + loaded + " / " + total);

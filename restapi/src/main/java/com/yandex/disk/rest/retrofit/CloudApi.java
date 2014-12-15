@@ -39,11 +39,6 @@ public interface CloudApi {
     Link getDownloadLink(@Query("path") String path)
             throws WebdavIOException;
 
-    @GET("/")
-    @Streaming
-    Response downloadFile(/*@Path("path") String path, */ @QueryMap Map<String, String> queryMap)
-            throws FileNotModifiedException, RemoteFileNotFoundException, RangeNotSatisfiableException, ServerWebdavException;
-
     @GET("/v1/disk/trash/resources")
     Resource listTrash(@Query("path") String path, @Query("fields") String fields,
                        @Query("limit") int limit, @Query("offset") int offset, @Query("sort") String sort,
