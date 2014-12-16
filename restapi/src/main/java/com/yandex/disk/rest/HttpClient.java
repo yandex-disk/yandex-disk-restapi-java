@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 import retrofit.client.Request;
 import retrofit.client.UrlConnectionClient;
 
-public class MyOkClient extends UrlConnectionClient {
+public class HttpClient extends UrlConnectionClient {
 
     private static final int CONNECT_TIMEOUT_MILLIS = 30 * 1000;
     private static final int READ_TIMEOUT_MILLIS = 30 * 1000;
@@ -37,11 +37,11 @@ public class MyOkClient extends UrlConnectionClient {
         return client;
     }
 
-    public MyOkClient() {
+    public HttpClient() {
         this(makeClient());
     }
 
-    public MyOkClient(OkHttpClient client) {
+    public HttpClient(OkHttpClient client) {
         this.urlFactory = new OkUrlFactory(client);
         this.client = client;
     }

@@ -39,6 +39,10 @@ public interface CloudApi {
     Link getDownloadLink(@Query("path") String path)
             throws WebdavIOException;
 
+    @GET("/v1/disk/resources/upload")
+    Link getUploadLink(@Query("path") String path, @Query("overwrite") boolean overwrite)
+            throws WebdavIOException;
+
     @GET("/v1/disk/trash/resources")
     Resource listTrash(@Query("path") String path, @Query("fields") String fields,
                        @Query("limit") int limit, @Query("offset") int offset, @Query("sort") String sort,

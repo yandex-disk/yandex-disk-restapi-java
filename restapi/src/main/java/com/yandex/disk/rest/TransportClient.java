@@ -1,5 +1,6 @@
 package com.yandex.disk.rest;
 
+import com.yandex.disk.rest.exceptions.UnknownServerWebdavException;
 import com.yandex.disk.rest.exceptions.WebdavClientInitException;
 import com.yandex.disk.rest.exceptions.WebdavException;
 import com.yandex.disk.rest.exceptions.WebdavIOException;
@@ -28,8 +29,9 @@ public class TransportClient {
 
     private static final int NETWORK_TIMEOUT = 30000;
 
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String USER_AGENT_HEADER = "User-Agent";
     private static final String USER_AGENT = "Cloud API Android Client Example/1.0";
-    private static final String ATTR_ETAG_FROM_REDIRECT = "yandex.etag-from-redirect";
 
     private static URL serverURL;
 
@@ -42,18 +44,18 @@ public class TransportClient {
     }
 
     private final List<CustomHeader> commonHeaders;
-    private final MyOkClient client;
+    private final HttpClient client;
 
     public TransportClient(final Credentials credentials, final int networkTimeout)
             throws WebdavClientInitException {
         this.commonHeaders = fillCommonHeaders(credentials.getToken());
-        this.client = new MyOkClient();
+        this.client = new HttpClient();
     }
 
     private static List<CustomHeader> fillCommonHeaders(final String token) {
         List<CustomHeader> list = new ArrayList<>();
-        list.add(new CustomHeader("User-Agent", USER_AGENT));
-        list.add(new CustomHeader("Authorization", "OAuth " + token));
+        list.add(new CustomHeader(USER_AGENT_HEADER, USER_AGENT));
+        list.add(new CustomHeader(AUTHORIZATION_HEADER, "OAuth " + token));
         return list;
     }
 
@@ -158,7 +160,24 @@ public class TransportClient {
                 .getDownloadLink(path);
         Log.d(TAG, "getDownloadLink(): " + link);
 
-        new Download(client.getClient(), commonHeaders)
+        new HttpClientIO(client, commonHeaders)
                 .downloadUrl(link.getHref(), headerList, new FileDownloadListener(saveTo, progressListener));
+    }
+
+    public void uploadFile(final String serverPath, final boolean overwrite, final File localSource,
+                           final List<CustomHeader> headerList, final ProgressListener progressListener)
+            throws IOException, WebdavException {
+        Link link = getRestAdapterBuilder().build()
+                .create(CloudApi.class)
+                .getUploadLink(serverPath, overwrite);
+        Log.d(TAG, "getUploadLink(): " + link);
+
+        if (!"PUT".equalsIgnoreCase(link.getMethod())) {
+            throw new UnknownServerWebdavException("Method in Link object is not PUT"); // TODO throw a proper exception
+        }
+
+//        Hash hash = Hash.getHash(file);
+        new HttpClientIO(client, commonHeaders)
+                .uploadFile(link.getHref(), localSource, progressListener);
     }
 }

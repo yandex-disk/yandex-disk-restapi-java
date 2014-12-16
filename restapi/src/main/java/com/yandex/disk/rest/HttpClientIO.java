@@ -3,12 +3,14 @@ package com.yandex.disk.rest;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
 import com.yandex.disk.rest.exceptions.CancelledDownloadException;
 import com.yandex.disk.rest.exceptions.DownloadNoSpaceAvailableException;
 import com.yandex.disk.rest.exceptions.FileModifiedException;
 import com.yandex.disk.rest.exceptions.FileNotModifiedException;
+import com.yandex.disk.rest.exceptions.IntermediateFolderNotExistException;
 import com.yandex.disk.rest.exceptions.PreconditionFailedException;
 import com.yandex.disk.rest.exceptions.RangeNotSatisfiableException;
 import com.yandex.disk.rest.exceptions.RemoteFileNotFoundException;
@@ -17,6 +19,7 @@ import com.yandex.disk.rest.exceptions.UnknownServerWebdavException;
 import com.yandex.disk.rest.exceptions.WebdavNotAuthorizedException;
 import com.yandex.disk.rest.exceptions.WebdavUserNotInitialized;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,15 +27,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Download {
+public class HttpClientIO {
 
     private static final String TAG = "Download";
 
     private OkHttpClient client;
     private List<CustomHeader> commonHeaders;
 
-    public Download(OkHttpClient client, List<CustomHeader> commonHeaders) {
-        this.client = client;
+    public HttpClientIO(HttpClient client, List<CustomHeader> commonHeaders) {
+        this.client = client.getClient();
         this.commonHeaders = commonHeaders;
     }
 
@@ -219,5 +222,37 @@ public class Download {
             Log.d(TAG, "parseContentRangeHeader: " + header, ex);
             return null;
         }
+    }
+
+    public void uploadFile(final String url, final File file, final ProgressListener progressListener)
+            throws IntermediateFolderNotExistException, IOException, WebdavUserNotInitialized, PreconditionFailedException,
+            WebdavNotAuthorizedException, ServerWebdavException, UnknownServerWebdavException {
+        Log.d(TAG, "uploadFile: put to url: "+url);
+
+        MediaType mediaType = MediaType.parse("application/octet-stream");  // TODO
+        RequestBody requestBody = RequestBody.create(mediaType, file);      // TODO use progressListener
+        Request request = buildRequest()
+                .removeHeader(TransportClient.AUTHORIZATION_HEADER)
+                .url(url)
+                .put(requestBody)
+                .build();
+
+        Response response = client
+                .newCall(request)
+                .execute();
+        Log.d(TAG, "response: "+response);
+
+        int code = response.code();
+        switch (code) {
+            case 201:
+                // OK
+                Log.d(TAG, "File uploaded successfully: "+file);
+                break;
+            default:
+                throw new ServerWebdavException("error while downloading: code=" + code + " file " + url);
+        }
+
+        ResponseBody responseBody = response.body();
+        Log.d(TAG, "upload: " + responseBody.string());
     }
 }

@@ -1,7 +1,7 @@
 package com.yandex.disk.rest;
 
+import com.yandex.disk.rest.exceptions.WebdavIOException;
 import com.yandex.disk.rest.json.DiskMeta;
-import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
 
@@ -25,9 +25,10 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(JUnit4.class)
 public class TransportClientTest {
@@ -120,11 +121,12 @@ public class TransportClientTest {
 
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testDownloadFile() throws Exception {
         String path = "/yac-qr.png";
         File local = new File("/tmp/"+path);
+        assertFalse(local.exists());
         client.downloadFile(path, null, local, new ProgressListener() {
             @Override
             public void updateProgress(long loaded, long total) {
@@ -136,6 +138,44 @@ public class TransportClientTest {
                 return false;
             }
         });
-        assertThat(local.length(), not(lessThan(709L)));
+        System.out.println("length: " + local.length());
+        assertTrue(local.length() == 709L);
+        assertTrue(local.delete());
+    }
+
+    @Ignore
+    @Test(expected = WebdavIOException.class)   // TODO change the exception
+    public void testUploadFileOverwriteFailed() throws Exception {
+        String path = "/yac-qr.png";
+        client.uploadFile(path, false, null, null, new ProgressListener() {
+            @Override
+            public void updateProgress(long loaded, long total) {
+            }
+
+            @Override
+            public boolean hasCancelled() {
+                return false;
+            }
+        });
+    }
+
+    @Test
+    public void testUploadFile() throws Exception {
+        String name = "test-upload-001.bin";
+        String serverPath = "/0-test/" + name;
+        File local = new File("testResources/" + name);
+        assertTrue(local.exists());
+        assertTrue(local.length() == 1024);
+        client.uploadFile(serverPath, true, local, null, new ProgressListener() {
+            @Override
+            public void updateProgress(long loaded, long total) {
+                System.out.println("updateProgress: " + loaded + " / " + total);
+            }
+
+            @Override
+            public boolean hasCancelled() {
+                return false;
+            }
+        });
     }
 }
