@@ -164,20 +164,26 @@ public class TransportClient {
                 .downloadUrl(link.getHref(), headerList, new FileDownloadListener(saveTo, progressListener));
     }
 
-    public void uploadFile(final String serverPath, final boolean overwrite, final File localSource,
-                           final List<CustomHeader> headerList, final ProgressListener progressListener)
-            throws IOException, WebdavException {
+    public Link getUploadLink(final String serverPath, final boolean overwrite)
+            throws WebdavIOException, UnknownServerWebdavException {
         Link link = getRestAdapterBuilder().build()
                 .create(CloudApi.class)
                 .getUploadLink(serverPath, overwrite);
-        Log.d(TAG, "getUploadLink(): " + link);
+        Log.d(TAG, "getLink(): " + link);
 
         if (!"PUT".equalsIgnoreCase(link.getMethod())) {
             throw new UnknownServerWebdavException("Method in Link object is not PUT"); // TODO throw a proper exception
         }
 
+        return link;
+    }
+
+    public void uploadFile(final Link link, final boolean resumeUpload, final File localSource,
+                           final List<CustomHeader> headerList, final ProgressListener progressListener)
+            throws IOException, WebdavException {
 //        Hash hash = Hash.getHash(file);
         new HttpClientIO(client, commonHeaders)
                 .uploadFile(link.getHref(), localSource, progressListener);
     }
+
 }

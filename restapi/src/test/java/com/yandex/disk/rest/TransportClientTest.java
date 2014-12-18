@@ -2,6 +2,7 @@ package com.yandex.disk.rest;
 
 import com.yandex.disk.rest.exceptions.WebdavIOException;
 import com.yandex.disk.rest.json.DiskMeta;
+import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
 
@@ -143,22 +144,23 @@ public class TransportClientTest {
         assertTrue(local.delete());
     }
 
+    @Test
+    public void testHash() throws Exception {
+        File file = new File("testResources/test-upload-001.bin");
+        Hash hash = Hash.getHash(file);
+        assertTrue(hash.getSize() == file.length());
+        assertTrue("11968e619814b8f7f0367241d6ee1c2d".equalsIgnoreCase(hash.getMd5()));
+        assertTrue("18339f4b55f3771b5486595686d0d43ff63da17edd0b30edb7e95f69abce5fad".equalsIgnoreCase(hash.getSha256()));
+    }
+
     @Ignore
     @Test(expected = WebdavIOException.class)   // TODO change the exception
     public void testUploadFileOverwriteFailed() throws Exception {
         String path = "/yac-qr.png";
-        client.uploadFile(path, false, null, null, new ProgressListener() {
-            @Override
-            public void updateProgress(long loaded, long total) {
-            }
-
-            @Override
-            public boolean hasCancelled() {
-                return false;
-            }
-        });
+        client.getUploadLink(path, false);
     }
 
+    @Ignore
     @Test
     public void testUploadFile() throws Exception {
         String name = "test-upload-001.bin";
@@ -166,7 +168,8 @@ public class TransportClientTest {
         File local = new File("testResources/" + name);
         assertTrue(local.exists());
         assertTrue(local.length() == 1024);
-        client.uploadFile(serverPath, true, local, null, new ProgressListener() {
+        Link link = client.getUploadLink(serverPath, true);
+        client.uploadFile(link, true, local, null, new ProgressListener() {
             @Override
             public void updateProgress(long loaded, long total) {
                 System.out.println("updateProgress: " + loaded + " / " + total);
