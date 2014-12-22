@@ -1,6 +1,7 @@
-package com.yandex.disk.rest;
+package com.yandex.disk.rest.retrofit;
 
 import com.google.gson.Gson;
+import com.yandex.disk.rest.Log;
 import com.yandex.disk.rest.exceptions.UserUnauthorizedException;
 import com.yandex.disk.rest.exceptions.WebdavIOException;
 import com.yandex.disk.rest.json.ApiError;

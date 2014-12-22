@@ -10,15 +10,17 @@ import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
 import com.yandex.disk.rest.json.ResourceList;
 import com.yandex.disk.rest.retrofit.CloudApi;
+import com.yandex.disk.rest.retrofit.ErrorHandlerImpl;
+import com.yandex.disk.rest.retrofit.RequestInterceptorImpl;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 
 public class TransportClient {
@@ -56,7 +58,16 @@ public class TransportClient {
         List<CustomHeader> list = new ArrayList<>();
         list.add(new CustomHeader(USER_AGENT_HEADER, USER_AGENT));
         list.add(new CustomHeader(AUTHORIZATION_HEADER, "OAuth " + token));
-        return list;
+        return Collections.unmodifiableList(list);
+    }
+
+    private List<CustomHeader> getAllHeaders(final List<CustomHeader> headerList) {
+        if (headerList == null) {
+            return commonHeaders;
+        }
+        List<CustomHeader> list = new ArrayList<>(commonHeaders);
+        list.addAll(headerList);
+        return Collections.unmodifiableList(list);
     }
 
     public static TransportClient getInstance(final Credentials credentials)
@@ -68,22 +79,17 @@ public class TransportClient {
         return serverURL.toExternalForm();
     }
 
-    private RequestInterceptor requestInterceptor = new RequestInterceptor() {
-        @Override
-        public void intercept(RequestFacade request) {
-            for (CustomHeader header : commonHeaders) {
-                request.addHeader(header.getName(), header.getValue());
-            }
-        }
-    };
-
-    private RestAdapter.Builder getRestAdapterBuilder() {
+    private RestAdapter.Builder getRestAdapterBuilder(final List<CustomHeader> headerList) {
         return new RestAdapter.Builder()
                 .setClient(client)
                 .setEndpoint(getUrl())
-                .setRequestInterceptor(requestInterceptor)
+                .setRequestInterceptor(new RequestInterceptorImpl(commonHeaders, headerList))
                 .setErrorHandler(new ErrorHandlerImpl())
                 .setLogLevel(LOG_LEVEL);
+    }
+
+    private RestAdapter.Builder getRestAdapterBuilder() {
+        return getRestAdapterBuilder(null);
     }
 
     public Operation getOperation(final String operationId)
@@ -153,20 +159,21 @@ public class TransportClient {
         handler.onPageFinished(size);
     }
 
-    public void downloadFile(final String path, final List<CustomHeader> headerList, final File saveTo, final ProgressListener progressListener)
+    public void downloadFile(final String path, final File saveTo, final List<CustomHeader> headerList,
+                             final ProgressListener progressListener)
             throws IOException, WebdavException {
-        Link link = getRestAdapterBuilder().build()
+        Link link = getRestAdapterBuilder(headerList).build()
                 .create(CloudApi.class)
                 .getDownloadLink(path);
         Log.d(TAG, "getDownloadLink(): " + link);
 
-        new HttpClientIO(client, commonHeaders)
-                .downloadUrl(link.getHref(), headerList, new FileDownloadListener(saveTo, progressListener));
+        new HttpClientIO(client, getAllHeaders(headerList))
+                .downloadUrl(link.getHref(), new FileDownloadListener(saveTo, progressListener));
     }
 
-    public Link getUploadLink(final String serverPath, final boolean overwrite)
+    public Link getUploadLink(final String serverPath, final boolean overwrite, final List<CustomHeader> headerList)
             throws WebdavIOException, UnknownServerWebdavException {
-        Link link = getRestAdapterBuilder().build()
+        Link link = getRestAdapterBuilder(headerList).build()
                 .create(CloudApi.class)
                 .getUploadLink(serverPath, overwrite);
         Log.d(TAG, "getLink(): " + link);
@@ -181,9 +188,14 @@ public class TransportClient {
     public void uploadFile(final Link link, final boolean resumeUpload, final File localSource,
                            final List<CustomHeader> headerList, final ProgressListener progressListener)
             throws IOException, WebdavException {
-//        Hash hash = Hash.getHash(file);
-        new HttpClientIO(client, commonHeaders)
-                .uploadFile(link.getHref(), localSource, progressListener);
+        HttpClientIO clientIO = new HttpClientIO(client, getAllHeaders(headerList));
+        long startOffset = 0;
+        if (resumeUpload) {
+            Hash hash = Hash.getHash(localSource);
+            startOffset = clientIO.headUrl(link.getHref(), hash);
+            Log.d("head: startOffset="+startOffset);
+        }
+        clientIO.uploadFile(link.getHref(), localSource, startOffset, progressListener);
     }
 
 }

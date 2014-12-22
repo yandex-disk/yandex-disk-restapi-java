@@ -6,6 +6,10 @@ public class Log {
         ex.printStackTrace(System.err);
     }
 
+    public static void d(String s) {
+        System.err.println(s);
+    }
+
     public static void d(String tag, String s) {
         System.err.println(tag+" "+s);
     }

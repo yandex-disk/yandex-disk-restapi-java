@@ -18,6 +18,7 @@ public class HttpClient extends UrlConnectionClient {
 
     private static final int CONNECT_TIMEOUT_MILLIS = 30 * 1000;
     private static final int READ_TIMEOUT_MILLIS = 30 * 1000;
+    private static final int WRITE_TIMEOUT_MILLIS = 30 * 1000;
 
     private final OkUrlFactory urlFactory;
     private final OkHttpClient client;
@@ -27,9 +28,14 @@ public class HttpClient extends UrlConnectionClient {
 
         client.setConnectTimeout(CONNECT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         client.setReadTimeout(READ_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+        client.setWriteTimeout(WRITE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
 
-        client.setFollowSslRedirects(false);
-        client.setFollowRedirects(false);
+        Log.d("getConnectTimeout: " + client.getConnectTimeout());
+        Log.d("getReadTimeout: " + client.getReadTimeout());
+        Log.d("getWriteTimeout: " + client.getWriteTimeout());
+
+        client.setFollowSslRedirects(true);
+        client.setFollowRedirects(true);
 
         // TODO XXX pinning
 //        client.setSslSocketFactory(SSLCertificateSocketFactory.getDefault(CONNECT_TIMEOUT_MILLIS, null));

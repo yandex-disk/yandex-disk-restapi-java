@@ -29,7 +29,13 @@ import java.util.regex.Pattern;
 
 public class HttpClientIO {
 
-    private static final String TAG = "Download";
+    private static final String TAG = "HttpClientIO";
+
+    private static final String ETAG_HEADER = "Etag";
+    private static final String SHA256_HEADER = "Sha256";
+    private static final String SIZE_HEADER = "Size";
+    private static final String CONTENT_LENGTH_HEADER = "Content-Length";
+    private static final String CONTENT_RANGE_HEADER = "Content-Range";
 
     private OkHttpClient client;
     private List<CustomHeader> commonHeaders;
@@ -47,7 +53,7 @@ public class HttpClientIO {
         return request;
     }
 
-    public void downloadUrl(final String url, final List<CustomHeader> headerList, final DownloadListener downloadListener)
+    public void downloadUrl(final String url, final DownloadListener downloadListener)
             throws IOException, WebdavUserNotInitialized, PreconditionFailedException, WebdavNotAuthorizedException, ServerWebdavException,
             CancelledDownloadException, UnknownServerWebdavException, FileNotModifiedException, RemoteFileNotFoundException,
             DownloadNoSpaceAvailableException, RangeNotSatisfiableException, FileModifiedException {
@@ -70,8 +76,6 @@ public class HttpClientIO {
             Log.d(TAG, ifTag + ": " + etag);
             req.addHeader(ifTag, etag);
         }
-
-        addHeaders(req, headerList);
 
         Request request = req.build();
         Response response = client
@@ -194,14 +198,6 @@ public class HttpClientIO {
         }
     }
 
-    protected void addHeaders(Request.Builder req, List<CustomHeader> headerList) {
-        if (headerList != null) {
-            for (CustomHeader header : headerList) {
-                req.addHeader(header.getName(), header.getValue());
-            }
-        }
-    }
-
     private static Pattern CONTENT_RANGE_HEADER_PATTERN = Pattern.compile("bytes\\D+(\\d+)-\\d+/(\\d+)");
 
     private ContentRangeResponse parseContentRangeHeader(String header) {
@@ -224,35 +220,89 @@ public class HttpClientIO {
         }
     }
 
-    public void uploadFile(final String url, final File file, final ProgressListener progressListener)
+    public void uploadFile(final String url, final File file, final long startOffset, final ProgressListener progressListener)
             throws IntermediateFolderNotExistException, IOException, WebdavUserNotInitialized, PreconditionFailedException,
             WebdavNotAuthorizedException, ServerWebdavException, UnknownServerWebdavException {
         Log.d(TAG, "uploadFile: put to url: "+url);
 
         MediaType mediaType = MediaType.parse("application/octet-stream");  // TODO
-        RequestBody requestBody = RequestBody.create(mediaType, file);      // TODO use progressListener
+        RequestBody requestBody = RequestBodyProgress.create(mediaType, file, startOffset, progressListener);
+        Request.Builder requestBuilder = buildRequest()
+                .removeHeader(TransportClient.AUTHORIZATION_HEADER)
+                .url(url)
+                .put(requestBody);
+        if (startOffset > 0) {
+            StringBuilder contentRange = new StringBuilder();
+            contentRange.append("bytes ").append(startOffset).append("-").append(file.length() - 1).append("/").append(file.length());
+            Log.d(TAG, CONTENT_RANGE_HEADER + ": " + contentRange);
+            requestBuilder.addHeader(CONTENT_RANGE_HEADER, contentRange.toString());
+        }
+        Request request = requestBuilder.build();
+
+        Response response = client
+                .newCall(request)
+                .execute();
+        Log.d(TAG, "uploadFile: response: "+response);
+
+        String statusLine = response.message();
+        Log.d(TAG, "headUrl: " + statusLine + " for url " + url);
+
+        int code = response.code();
+
+        ResponseBody responseBody = response.body();
+//        Log.d(TAG, "upload: " + responseBody.string());
+        responseBody.close();
+
+        switch (code) {
+            case 201:
+                Log.d(TAG, "uploadFile: file uploaded successfully: "+file);
+                break;
+
+            // TODO more codes?
+
+            default:
+                throw new ServerWebdavException("error while uploading: code=" + code + " file " + url);
+        }
+    }
+
+    public long headUrl(String url, Hash hash)
+            throws IOException, NumberFormatException, WebdavUserNotInitialized, UnknownServerWebdavException, PreconditionFailedException,
+            WebdavNotAuthorizedException, ServerWebdavException {
+
         Request request = buildRequest()
                 .removeHeader(TransportClient.AUTHORIZATION_HEADER)
                 .url(url)
-                .put(requestBody)
+                .head()
+                .addHeader(ETAG_HEADER, hash.getMd5())
+                .addHeader(SHA256_HEADER, hash.getSha256())
+                .addHeader(SIZE_HEADER, String.valueOf(hash.getSize()))
                 .build();
 
         Response response = client
                 .newCall(request)
                 .execute();
-        Log.d(TAG, "response: "+response);
+        Log.d(TAG, "headUrl: response: "+response);
+
+        String statusLine = response.message();
+        Log.d(TAG, "headUrl: " + statusLine + " for url " + url);
 
         int code = response.code();
-        switch (code) {
-            case 201:
-                // OK
-                Log.d(TAG, "File uploaded successfully: "+file);
-                break;
-            default:
-                throw new ServerWebdavException("error while downloading: code=" + code + " file " + url);
-        }
 
         ResponseBody responseBody = response.body();
-        Log.d(TAG, "upload: " + responseBody.string());
+        responseBody.close();
+
+        switch (code) {
+            case 200:
+                return Long.valueOf(response.header(CONTENT_LENGTH_HEADER, "0"));
+            case 404:
+            case 409:
+            case 412:
+                return 0;
+
+            // TODO more codes?
+
+            default:
+                throw new ServerWebdavException("Error while downloading: code=" + code + " url " + url);
+        }
     }
 }

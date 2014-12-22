@@ -1,5 +1,6 @@
 package com.yandex.disk.rest;
 
+import com.yandex.disk.rest.exceptions.CancelledUploadingException;
 import com.yandex.disk.rest.exceptions.WebdavIOException;
 import com.yandex.disk.rest.json.DiskMeta;
 import com.yandex.disk.rest.json.Link;
@@ -14,6 +15,7 @@ import org.junit.runners.JUnit4;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +40,7 @@ public class TransportClientTest {
 
     @Before
     public void setUp() throws Exception {
-        System.out.println("pwd: " + new File(".").getAbsolutePath());
+        Log.d("pwd: " + new File(".").getAbsolutePath());
 
         FileInputStream propertiesFile = new FileInputStream("local.properties");
         Properties properties = new Properties();
@@ -53,13 +55,22 @@ public class TransportClientTest {
         Credentials credentials = new Credentials(user, token);
 
         client = TransportClient.getInstance(credentials);
+
+        generateResources();
+    }
+
+    private void generateResources() throws Exception {
+        // TODO move to proper directory
+        Runtime.getRuntime().exec("/usr/bin/env dd if=/dev/urandom of=testResources/test-upload-002.bin bs=1m count=1")
+                .waitFor();
+        Log.d("generateResources: done");
     }
 
     @Ignore
     @Test
     public void testOperation() throws Exception {
         Operation operation = client.getOperation("5");
-        System.out.println("operation: "+operation);
+        Log.d("operation: "+operation);
         assertThat(operation.getStatus(), not(isEmptyOrNullString()));
     }
 
@@ -67,7 +78,7 @@ public class TransportClientTest {
     @Test
     public void testDiskMeta() throws Exception {
         DiskMeta meta = client.getDiskMeta();
-        System.out.println("meta: " + meta);
+        Log.d("meta: " + meta);
         assertThat(meta.getTotalSpace(), greaterThan(0L));
         assertThat(meta.getTrashSize(), greaterThanOrEqualTo(0L));
         assertThat(meta.getUsedSpace(), greaterThanOrEqualTo(0L));
@@ -84,7 +95,7 @@ public class TransportClientTest {
             @Override
             public boolean handleItem(Resource item) {
                 items.add(item);
-                System.out.println("item: " + item);
+                Log.d("item: " + item);
                 return true;
             }
 
@@ -115,10 +126,10 @@ public class TransportClientTest {
         });
 
 //        ListItem item = items.get(0);
-//        System.out.println("item to delete: " + item);
+//        Log.d("item to delete: " + item);
 //
 //        Link link = client.dropTrash(item.getFullPath(), null);
-//        System.out.println("dropTrash result: " + link);
+//        Log.d("dropTrash result: " + link);
 
     }
 
@@ -128,10 +139,10 @@ public class TransportClientTest {
         String path = "/yac-qr.png";
         File local = new File("/tmp/"+path);
         assertFalse(local.exists());
-        client.downloadFile(path, null, local, new ProgressListener() {
+        client.downloadFile(path, local, null, new ProgressListener() {
             @Override
             public void updateProgress(long loaded, long total) {
-                System.out.println("updateProgress: " + loaded + " / " + total);
+                Log.d("updateProgress: " + loaded + " / " + total);
             }
 
             @Override
@@ -139,11 +150,12 @@ public class TransportClientTest {
                 return false;
             }
         });
-        System.out.println("length: " + local.length());
+        Log.d("length: " + local.length());
         assertTrue(local.length() == 709L);
         assertTrue(local.delete());
     }
 
+    @Ignore
     @Test
     public void testHash() throws Exception {
         File file = new File("testResources/test-upload-001.bin");
@@ -157,28 +169,57 @@ public class TransportClientTest {
     @Test(expected = WebdavIOException.class)   // TODO change the exception
     public void testUploadFileOverwriteFailed() throws Exception {
         String path = "/yac-qr.png";
-        client.getUploadLink(path, false);
+        client.getUploadLink(path, false, null);
     }
 
-    @Ignore
+//    @Ignore
     @Test
-    public void testUploadFile() throws Exception {
-        String name = "test-upload-001.bin";
+    public void testUploadFileResume() throws Exception {
+        String name = "test-upload-002.bin";
         String serverPath = "/0-test/" + name;
+//        String serverPath = "/0-test/" + UUID.randomUUID().toString();
         File local = new File("testResources/" + name);
         assertTrue(local.exists());
-        assertTrue(local.length() == 1024);
-        Link link = client.getUploadLink(serverPath, true);
-        client.uploadFile(link, true, local, null, new ProgressListener() {
-            @Override
-            public void updateProgress(long loaded, long total) {
-                System.out.println("updateProgress: " + loaded + " / " + total);
-            }
+        assertTrue(local.length() == 1048576);
 
-            @Override
-            public boolean hasCancelled() {
-                return false;
+        Link link = client.getUploadLink(serverPath, true, null);
+
+//        final int lastPass = 2;
+        final int lastPass = 1;
+        for (int i = 0; i <= lastPass; i++) {
+            final int pass = i;
+            try {
+//                Link link = client.getUploadLink(serverPath, true);
+//                client.uploadFile(link, true, local, null, null);
+                client.uploadFile(link, true, local, null, new ProgressListener() {
+                    boolean doCancel = false;
+
+                    @Override
+                    public void updateProgress(long loaded, long total) {
+                        Log.d("updateProgress: pass=" + pass + ": " + loaded + " / " + total);
+                        if (pass == 0 && loaded >= 10240) {
+                            doCancel = true;
+                        }
+//                        if (pass == 1 && loaded >= 102400) {
+//                            doCancel = true;
+//                        }
+                    }
+
+                    @Override
+                    public boolean hasCancelled() {
+                        if (doCancel) {
+                            Log.d("###### cancelled");
+                        }
+                        return doCancel;
+                    }
+                });
+            } catch (CancelledUploadingException ex) {
+                Log.d("CancelledUploadingException");
+            } catch (IOException ex) {
+                if (pass >= lastPass) {
+                    throw ex;
+                }
             }
-        });
+        }
     }
 }
