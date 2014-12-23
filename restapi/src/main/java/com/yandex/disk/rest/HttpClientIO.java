@@ -242,7 +242,9 @@ public class HttpClientIO {
         Response response = client
                 .newCall(request)
                 .execute();
-        Log.d(TAG, "uploadFile: response: "+response);
+        Log.d(TAG, "uploadFile: networkResponse: "+response.networkResponse());
+        Log.d(TAG, "uploadFile: priorResponse: "+response.priorResponse());
+        Log.d(TAG, "uploadFile: headers: \n>>>\n"+response.headers()+"<<<");
 
         String statusLine = response.message();
         Log.d(TAG, "headUrl: " + statusLine + " for url " + url);
@@ -281,7 +283,9 @@ public class HttpClientIO {
         Response response = client
                 .newCall(request)
                 .execute();
-        Log.d(TAG, "headUrl: response: "+response);
+        Log.d(TAG, "headUrl: networkResponse: "+response.networkResponse());
+        Log.d(TAG, "headUrl: priorResponse: "+response.priorResponse());
+        Log.d(TAG, "headUrl: headers: \n>>>\n"+response.headers()+"<<<");
 
         String statusLine = response.message();
         Log.d(TAG, "headUrl: " + statusLine + " for url " + url);

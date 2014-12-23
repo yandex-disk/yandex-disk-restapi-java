@@ -53,7 +53,7 @@ public abstract class RequestBodyProgress {
 
             @Override
             public long contentLength() {
-                return file.length();
+                return file.length() - startOffset;
             }
 
             @Override
@@ -73,6 +73,7 @@ public abstract class RequestBodyProgress {
                     Buffer buffer = new Buffer();
                     for (long readCount; (readCount = source.read(buffer, SIZE)) != -1; ) {
                         sink.write(buffer, readCount);
+//                        sink.emitCompleteSegments(); TODO XXX
                         loaded += readCount;
                         updateProgress(loaded);
                     }

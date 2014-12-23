@@ -184,13 +184,10 @@ public class TransportClientTest {
 
         Link link = client.getUploadLink(serverPath, true, null);
 
-//        final int lastPass = 2;
-        final int lastPass = 1;
+        final int lastPass = 2;
         for (int i = 0; i <= lastPass; i++) {
             final int pass = i;
             try {
-//                Link link = client.getUploadLink(serverPath, true);
-//                client.uploadFile(link, true, local, null, null);
                 client.uploadFile(link, true, local, null, new ProgressListener() {
                     boolean doCancel = false;
 
@@ -200,15 +197,15 @@ public class TransportClientTest {
                         if (pass == 0 && loaded >= 10240) {
                             doCancel = true;
                         }
-//                        if (pass == 1 && loaded >= 102400) {
-//                            doCancel = true;
-//                        }
+                        if (pass == 1 && loaded >= 102400) {
+                            doCancel = true;
+                        }
                     }
 
                     @Override
                     public boolean hasCancelled() {
                         if (doCancel) {
-                            Log.d("###### cancelled");
+                            Log.d("cancelled");
                         }
                         return doCancel;
                     }
