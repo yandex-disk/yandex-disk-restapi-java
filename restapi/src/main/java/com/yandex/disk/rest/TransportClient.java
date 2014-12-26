@@ -4,6 +4,7 @@ import com.yandex.disk.rest.exceptions.UnknownServerWebdavException;
 import com.yandex.disk.rest.exceptions.WebdavClientInitException;
 import com.yandex.disk.rest.exceptions.WebdavException;
 import com.yandex.disk.rest.exceptions.WebdavIOException;
+import com.yandex.disk.rest.json.ApiVersion;
 import com.yandex.disk.rest.json.DiskMeta;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
@@ -90,6 +91,13 @@ public class TransportClient {
 
     private RestAdapter.Builder getRestAdapterBuilder() {
         return getRestAdapterBuilder(null);
+    }
+
+    public ApiVersion getApiVersion()
+            throws IOException, WebdavIOException {
+        return getRestAdapterBuilder().build()
+                .create(CloudApi.class)
+                .getApiVersion();
     }
 
     public Operation getOperation(final String operationId)

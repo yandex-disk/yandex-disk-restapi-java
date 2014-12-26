@@ -2,6 +2,7 @@ package com.yandex.disk.rest;
 
 import com.yandex.disk.rest.exceptions.CancelledUploadingException;
 import com.yandex.disk.rest.exceptions.WebdavIOException;
+import com.yandex.disk.rest.json.ApiVersion;
 import com.yandex.disk.rest.json.DiskMeta;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
@@ -68,7 +69,18 @@ public class TransportClientTest {
 
     @Ignore
     @Test
+    public void testApiVersion() throws Exception {
+        ApiVersion apiVersion = client.getApiVersion();
+        Log.d("apiVersion: " + apiVersion);
+        assertThat(apiVersion.getBuild(), not(isEmptyOrNullString()));
+        assertTrue("2.3.87".equalsIgnoreCase(apiVersion.getBuild()));
+        assertTrue("v1".equalsIgnoreCase(apiVersion.getApiVersion()));
+    }
+
+    @Ignore
+    @Test
     public void testOperation() throws Exception {
+        // TODO complete test: make directory, make file inside directory, remove directory, check operation
         Operation operation = client.getOperation("5");
         Log.d("operation: "+operation);
         assertThat(operation.getStatus(), not(isEmptyOrNullString()));
@@ -172,7 +184,7 @@ public class TransportClientTest {
         client.getUploadLink(path, false, null);
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testUploadFileResume() throws Exception {
         String name = "test-upload-002.bin";

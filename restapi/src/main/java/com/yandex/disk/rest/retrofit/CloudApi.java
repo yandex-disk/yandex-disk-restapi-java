@@ -5,6 +5,7 @@ import com.yandex.disk.rest.exceptions.RangeNotSatisfiableException;
 import com.yandex.disk.rest.exceptions.RemoteFileNotFoundException;
 import com.yandex.disk.rest.exceptions.ServerWebdavException;
 import com.yandex.disk.rest.exceptions.WebdavIOException;
+import com.yandex.disk.rest.json.ApiVersion;
 import com.yandex.disk.rest.json.DiskMeta;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
@@ -22,6 +23,10 @@ import retrofit.http.QueryMap;
 import retrofit.http.Streaming;
 
 public interface CloudApi {
+
+    @GET("/")
+    ApiVersion getApiVersion()
+            throws WebdavIOException;
 
     @GET("/v1/disk/operations/{operation_id}")
     Operation getOperation(@Path("operation_id") String operationId)

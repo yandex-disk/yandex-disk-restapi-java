@@ -33,7 +33,7 @@ public abstract class DownloadListener implements ProgressListener {
      * Content length after server response. 0 if not known
      * @throws DownloadNoSpaceAvailableException if no local space for content
      */
-    public void setContentLength(long lenght)
+    public void setContentLength(long length)
         throws DownloadNoSpaceAvailableException {
     }
 
