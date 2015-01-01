@@ -68,7 +68,7 @@ public class TransportClientTest {
         Log.d("generateResources: done");
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testApiVersion() throws Exception {
         ApiVersion apiVersion = client.getApiVersion();
@@ -87,7 +87,7 @@ public class TransportClientTest {
         assertThat(operation.getStatus(), not(isEmptyOrNullString()));
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testDiskMeta() throws Exception {
         DiskMeta meta = client.getDiskMeta();
@@ -100,7 +100,7 @@ public class TransportClientTest {
         assertThat(meta.getSystemFolders(), hasKey("downloads"));
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testListResources() throws Exception {
         final List<Resource> items = new ArrayList<>();
@@ -146,7 +146,7 @@ public class TransportClientTest {
 
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testDownloadFile() throws Exception {
         String path = "/yac-qr.png";
@@ -178,14 +178,14 @@ public class TransportClientTest {
         assertTrue("18339f4b55f3771b5486595686d0d43ff63da17edd0b30edb7e95f69abce5fad".equalsIgnoreCase(hash.getSha256()));
     }
 
-    @Ignore
+//    @Ignore
     @Test(expected = WebdavIOException.class)   // TODO change the exception
     public void testUploadFileOverwriteFailed() throws Exception {
         String path = "/yac-qr.png";
         client.getUploadLink(path, false, null);
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void testUploadFileResume() throws Exception {
         String name = "test-upload-002.bin";
