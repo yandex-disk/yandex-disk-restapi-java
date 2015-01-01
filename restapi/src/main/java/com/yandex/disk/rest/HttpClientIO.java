@@ -18,6 +18,8 @@ import com.yandex.disk.rest.exceptions.ServerWebdavException;
 import com.yandex.disk.rest.exceptions.UnknownServerWebdavException;
 import com.yandex.disk.rest.exceptions.WebdavNotAuthorizedException;
 import com.yandex.disk.rest.exceptions.WebdavUserNotInitialized;
+import com.yandex.disk.rest.okhttp.LoggingInterceptor;
+import com.yandex.disk.rest.util.Hash;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +44,7 @@ public class HttpClientIO {
 
     public HttpClientIO(HttpClient client, List<CustomHeader> commonHeaders) {
         this.client = client.getClient();
+        this.client.networkInterceptors().add(new LoggingInterceptor());
         this.commonHeaders = commonHeaders;
     }
 
@@ -242,9 +245,9 @@ public class HttpClientIO {
         Response response = client
                 .newCall(request)
                 .execute();
-        Log.d(TAG, "uploadFile: networkResponse: "+response.networkResponse());
-        Log.d(TAG, "uploadFile: priorResponse: "+response.priorResponse());
-        Log.d(TAG, "uploadFile: headers: \n>>>\n"+response.headers()+"<<<");
+//        Log.d(TAG, "uploadFile: networkResponse: "+response.networkResponse());
+//        Log.d(TAG, "uploadFile: priorResponse: "+response.priorResponse());
+//        Log.d(TAG, "uploadFile: headers: \n>>>\n"+response.headers()+"<<<");
 
         String statusLine = response.message();
         Log.d(TAG, "headUrl: " + statusLine + " for url " + url);
@@ -283,9 +286,9 @@ public class HttpClientIO {
         Response response = client
                 .newCall(request)
                 .execute();
-        Log.d(TAG, "headUrl: networkResponse: "+response.networkResponse());
-        Log.d(TAG, "headUrl: priorResponse: "+response.priorResponse());
-        Log.d(TAG, "headUrl: headers: \n>>>\n"+response.headers()+"<<<");
+//        Log.d(TAG, "headUrl: networkResponse: "+response.networkResponse());
+//        Log.d(TAG, "headUrl: priorResponse: "+response.priorResponse());
+//        Log.d(TAG, "headUrl: headers: \n>>>\n"+response.headers()+"<<<");
 
         String statusLine = response.message();
         Log.d(TAG, "headUrl: " + statusLine + " for url " + url);

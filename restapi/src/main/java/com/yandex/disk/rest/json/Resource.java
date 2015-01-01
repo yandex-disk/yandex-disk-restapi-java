@@ -1,8 +1,8 @@
 package com.yandex.disk.rest.json;
 
 import com.google.gson.annotations.SerializedName;
-import com.yandex.disk.rest.conv.ISO8601;
-import com.yandex.disk.rest.conv.ResourcePath;
+import com.yandex.disk.rest.util.ISO8601;
+import com.yandex.disk.rest.util.ResourcePath;
 
 import java.util.Date;
 

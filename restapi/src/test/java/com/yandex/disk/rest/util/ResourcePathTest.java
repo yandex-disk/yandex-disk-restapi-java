@@ -1,4 +1,4 @@
-package com.yandex.disk.rest.conv;
+package com.yandex.disk.rest.util;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

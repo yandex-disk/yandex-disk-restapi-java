@@ -1,5 +1,5 @@
 
-package com.yandex.disk.rest;
+package com.yandex.disk.rest.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

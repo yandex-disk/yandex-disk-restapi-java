@@ -13,6 +13,7 @@ import com.yandex.disk.rest.json.ResourceList;
 import com.yandex.disk.rest.retrofit.CloudApi;
 import com.yandex.disk.rest.retrofit.ErrorHandlerImpl;
 import com.yandex.disk.rest.retrofit.RequestInterceptorImpl;
+import com.yandex.disk.rest.util.Hash;
 
 import java.io.File;
 import java.io.IOException;

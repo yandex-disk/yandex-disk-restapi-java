@@ -38,6 +38,7 @@ public class HttpClient extends UrlConnectionClient {
         client.setFollowRedirects(true);
 
         // TODO XXX pinning
+        // https://github.com/square/okhttp/blob/master/samples/guide/src/main/java/com/squareup/okhttp/recipes/CertificatePinning.java
 //        client.setSslSocketFactory(SSLCertificateSocketFactory.getDefault(CONNECT_TIMEOUT_MILLIS, null));
 
         return client;

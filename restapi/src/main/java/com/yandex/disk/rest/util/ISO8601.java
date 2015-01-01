@@ -1,4 +1,4 @@
-package com.yandex.disk.rest.conv;
+package com.yandex.disk.rest.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

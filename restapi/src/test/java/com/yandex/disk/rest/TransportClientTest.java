@@ -7,6 +7,7 @@ import com.yandex.disk.rest.json.DiskMeta;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
+import com.yandex.disk.rest.util.Hash;
 
 import org.junit.Before;
 import org.junit.Ignore;
