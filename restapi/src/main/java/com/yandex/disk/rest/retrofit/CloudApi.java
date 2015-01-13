@@ -1,39 +1,43 @@
 package com.yandex.disk.rest.retrofit;
 
-import com.yandex.disk.rest.exceptions.FileNotModifiedException;
-import com.yandex.disk.rest.exceptions.RangeNotSatisfiableException;
-import com.yandex.disk.rest.exceptions.RemoteFileNotFoundException;
-import com.yandex.disk.rest.exceptions.ServerWebdavException;
 import com.yandex.disk.rest.exceptions.WebdavIOException;
 import com.yandex.disk.rest.json.ApiVersion;
-import com.yandex.disk.rest.json.DiskMeta;
+import com.yandex.disk.rest.json.Capacity;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
 
-import java.util.Map;
-
-import retrofit.client.Response;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
 import retrofit.http.PUT;
 import retrofit.http.Path;
 import retrofit.http.Query;
-import retrofit.http.QueryMap;
-import retrofit.http.Streaming;
 
 public interface CloudApi {
 
+    /**
+     * Server API version and build
+     */
     @GET("/")
     ApiVersion getApiVersion()
             throws WebdavIOException;
 
+    /**
+     * Operation status
+     * @see <p><a href="http://api.yandex.com/disk/api/reference/operations.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/operations-docpage/">russian</a></p>
+     */
     @GET("/v1/disk/operations/{operation_id}")
     Operation getOperation(@Path("operation_id") String operationId)
             throws WebdavIOException;
 
+    /**
+     * Data about a user's Disk
+     * @see <p><a href="http://api.yandex.com/disk/api/reference/capacity.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/capacity-docpage/">russian</a></p>
+     */
     @GET("/v1/disk")
-    DiskMeta getDiskMeta(@Query("fields") String fields)
+    Capacity getCapacity(@Query("fields") String fields)
             throws WebdavIOException;
 
     @GET("/v1/disk/resources")

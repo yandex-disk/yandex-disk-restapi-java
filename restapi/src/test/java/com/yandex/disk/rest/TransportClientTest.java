@@ -3,7 +3,7 @@ package com.yandex.disk.rest;
 import com.yandex.disk.rest.exceptions.CancelledUploadingException;
 import com.yandex.disk.rest.exceptions.WebdavIOException;
 import com.yandex.disk.rest.json.ApiVersion;
-import com.yandex.disk.rest.json.DiskMeta;
+import com.yandex.disk.rest.json.Capacity;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
@@ -68,13 +68,13 @@ public class TransportClientTest {
         Log.d("generateResources: done");
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testApiVersion() throws Exception {
         ApiVersion apiVersion = client.getApiVersion();
         Log.d("apiVersion: " + apiVersion);
         assertThat(apiVersion.getBuild(), not(isEmptyOrNullString()));
-        assertTrue("2.3.87".equalsIgnoreCase(apiVersion.getBuild()));
+        assertTrue("2.4.65".equalsIgnoreCase(apiVersion.getBuild()));
         assertTrue("v1".equalsIgnoreCase(apiVersion.getApiVersion()));
     }
 
@@ -87,20 +87,20 @@ public class TransportClientTest {
         assertThat(operation.getStatus(), not(isEmptyOrNullString()));
     }
 
-//    @Ignore
+    @Ignore
     @Test
-    public void testDiskMeta() throws Exception {
-        DiskMeta meta = client.getDiskMeta();
-        Log.d("meta: " + meta);
-        assertThat(meta.getTotalSpace(), greaterThan(0L));
-        assertThat(meta.getTrashSize(), greaterThanOrEqualTo(0L));
-        assertThat(meta.getUsedSpace(), greaterThanOrEqualTo(0L));
-        assertThat(meta.getSystemFolders(), isA(Map.class));
-        assertThat(meta.getSystemFolders(), hasKey("applications"));
-        assertThat(meta.getSystemFolders(), hasKey("downloads"));
+    public void testCapacity() throws Exception {
+        Capacity capacity = client.getCapacity();
+        Log.d("capacity: " + capacity);
+        assertThat(capacity.getTotalSpace(), greaterThan(0L));
+        assertThat(capacity.getTrashSize(), greaterThanOrEqualTo(0L));
+        assertThat(capacity.getUsedSpace(), greaterThanOrEqualTo(0L));
+        assertThat(capacity.getSystemFolders(), isA(Map.class));
+        assertThat(capacity.getSystemFolders(), hasKey("applications"));
+        assertThat(capacity.getSystemFolders(), hasKey("downloads"));
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testListResources() throws Exception {
         final List<Resource> items = new ArrayList<>();
@@ -146,7 +146,7 @@ public class TransportClientTest {
 
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testDownloadFile() throws Exception {
         String path = "/yac-qr.png";
@@ -178,14 +178,14 @@ public class TransportClientTest {
         assertTrue("18339f4b55f3771b5486595686d0d43ff63da17edd0b30edb7e95f69abce5fad".equalsIgnoreCase(hash.getSha256()));
     }
 
-//    @Ignore
+    @Ignore
     @Test(expected = WebdavIOException.class)   // TODO change the exception
     public void testUploadFileOverwriteFailed() throws Exception {
         String path = "/yac-qr.png";
         client.getUploadLink(path, false, null);
     }
 
-//    @Ignore
+    @Ignore
     @Test
     public void testUploadFileResume() throws Exception {
         String name = "test-upload-002.bin";

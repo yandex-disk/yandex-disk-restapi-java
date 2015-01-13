@@ -5,7 +5,7 @@ import com.yandex.disk.rest.exceptions.WebdavClientInitException;
 import com.yandex.disk.rest.exceptions.WebdavException;
 import com.yandex.disk.rest.exceptions.WebdavIOException;
 import com.yandex.disk.rest.json.ApiVersion;
-import com.yandex.disk.rest.json.DiskMeta;
+import com.yandex.disk.rest.json.Capacity;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
@@ -108,16 +108,16 @@ public class TransportClient {
                 .getOperation(operationId);
     }
 
-    public DiskMeta getDiskMeta()
+    public Capacity getCapacity()
             throws IOException, WebdavIOException {
-        return getDiskMeta(null);
+        return getCapacity(null);
     }
 
-    public DiskMeta getDiskMeta(final String fields)
+    public Capacity getCapacity(final String fields)
             throws IOException, WebdavIOException {
         return getRestAdapterBuilder().build()
                 .create(CloudApi.class)
-                .getDiskMeta(fields);
+                .getCapacity(fields);
     }
 
     public void listResources(final String path, final ListParsingHandler handler)

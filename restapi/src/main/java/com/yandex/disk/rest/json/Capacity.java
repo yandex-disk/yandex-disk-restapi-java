@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Map;
 
-public class DiskMeta {
+public class Capacity {
 
     @SerializedName("trash_size")
     long trashSize;
@@ -36,7 +36,7 @@ public class DiskMeta {
 
     @Override
     public String toString() {
-        return "DiskMeta{" +
+        return "Capacity{" +
                 "trashSize=" + trashSize +
                 ", totalSpace=" + totalSpace +
                 ", usedSpace=" + usedSpace +
