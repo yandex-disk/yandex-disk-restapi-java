@@ -9,6 +9,7 @@ import com.yandex.disk.rest.json.Resource;
 
 import retrofit.http.DELETE;
 import retrofit.http.GET;
+import retrofit.http.POST;
 import retrofit.http.PUT;
 import retrofit.http.Path;
 import retrofit.http.Query;
@@ -72,9 +73,17 @@ public interface CloudApi {
     Link getDownloadLink(@Query("path") String path)
             throws WebdavIOException;
 
-
-    // TODO https://tech.yandex.ru/disk/api/reference/upload-ext-docpage/
-
+    /**
+     * Uploading a file to Disk from external resource
+     *
+     * <br/><br/><tt>TODO link to API reference in english is broken</tt>
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/upload-ext.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/upload-ext-docpage/">russian</a></p>
+     */
+    @POST("/v1/disk/resources/upload")
+    Link saveFromUrl(@Query("url") String url, @Query("path") String path)
+            throws WebdavIOException;
 
     /**
      * Uploading a file to Disk
@@ -92,6 +101,16 @@ public interface CloudApi {
     // TODO https://tech.yandex.ru/disk/api/reference/move-docpage/
 
     // TODO https://tech.yandex.ru/disk/api/reference/delete-docpage/
+
+    /**
+     * Deleting a file or folder
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/delete.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/delete-docpage/">russian</a></p>
+     */
+    @DELETE("/v1/disk/resources")
+    Link delete(@Query("path") String path, @Query("permanently") boolean permanently)
+            throws WebdavIOException;
 
     // TODO https://tech.yandex.ru/disk/api/reference/create-folder-docpage/
 

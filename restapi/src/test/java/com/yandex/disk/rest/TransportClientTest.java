@@ -83,7 +83,7 @@ public class TransportClientTest {
     public void testOperation() throws Exception {
         // TODO complete test: make directory, make file inside directory, remove directory, check operation
         Operation operation = client.getOperation("5");
-        Log.d("operation: "+operation);
+        Log.d("operation: " + operation);
         assertThat(operation.getStatus(), not(isEmptyOrNullString()));
     }
 
@@ -176,6 +176,23 @@ public class TransportClientTest {
         assertTrue(hash.getSize() == file.length());
         assertTrue("11968e619814b8f7f0367241d6ee1c2d".equalsIgnoreCase(hash.getMd5()));
         assertTrue("18339f4b55f3771b5486595686d0d43ff63da17edd0b30edb7e95f69abce5fad".equalsIgnoreCase(hash.getSha256()));
+    }
+
+    @Test
+    public void testSaveFromUrl() throws Exception {
+        String url = "http://yastatic.net/morda-logo/i/apple-touch-icon/ru-76x76.png";
+        String path = "/0-test/save-from-url-test.png";
+
+        try {
+            Link deleteLink = client.delete(path, false);
+        } catch (WebdavIOException ex) {
+            ex.printStackTrace();
+        }
+
+        Link saveLink = client.saveFromUrl(url, path, null);
+        Operation operation = client.getOperation(saveLink.getOperationId());
+        Log.d("operation: "+operation);
+        assertThat(operation.getStatus(), not(isEmptyOrNullString()));
     }
 
     @Ignore

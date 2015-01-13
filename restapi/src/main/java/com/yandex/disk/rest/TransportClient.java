@@ -181,12 +181,21 @@ public class TransportClient {
                 .downloadUrl(link.getHref(), new FileDownloadListener(saveTo, progressListener));
     }
 
+    public Link saveFromUrl(final String url, final String serverPath, final List<CustomHeader> headerList)
+            throws WebdavIOException, UnknownServerWebdavException {
+        Link link = getRestAdapterBuilder(headerList).build()
+                .create(CloudApi.class)
+                .saveFromUrl(url, serverPath);
+        Log.d(TAG, "saveFromUrl(): " + link);
+        return link;
+    }
+
     public Link getUploadLink(final String serverPath, final boolean overwrite, final List<CustomHeader> headerList)
             throws WebdavIOException, UnknownServerWebdavException {
         Link link = getRestAdapterBuilder(headerList).build()
                 .create(CloudApi.class)
                 .getUploadLink(serverPath, overwrite);
-        Log.d(TAG, "getLink(): " + link);
+        Log.d(TAG, "getUploadLink(): " + link);
 
         if (!"PUT".equalsIgnoreCase(link.getMethod())) {
             throw new UnknownServerWebdavException("Method in Link object is not PUT"); // TODO throw a proper exception
@@ -208,4 +217,13 @@ public class TransportClient {
         clientIO.uploadFile(link.getHref(), localSource, startOffset, progressListener);
     }
 
+    // TODO catch 202 vs 204 http code from server
+    public Link delete(final String path, final boolean permanently)
+            throws WebdavIOException, UnknownServerWebdavException {
+        Link link = getRestAdapterBuilder().build()
+                .create(CloudApi.class)
+                .delete(path, permanently);
+        Log.d(TAG, "delete(): " + link);
+        return link;
+    }
 }
