@@ -3,7 +3,7 @@ package com.yandex.disk.rest;
 import com.yandex.disk.rest.exceptions.CancelledUploadingException;
 import com.yandex.disk.rest.exceptions.WebdavIOException;
 import com.yandex.disk.rest.json.ApiVersion;
-import com.yandex.disk.rest.json.Capacity;
+import com.yandex.disk.rest.json.DiskCapacity;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
@@ -90,7 +90,7 @@ public class TransportClientTest {
     @Ignore
     @Test
     public void testCapacity() throws Exception {
-        Capacity capacity = client.getCapacity();
+        DiskCapacity capacity = client.getCapacity();
         Log.d("capacity: " + capacity);
         assertThat(capacity.getTotalSpace(), greaterThan(0L));
         assertThat(capacity.getTrashSize(), greaterThanOrEqualTo(0L));

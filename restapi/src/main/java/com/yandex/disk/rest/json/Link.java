@@ -3,7 +3,8 @@ package com.yandex.disk.rest.json;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * @see <a href="http://api.yandex.ru/disk/api/reference/response-objects.xml">API reference</a>
+ * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/response-objects.xml#link">english</a>,
+ * <a href="https://tech.yandex.ru/disk/api/reference/response-objects-docpage/#link">russian</a></p>
  */
 public class Link {
 

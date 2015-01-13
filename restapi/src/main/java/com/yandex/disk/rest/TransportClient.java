@@ -5,7 +5,7 @@ import com.yandex.disk.rest.exceptions.WebdavClientInitException;
 import com.yandex.disk.rest.exceptions.WebdavException;
 import com.yandex.disk.rest.exceptions.WebdavIOException;
 import com.yandex.disk.rest.json.ApiVersion;
-import com.yandex.disk.rest.json.Capacity;
+import com.yandex.disk.rest.json.DiskCapacity;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
@@ -108,12 +108,12 @@ public class TransportClient {
                 .getOperation(operationId);
     }
 
-    public Capacity getCapacity()
+    public DiskCapacity getCapacity()
             throws IOException, WebdavIOException {
         return getCapacity(null);
     }
 
-    public Capacity getCapacity(final String fields)
+    public DiskCapacity getCapacity(final String fields)
             throws IOException, WebdavIOException {
         return getRestAdapterBuilder().build()
                 .create(CloudApi.class)
@@ -122,15 +122,16 @@ public class TransportClient {
 
     public void listResources(final String path, final ListParsingHandler handler)
             throws IOException, WebdavIOException {
-        listResources(path, 0, 0, null, handler);
+        listResources(path, null, 0, 0, null, null, handler);
     }
 
-    // TODO make test with limit, offset and sort
-    public void listResources(final String path, final int limit, final int offset, final String sort, final ListParsingHandler handler)
+    // TODO make test with fields, limit, offset, sort and previewSize
+    public void listResources(final String path, final String fields, final int limit, final int offset,
+                              final String sort, final String previewSize, final ListParsingHandler handler)
             throws IOException, WebdavIOException {
         Resource resource = getRestAdapterBuilder().build()
                 .create(CloudApi.class)
-                .listResources(path, limit, offset, sort);
+                .listResources(path, fields, limit, offset, sort, previewSize);
         parseListResponse(resource, handler);
     }
 
@@ -148,11 +149,11 @@ public class TransportClient {
         parseListResponse(resource, handler);
     }
 
-    public Link dropTrash(final String path, final String fields)
+    public Link dropTrash(final String path)
             throws IOException, WebdavIOException {
         return getRestAdapterBuilder().build()
                 .create(CloudApi.class)
-                .dropTrash(path, fields);
+                .dropTrash(path);
     }
 
     private void parseListResponse(final Resource resource, final ListParsingHandler handler) {
