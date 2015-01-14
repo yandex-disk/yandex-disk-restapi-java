@@ -1,5 +1,6 @@
 package com.yandex.disk.rest;
 
+import com.google.gson.Gson;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -24,6 +25,7 @@ import com.yandex.disk.rest.util.Hash;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -310,6 +312,34 @@ public class HttpClientIO {
 
             default:
                 throw new ServerWebdavException("Error while downloading: code=" + code + " url " + url);
+        }
+    }
+
+    public <T> T getJson(String url, Class<T> classOfT)
+            throws IOException, ServerWebdavException {
+        Request request = buildRequest()
+                .url(url)
+                .get()
+                .build();
+
+        Response response = client
+                .newCall(request)
+                .execute();
+
+        int code = response.code();
+        if (!response.isSuccessful()) {
+            throw new ServerWebdavException("Error in GET: code=" + code + " url " + url);
+        }
+
+        ResponseBody responseBody = null;
+        try {
+            responseBody = response.body();
+            Gson gson = new Gson();
+            return gson.fromJson(responseBody.charStream(), classOfT);
+        } finally {
+            if (responseBody != null) {
+                responseBody.close();
+            }
         }
     }
 }

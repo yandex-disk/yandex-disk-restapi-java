@@ -21,16 +21,6 @@ public class Link {
         return href;
     }
 
-    /**
-     * Pure magic :(
-     *
-     * <br/>TODO ask the server to change API
-     */
-    @Deprecated
-    public String getOperationId() {
-        return href != null ? href.substring(href.length() - 64, href.length()) : null;
-    }
-
     public String getMethod() {
         return method;
     }

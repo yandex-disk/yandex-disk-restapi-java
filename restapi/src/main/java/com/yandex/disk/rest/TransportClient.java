@@ -1,5 +1,7 @@
 package com.yandex.disk.rest;
 
+import com.google.gson.Gson;
+import com.yandex.disk.rest.exceptions.ServerWebdavException;
 import com.yandex.disk.rest.exceptions.UnknownServerWebdavException;
 import com.yandex.disk.rest.exceptions.WebdavClientInitException;
 import com.yandex.disk.rest.exceptions.WebdavException;
@@ -17,6 +19,8 @@ import com.yandex.disk.rest.util.Hash;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -106,6 +110,17 @@ public class TransportClient {
         return getRestAdapterBuilder().build()
                 .create(CloudApi.class)
                 .getOperation(operationId);
+    }
+
+    public Operation getOperation(final Link link)
+            throws IOException, ServerWebdavException, UnknownServerWebdavException {
+        if (!"GET".equalsIgnoreCase(link.getMethod())) {
+            throw new UnknownServerWebdavException("Method in Link object is not GET"); // TODO throw a proper exception
+        }
+        Operation operation = new HttpClientIO(client, getAllHeaders(null))
+                .getJson(link.getHref(), Operation.class);
+        Log.d(TAG, "getOperation: " + operation);
+        return operation;
     }
 
     public DiskCapacity getCapacity()

@@ -184,13 +184,13 @@ public class TransportClientTest {
         String path = "/0-test/save-from-url-test.png";
 
         try {
-            Link deleteLink = client.delete(path, false);
+            client.delete(path, false);
         } catch (WebdavIOException ex) {
             ex.printStackTrace();
         }
 
         Link saveLink = client.saveFromUrl(url, path, null);
-        Operation operation = client.getOperation(saveLink.getOperationId());
+        Operation operation = client.getOperation(saveLink);
         Log.d("operation: "+operation);
         assertThat(operation.getStatus(), not(isEmptyOrNullString()));
     }
