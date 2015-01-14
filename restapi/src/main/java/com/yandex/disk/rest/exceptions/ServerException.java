@@ -6,7 +6,21 @@
 
 package com.yandex.disk.rest.exceptions;
 
-import java.io.InterruptedIOException;
+public abstract class ServerException extends Exception {
 
-public class ServerException extends InterruptedIOException {
+    public ServerException() {
+        super();
+    }
+
+    public ServerException(String detailMessage) {
+        super(detailMessage);
+    }
+
+    public ServerException(String detailMessage, Throwable throwable) {
+        super(detailMessage, throwable);
+    }
+
+    public ServerException(Throwable throwable) {
+        super(throwable);
+    }
 }

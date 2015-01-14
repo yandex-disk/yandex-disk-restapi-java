@@ -6,8 +6,5 @@
 
 package com.yandex.disk.rest.exceptions;
 
-public class WebdavFileNotFoundException extends WebdavException {
-    public WebdavFileNotFoundException(String detailMessage) {
-        super(detailMessage);
-    }
+public class ServerClientInitException extends ServerException {
 }

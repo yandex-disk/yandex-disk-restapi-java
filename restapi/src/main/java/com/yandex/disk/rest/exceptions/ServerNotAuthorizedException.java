@@ -6,8 +6,8 @@
 
 package com.yandex.disk.rest.exceptions;
 
-public class DuplicateFolderException extends WebdavException {
-    public DuplicateFolderException(String detailMessage) {
+public class ServerNotAuthorizedException extends ServerException {
+    public ServerNotAuthorizedException(String detailMessage) {
         super(detailMessage);
     }
 }

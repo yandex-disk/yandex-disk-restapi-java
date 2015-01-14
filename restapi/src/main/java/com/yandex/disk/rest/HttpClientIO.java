@@ -15,17 +15,15 @@ import com.yandex.disk.rest.exceptions.IntermediateFolderNotExistException;
 import com.yandex.disk.rest.exceptions.PreconditionFailedException;
 import com.yandex.disk.rest.exceptions.RangeNotSatisfiableException;
 import com.yandex.disk.rest.exceptions.RemoteFileNotFoundException;
-import com.yandex.disk.rest.exceptions.ServerWebdavException;
-import com.yandex.disk.rest.exceptions.UnknownServerWebdavException;
-import com.yandex.disk.rest.exceptions.WebdavNotAuthorizedException;
-import com.yandex.disk.rest.exceptions.WebdavUserNotInitialized;
+import com.yandex.disk.rest.exceptions.ServerNotAuthorizedException;
+import com.yandex.disk.rest.exceptions.UnknownServerException;
+import com.yandex.disk.rest.exceptions.UserNotInitializedException;
 import com.yandex.disk.rest.okhttp.LoggingInterceptor;
 import com.yandex.disk.rest.util.Hash;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -59,8 +57,8 @@ public class HttpClientIO {
     }
 
     public void downloadUrl(final String url, final DownloadListener downloadListener)
-            throws IOException, WebdavUserNotInitialized, PreconditionFailedException, WebdavNotAuthorizedException, ServerWebdavException,
-            CancelledDownloadException, UnknownServerWebdavException, FileNotModifiedException, RemoteFileNotFoundException,
+            throws IOException, UserNotInitializedException, PreconditionFailedException, ServerNotAuthorizedException,
+            CancelledDownloadException, UnknownServerException, FileNotModifiedException, RemoteFileNotFoundException,
             DownloadNoSpaceAvailableException, RangeNotSatisfiableException, FileModifiedException {
 
         Request.Builder req = buildRequest()
@@ -108,7 +106,7 @@ public class HttpClientIO {
             default:
 //                consumeContent(httpResponse);
 //                checkStatusCodes(httpResponse, "GET '" + url + "'");
-                throw new ServerWebdavException("error while downloading: code=" + code + " file " + url);
+                throw new UnknownServerException("error while downloading: code=" + code + " file " + url);
 //                break;
         }
 
@@ -226,8 +224,8 @@ public class HttpClientIO {
     }
 
     public void uploadFile(final String url, final File file, final long startOffset, final ProgressListener progressListener)
-            throws IntermediateFolderNotExistException, IOException, WebdavUserNotInitialized, PreconditionFailedException,
-            WebdavNotAuthorizedException, ServerWebdavException, UnknownServerWebdavException {
+            throws IntermediateFolderNotExistException, IOException, UserNotInitializedException, PreconditionFailedException,
+            ServerNotAuthorizedException, UnknownServerException {
         Log.d(TAG, "uploadFile: put to url: "+url);
 
         MediaType mediaType = MediaType.parse("application/octet-stream");  // TODO
@@ -268,13 +266,13 @@ public class HttpClientIO {
             // TODO more codes?
 
             default:
-                throw new ServerWebdavException("error while uploading: code=" + code + " file " + url);
+                throw new UnknownServerException("error while uploading: code=" + code + " file " + url);
         }
     }
 
     public long headUrl(String url, Hash hash)
-            throws IOException, NumberFormatException, WebdavUserNotInitialized, UnknownServerWebdavException, PreconditionFailedException,
-            WebdavNotAuthorizedException, ServerWebdavException {
+            throws IOException, NumberFormatException, UserNotInitializedException, UnknownServerException,
+            PreconditionFailedException, ServerNotAuthorizedException {
 
         Request request = buildRequest()
                 .removeHeader(TransportClient.AUTHORIZATION_HEADER)
@@ -311,12 +309,12 @@ public class HttpClientIO {
             // TODO more codes?
 
             default:
-                throw new ServerWebdavException("Error while downloading: code=" + code + " url " + url);
+                throw new UnknownServerException("Error while downloading: code=" + code + " url " + url);
         }
     }
 
     public <T> T getJson(String url, Class<T> classOfT)
-            throws IOException, ServerWebdavException {
+            throws IOException, UnknownServerException {
         Request request = buildRequest()
                 .url(url)
                 .get()
@@ -328,7 +326,7 @@ public class HttpClientIO {
 
         int code = response.code();
         if (!response.isSuccessful()) {
-            throw new ServerWebdavException("Error in GET: code=" + code + " url " + url);
+            throw new UnknownServerException("Error in GET: code=" + code + " url " + url);
         }
 
         ResponseBody responseBody = null;

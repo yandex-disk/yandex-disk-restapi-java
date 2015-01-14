@@ -6,12 +6,20 @@
 
 package com.yandex.disk.rest.exceptions;
 
-public class UnknownServerWebdavException extends WebdavException {
-    public UnknownServerWebdavException(Exception ex) {
-        super(ex);
-    }
+import java.io.IOException;
 
-    public UnknownServerWebdavException(String message) {
+public class ServerIOException extends ServerException {
+
+    public ServerIOException(String message) {
         super(message);
     }
+
+    public ServerIOException(Throwable e) {
+        super(e);
+    }
+
+    public ServerIOException(String message, IOException e) {
+        super(message, e);
+    }
+
 }

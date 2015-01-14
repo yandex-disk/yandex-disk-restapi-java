@@ -6,7 +6,7 @@
 
 package com.yandex.disk.rest.exceptions;
 
-public class RemoteFileNotFoundException extends WebdavException {
+public class RemoteFileNotFoundException extends ServerException {
 
     public RemoteFileNotFoundException(String msg) {
         super(msg);

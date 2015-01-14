@@ -6,8 +6,12 @@
 
 package com.yandex.disk.rest.exceptions;
 
-public class UnsupportedMediaTypeException extends WebdavException {
-    public UnsupportedMediaTypeException(String message) {
+public class UnknownServerException extends ServerException {
+    public UnknownServerException(Exception ex) {
+        super(ex);
+    }
+
+    public UnknownServerException(String message) {
         super(message);
     }
 }

@@ -6,5 +6,5 @@
 
 package com.yandex.disk.rest.exceptions;
 
-public class CancelledDownloadException extends WebdavException {
+public class CancelledDownloadException extends ServerException {
 }

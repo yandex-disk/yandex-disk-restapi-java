@@ -1,6 +1,6 @@
 package com.yandex.disk.rest.retrofit;
 
-import com.yandex.disk.rest.exceptions.WebdavIOException;
+import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.json.ApiVersion;
 import com.yandex.disk.rest.json.DiskCapacity;
 import com.yandex.disk.rest.json.Link;
@@ -21,7 +21,7 @@ public interface CloudApi {
      */
     @GET("/")
     ApiVersion getApiVersion()
-            throws WebdavIOException;
+            throws ServerIOException;
 
     /**
      * Operation status
@@ -31,7 +31,7 @@ public interface CloudApi {
      */
     @GET("/v1/disk/operations/{operation_id}")
     Operation getOperation(@Path("operation_id") String operationId)
-            throws WebdavIOException;
+            throws ServerIOException;
 
     /**
      * Data about a user's Disk
@@ -41,7 +41,7 @@ public interface CloudApi {
      */
     @GET("/v1/disk")
     DiskCapacity getCapacity(@Query("fields") String fields)
-            throws WebdavIOException;
+            throws ServerIOException;
 
     /**
      * Metainformation about a file or folder
@@ -53,7 +53,7 @@ public interface CloudApi {
     Resource listResources(@Query("path") String path, @Query("fields") String fields,
                            @Query("limit") int limit, @Query("offset") int offset, @Query("sort") String sort,
                            @Query("preview_size") String previewSize)
-            throws WebdavIOException;
+            throws ServerIOException;
 
 
     // TODO https://tech.yandex.ru/disk/api/reference/all-files-docpage/
@@ -71,7 +71,7 @@ public interface CloudApi {
      */
     @GET("/v1/disk/resources/download")
     Link getDownloadLink(@Query("path") String path)
-            throws WebdavIOException;
+            throws ServerIOException;
 
     /**
      * Uploading a file to Disk from external resource
@@ -83,7 +83,7 @@ public interface CloudApi {
      */
     @POST("/v1/disk/resources/upload")
     Link saveFromUrl(@Query("url") String url, @Query("path") String path)
-            throws WebdavIOException;
+            throws ServerIOException;
 
     /**
      * Uploading a file to Disk
@@ -93,7 +93,7 @@ public interface CloudApi {
      */
     @GET("/v1/disk/resources/upload")
     Link getUploadLink(@Query("path") String path, @Query("overwrite") boolean overwrite)
-            throws WebdavIOException;
+            throws ServerIOException;
 
 
     // TODO https://tech.yandex.ru/disk/api/reference/copy-docpage/
@@ -110,7 +110,7 @@ public interface CloudApi {
      */
     @DELETE("/v1/disk/resources")
     Link delete(@Query("path") String path, @Query("permanently") boolean permanently)
-            throws WebdavIOException;
+            throws ServerIOException;
 
     // TODO https://tech.yandex.ru/disk/api/reference/create-folder-docpage/
 
@@ -128,7 +128,7 @@ public interface CloudApi {
     Resource listTrash(@Query("path") String path, @Query("fields") String fields,
                        @Query("limit") int limit, @Query("offset") int offset, @Query("sort") String sort,
                        @Query("preview_size") String previewSize)
-            throws WebdavIOException;
+            throws ServerIOException;
 
     /**
      * Cleaning the Trash
@@ -138,7 +138,7 @@ public interface CloudApi {
      */
     @DELETE("/v1/disk/trash/resources")
     Link dropTrash(@Query("path") String path)
-            throws WebdavIOException;
+            throws ServerIOException;
 
     /**
      * Restoring a file or folder from the Trash
@@ -148,6 +148,6 @@ public interface CloudApi {
      */
     @PUT("/v1/disk/trash/resources/restore")
     Link restoreTrash(@Query("path") String path, @Query("name") String name, @Query("overwrite") boolean overwrite)
-            throws WebdavIOException;
+            throws ServerIOException;
 
 }

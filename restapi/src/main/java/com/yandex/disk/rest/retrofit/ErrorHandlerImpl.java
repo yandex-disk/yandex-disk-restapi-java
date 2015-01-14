@@ -2,8 +2,8 @@ package com.yandex.disk.rest.retrofit;
 
 import com.google.gson.Gson;
 import com.yandex.disk.rest.Log;
+import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.exceptions.UserUnauthorizedException;
-import com.yandex.disk.rest.exceptions.WebdavIOException;
 import com.yandex.disk.rest.json.ApiError;
 
 import java.io.IOException;
@@ -24,10 +24,10 @@ public class ErrorHandlerImpl implements ErrorHandler {
             RetrofitError.Kind kind = retrofitError.getKind();
             switch (kind) {
                 case NETWORK:
-                    return new WebdavIOException(retrofitError.getMessage());
+                    return new ServerIOException(retrofitError.getMessage());
 
                 case CONVERSION:    // TODO XXX test it
-                    return new WebdavIOException(retrofitError.getCause());
+                    return new ServerIOException(retrofitError.getCause());
 
                 case HTTP:
                     Response response = retrofitError.getResponse();
@@ -42,20 +42,20 @@ public class ErrorHandlerImpl implements ErrorHandler {
                         // TODO XXX other 4xx codes
 
                         default:
-                            return new WebdavIOException(apiError != null
+                            return new ServerIOException(apiError != null
                                     ? apiError.getDescription()
                                     : "HTTP Error code " + retrofitError.getResponse().getStatus());
                     }
 
                 case UNEXPECTED:    // TODO XXX use other exception
-                    return new WebdavIOException(retrofitError.getCause());
+                    return new ServerIOException(retrofitError.getCause());
 
                 default:
-                    return new WebdavIOException("ErrorHandler: unhandled error " + kind.name());
+                    return new ServerIOException("ErrorHandler: unhandled error " + kind.name());
             }
         } catch (IOException ex) {
             Log.d(TAG, "errorHandler", retrofitError);
-            return new WebdavIOException(ex);
+            return new ServerIOException(ex);
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.yandex.disk.rest;
 
 import com.yandex.disk.rest.exceptions.CancelledUploadingException;
-import com.yandex.disk.rest.exceptions.WebdavIOException;
+import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.json.ApiVersion;
 import com.yandex.disk.rest.json.DiskCapacity;
 import com.yandex.disk.rest.json.Link;
@@ -178,6 +178,7 @@ public class TransportClientTest {
         assertTrue("18339f4b55f3771b5486595686d0d43ff63da17edd0b30edb7e95f69abce5fad".equalsIgnoreCase(hash.getSha256()));
     }
 
+    @Ignore
     @Test
     public void testSaveFromUrl() throws Exception {
         String url = "http://yastatic.net/morda-logo/i/apple-touch-icon/ru-76x76.png";
@@ -185,7 +186,7 @@ public class TransportClientTest {
 
         try {
             client.delete(path, false);
-        } catch (WebdavIOException ex) {
+        } catch (ServerIOException ex) {
             ex.printStackTrace();
         }
 
@@ -196,7 +197,7 @@ public class TransportClientTest {
     }
 
     @Ignore
-    @Test(expected = WebdavIOException.class)   // TODO change the exception
+    @Test(expected = ServerIOException.class)   // TODO change the exception
     public void testUploadFileOverwriteFailed() throws Exception {
         String path = "/yac-qr.png";
         client.getUploadLink(path, false, null);

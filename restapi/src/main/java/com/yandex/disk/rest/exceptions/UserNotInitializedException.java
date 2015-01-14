@@ -6,5 +6,12 @@
 
 package com.yandex.disk.rest.exceptions;
 
-public class WebdavForbiddenException extends WebdavException {
+public class UserNotInitializedException extends ServerException {
+
+    /**
+     * 403: User have to check http://disk.yandex.ru once before start using this client
+     */
+    public UserNotInitializedException(String detailMessage) {
+        super(detailMessage);
+    }
 }

@@ -6,7 +6,7 @@
 
 package com.yandex.disk.rest.exceptions;
 
-public class IntermediateFolderNotExistException extends WebdavException {
+public class IntermediateFolderNotExistException extends ServerException {
     public IntermediateFolderNotExistException(String detailMessage) {
         super(detailMessage);
     }

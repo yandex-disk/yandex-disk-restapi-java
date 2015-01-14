@@ -6,7 +6,7 @@
 
 package com.yandex.disk.rest.exceptions;
 
-public class DownloadNoSpaceAvailableException extends WebdavException {
+public class DownloadNoSpaceAvailableException extends ServerException {
 
     private final String destinationFolder;
     private final long length;

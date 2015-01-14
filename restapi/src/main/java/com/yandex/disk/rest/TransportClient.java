@@ -1,11 +1,9 @@
 package com.yandex.disk.rest;
 
-import com.google.gson.Gson;
-import com.yandex.disk.rest.exceptions.ServerWebdavException;
-import com.yandex.disk.rest.exceptions.UnknownServerWebdavException;
-import com.yandex.disk.rest.exceptions.WebdavClientInitException;
-import com.yandex.disk.rest.exceptions.WebdavException;
-import com.yandex.disk.rest.exceptions.WebdavIOException;
+import com.yandex.disk.rest.exceptions.ServerClientInitException;
+import com.yandex.disk.rest.exceptions.ServerException;
+import com.yandex.disk.rest.exceptions.ServerIOException;
+import com.yandex.disk.rest.exceptions.UnknownServerException;
 import com.yandex.disk.rest.json.ApiVersion;
 import com.yandex.disk.rest.json.DiskCapacity;
 import com.yandex.disk.rest.json.Link;
@@ -19,8 +17,6 @@ import com.yandex.disk.rest.util.Hash;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -55,7 +51,7 @@ public class TransportClient {
     private final HttpClient client;
 
     public TransportClient(final Credentials credentials, final int networkTimeout)
-            throws WebdavClientInitException {
+            throws ServerClientInitException {
         this.commonHeaders = fillCommonHeaders(credentials.getToken());
         this.client = new HttpClient();
     }
@@ -77,7 +73,7 @@ public class TransportClient {
     }
 
     public static TransportClient getInstance(final Credentials credentials)
-            throws WebdavClientInitException {
+            throws ServerClientInitException {
         return new TransportClient(credentials, NETWORK_TIMEOUT);
     }
 
@@ -99,23 +95,23 @@ public class TransportClient {
     }
 
     public ApiVersion getApiVersion()
-            throws IOException, WebdavIOException {
+            throws IOException, ServerIOException {
         return getRestAdapterBuilder().build()
                 .create(CloudApi.class)
                 .getApiVersion();
     }
 
     public Operation getOperation(final String operationId)
-            throws IOException, WebdavIOException {
+            throws IOException, ServerIOException {
         return getRestAdapterBuilder().build()
                 .create(CloudApi.class)
                 .getOperation(operationId);
     }
 
     public Operation getOperation(final Link link)
-            throws IOException, ServerWebdavException, UnknownServerWebdavException {
+            throws IOException, UnknownServerException {
         if (!"GET".equalsIgnoreCase(link.getMethod())) {
-            throw new UnknownServerWebdavException("Method in Link object is not GET"); // TODO throw a proper exception
+            throw new UnknownServerException("Method in Link object is not GET"); // TODO throw a proper exception
         }
         Operation operation = new HttpClientIO(client, getAllHeaders(null))
                 .getJson(link.getHref(), Operation.class);
@@ -124,26 +120,26 @@ public class TransportClient {
     }
 
     public DiskCapacity getCapacity()
-            throws IOException, WebdavIOException {
+            throws IOException, ServerIOException {
         return getCapacity(null);
     }
 
     public DiskCapacity getCapacity(final String fields)
-            throws IOException, WebdavIOException {
+            throws IOException, ServerIOException {
         return getRestAdapterBuilder().build()
                 .create(CloudApi.class)
                 .getCapacity(fields);
     }
 
     public void listResources(final String path, final ListParsingHandler handler)
-            throws IOException, WebdavIOException {
+            throws IOException, ServerIOException {
         listResources(path, null, 0, 0, null, null, handler);
     }
 
     // TODO make test with fields, limit, offset, sort and previewSize
     public void listResources(final String path, final String fields, final int limit, final int offset,
                               final String sort, final String previewSize, final ListParsingHandler handler)
-            throws IOException, WebdavIOException {
+            throws IOException, ServerIOException {
         Resource resource = getRestAdapterBuilder().build()
                 .create(CloudApi.class)
                 .listResources(path, fields, limit, offset, sort, previewSize);
@@ -151,13 +147,13 @@ public class TransportClient {
     }
 
     public void listTrash(final String path, final ListParsingHandler handler)
-            throws IOException, WebdavIOException {
+            throws IOException, ServerIOException {
         listTrash(path, null, 0, 0, null, null, handler);
     }
 
     public void listTrash(final String path, final String fields, final int limit, final int offset,
                           final String sort, final String previewSize, final ListParsingHandler handler)
-            throws IOException, WebdavIOException {
+            throws IOException, ServerIOException {
         Resource resource = getRestAdapterBuilder().build()
                 .create(CloudApi.class)
                 .listTrash(path, fields, limit, offset, sort, previewSize);
@@ -165,7 +161,7 @@ public class TransportClient {
     }
 
     public Link dropTrash(final String path)
-            throws IOException, WebdavIOException {
+            throws IOException, ServerIOException {
         return getRestAdapterBuilder().build()
                 .create(CloudApi.class)
                 .dropTrash(path);
@@ -186,7 +182,7 @@ public class TransportClient {
 
     public void downloadFile(final String path, final File saveTo, final List<CustomHeader> headerList,
                              final ProgressListener progressListener)
-            throws IOException, WebdavException {
+            throws IOException, ServerException {
         Link link = getRestAdapterBuilder(headerList).build()
                 .create(CloudApi.class)
                 .getDownloadLink(path);
@@ -197,7 +193,7 @@ public class TransportClient {
     }
 
     public Link saveFromUrl(final String url, final String serverPath, final List<CustomHeader> headerList)
-            throws WebdavIOException, UnknownServerWebdavException {
+            throws ServerIOException, UnknownServerException {
         Link link = getRestAdapterBuilder(headerList).build()
                 .create(CloudApi.class)
                 .saveFromUrl(url, serverPath);
@@ -206,14 +202,14 @@ public class TransportClient {
     }
 
     public Link getUploadLink(final String serverPath, final boolean overwrite, final List<CustomHeader> headerList)
-            throws WebdavIOException, UnknownServerWebdavException {
+            throws ServerIOException, UnknownServerException {
         Link link = getRestAdapterBuilder(headerList).build()
                 .create(CloudApi.class)
                 .getUploadLink(serverPath, overwrite);
         Log.d(TAG, "getUploadLink(): " + link);
 
         if (!"PUT".equalsIgnoreCase(link.getMethod())) {
-            throw new UnknownServerWebdavException("Method in Link object is not PUT"); // TODO throw a proper exception
+            throw new UnknownServerException("Method in Link object is not PUT"); // TODO throw a proper exception
         }
 
         return link;
@@ -221,7 +217,7 @@ public class TransportClient {
 
     public void uploadFile(final Link link, final boolean resumeUpload, final File localSource,
                            final List<CustomHeader> headerList, final ProgressListener progressListener)
-            throws IOException, WebdavException {
+            throws IOException, ServerException {
         HttpClientIO clientIO = new HttpClientIO(client, getAllHeaders(headerList));
         long startOffset = 0;
         if (resumeUpload) {
@@ -234,7 +230,7 @@ public class TransportClient {
 
     // TODO catch 202 vs 204 http code from server
     public Link delete(final String path, final boolean permanently)
-            throws WebdavIOException, UnknownServerWebdavException {
+            throws ServerIOException, UnknownServerException {
         Link link = getRestAdapterBuilder().build()
                 .create(CloudApi.class)
                 .delete(path, permanently);

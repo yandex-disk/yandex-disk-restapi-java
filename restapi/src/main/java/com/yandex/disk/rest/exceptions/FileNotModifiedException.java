@@ -9,5 +9,5 @@ package com.yandex.disk.rest.exceptions;
 /**
  * 304 on GET with If-None-Match
  */
-public class FileNotModifiedException extends WebdavException {
+public class FileNotModifiedException extends ServerException {
 }
