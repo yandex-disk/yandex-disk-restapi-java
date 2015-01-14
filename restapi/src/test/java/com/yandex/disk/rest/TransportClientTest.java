@@ -250,4 +250,21 @@ public class TransportClientTest {
             }
         }
     }
+
+    @Ignore
+    @Test
+    public void testMakeFolder() throws Exception {
+        String path = "/0-test/make-folder-test";
+
+        try {
+            client.delete(path, false);
+        } catch (ServerIOException ex) {
+            ex.printStackTrace();
+        }
+
+        Link saveLink = client.makeFolder(path);
+        Operation operation = client.getOperation(saveLink);
+        Log.d("operation: "+operation);
+        assertTrue(operation.getStatus() == null);
+    }
 }

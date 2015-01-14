@@ -234,7 +234,16 @@ public class TransportClient {
         Link link = getRestAdapterBuilder().build()
                 .create(CloudApi.class)
                 .delete(path, permanently);
-        Log.d(TAG, "delete(): " + link);
+        Log.d(TAG, "delete: " + link);
+        return link;
+    }
+
+    public Link makeFolder(final String path)
+            throws ServerIOException, UnknownServerException {
+        Link link = getRestAdapterBuilder().build()
+                .create(CloudApi.class)
+                .makeFolder(path);
+        Log.d(TAG, "makeFolder: " + link);
         return link;
     }
 }

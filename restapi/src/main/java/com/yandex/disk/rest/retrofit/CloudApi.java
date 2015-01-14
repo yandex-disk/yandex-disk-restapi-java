@@ -100,8 +100,6 @@ public interface CloudApi {
 
     // TODO https://tech.yandex.ru/disk/api/reference/move-docpage/
 
-    // TODO https://tech.yandex.ru/disk/api/reference/delete-docpage/
-
     /**
      * Deleting a file or folder
      *
@@ -112,7 +110,15 @@ public interface CloudApi {
     Link delete(@Query("path") String path, @Query("permanently") boolean permanently)
             throws ServerIOException;
 
-    // TODO https://tech.yandex.ru/disk/api/reference/create-folder-docpage/
+    /**
+     * Creating a folder
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/create-folder.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/create-folder-docpage/">russian</a></p>
+     */
+    @PUT("/v1/disk/resources")
+    Link makeFolder(@Query("path") String path)
+            throws ServerIOException;
 
     // TODO https://tech.yandex.ru/disk/api/reference/publish-docpage/
 
