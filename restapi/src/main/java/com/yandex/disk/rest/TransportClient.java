@@ -4,6 +4,7 @@ import com.yandex.disk.rest.exceptions.ServerClientInitException;
 import com.yandex.disk.rest.exceptions.ServerException;
 import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.exceptions.UnknownServerException;
+import com.yandex.disk.rest.exceptions.WrongMethodException;
 import com.yandex.disk.rest.json.ApiVersion;
 import com.yandex.disk.rest.json.DiskCapacity;
 import com.yandex.disk.rest.json.Link;
@@ -90,28 +91,30 @@ public class TransportClient {
                 .setLogLevel(LOG_LEVEL);
     }
 
-    private RestAdapter.Builder getRestAdapterBuilder() {
-        return getRestAdapterBuilder(null);
+    private CloudApi call(final List<CustomHeader> headerList) {
+        return getRestAdapterBuilder(headerList).build()
+                .create(CloudApi.class);
+    }
+
+    private CloudApi call() {
+        return getRestAdapterBuilder(null).build()
+                .create(CloudApi.class);
     }
 
     public ApiVersion getApiVersion()
             throws IOException, ServerIOException {
-        return getRestAdapterBuilder().build()
-                .create(CloudApi.class)
-                .getApiVersion();
+        return call().getApiVersion();
     }
 
     public Operation getOperation(final String operationId)
             throws IOException, ServerIOException {
-        return getRestAdapterBuilder().build()
-                .create(CloudApi.class)
-                .getOperation(operationId);
+        return call().getOperation(operationId);
     }
 
     public Operation getOperation(final Link link)
-            throws IOException, UnknownServerException {
+            throws IOException, UnknownServerException, WrongMethodException {
         if (!"GET".equalsIgnoreCase(link.getMethod())) {
-            throw new UnknownServerException("Method in Link object is not GET"); // TODO throw a proper exception
+            throw new WrongMethodException("Method in Link object is not GET");
         }
         Operation operation = new HttpClientIO(client, getAllHeaders(null))
                 .getJson(link.getHref(), Operation.class);
@@ -126,9 +129,7 @@ public class TransportClient {
 
     public DiskCapacity getCapacity(final String fields)
             throws IOException, ServerIOException {
-        return getRestAdapterBuilder().build()
-                .create(CloudApi.class)
-                .getCapacity(fields);
+        return call().getCapacity(fields);
     }
 
     public void listResources(final String path, final ListParsingHandler handler)
@@ -140,9 +141,7 @@ public class TransportClient {
     public void listResources(final String path, final String fields, final int limit, final int offset,
                               final String sort, final String previewSize, final ListParsingHandler handler)
             throws IOException, ServerIOException {
-        Resource resource = getRestAdapterBuilder().build()
-                .create(CloudApi.class)
-                .listResources(path, fields, limit, offset, sort, previewSize);
+        Resource resource = call().listResources(path, fields, limit, offset, sort, previewSize);
         parseListResponse(resource, handler);
     }
 
@@ -154,23 +153,18 @@ public class TransportClient {
     public void listTrash(final String path, final String fields, final int limit, final int offset,
                           final String sort, final String previewSize, final ListParsingHandler handler)
             throws IOException, ServerIOException {
-        Resource resource = getRestAdapterBuilder().build()
-                .create(CloudApi.class)
-                .listTrash(path, fields, limit, offset, sort, previewSize);
+        Resource resource = call().listTrash(path, fields, limit, offset, sort, previewSize);
         parseListResponse(resource, handler);
     }
 
     public Link dropTrash(final String path)
             throws IOException, ServerIOException {
-        return getRestAdapterBuilder().build()
-                .create(CloudApi.class)
-                .dropTrash(path);
+        return call().dropTrash(path);
     }
 
     private void parseListResponse(final Resource resource, final ListParsingHandler handler) {
         ResourceList items = resource.getItems();
         int size = items.getItems().size();
-        Log.d(TAG, "parseListResponse: size=" + size);
         for (Resource item : items.getItems()) {
 //            if (handler.hasCancelled()) { TODO
 //                return;
@@ -183,35 +177,22 @@ public class TransportClient {
     public void downloadFile(final String path, final File saveTo, final List<CustomHeader> headerList,
                              final ProgressListener progressListener)
             throws IOException, ServerException {
-        Link link = getRestAdapterBuilder(headerList).build()
-                .create(CloudApi.class)
-                .getDownloadLink(path);
-        Log.d(TAG, "getDownloadLink(): " + link);
-
+        Link link = call(headerList).getDownloadLink(path);
         new HttpClientIO(client, getAllHeaders(headerList))
                 .downloadUrl(link.getHref(), new FileDownloadListener(saveTo, progressListener));
     }
 
     public Link saveFromUrl(final String url, final String serverPath, final List<CustomHeader> headerList)
             throws ServerIOException, UnknownServerException {
-        Link link = getRestAdapterBuilder(headerList).build()
-                .create(CloudApi.class)
-                .saveFromUrl(url, serverPath);
-        Log.d(TAG, "saveFromUrl(): " + link);
-        return link;
+        return call(headerList).saveFromUrl(url, serverPath);
     }
 
     public Link getUploadLink(final String serverPath, final boolean overwrite, final List<CustomHeader> headerList)
-            throws ServerIOException, UnknownServerException {
-        Link link = getRestAdapterBuilder(headerList).build()
-                .create(CloudApi.class)
-                .getUploadLink(serverPath, overwrite);
-        Log.d(TAG, "getUploadLink(): " + link);
-
+            throws ServerIOException, WrongMethodException {
+        Link link = call(headerList).getUploadLink(serverPath, overwrite);
         if (!"PUT".equalsIgnoreCase(link.getMethod())) {
-            throw new UnknownServerException("Method in Link object is not PUT"); // TODO throw a proper exception
+            throw new WrongMethodException("Method in Link object is not PUT");
         }
-
         return link;
     }
 
@@ -230,38 +211,32 @@ public class TransportClient {
 
     // TODO catch 202 vs 204 http code from server
     public Link delete(final String path, final boolean permanently)
-            throws ServerIOException, UnknownServerException {
-        Link link = getRestAdapterBuilder().build()
-                .create(CloudApi.class)
-                .delete(path, permanently);
-        Log.d(TAG, "delete: " + link);
-        return link;
+            throws ServerIOException {
+        return call().delete(path, permanently);
     }
 
     public Link makeFolder(final String path)
-            throws ServerIOException, UnknownServerException {
-        Link link = getRestAdapterBuilder().build()
-                .create(CloudApi.class)
-                .makeFolder(path);
-        Log.d(TAG, "makeFolder: " + link);
-        return link;
+            throws ServerIOException {
+        return call().makeFolder(path);
     }
 
     public Link copy(final String from, final String path, final boolean overwrite)
-            throws ServerIOException, UnknownServerException {
-        Link link = getRestAdapterBuilder().build()
-                .create(CloudApi.class)
-                .copy(from, path, overwrite);
-        Log.d(TAG, "copy: " + link);
-        return link;
+            throws ServerIOException {
+        return call().copy(from, path, overwrite);
     }
 
     public Link move(final String from, final String path, final boolean overwrite)
             throws ServerIOException, UnknownServerException {
-        Link link = getRestAdapterBuilder().build()
-                .create(CloudApi.class)
-                .move(from, path, overwrite);
-        Log.d(TAG, "move: " + link);
-        return link;
+        return call().move(from, path, overwrite);
+    }
+
+    public Link publish(final String path)
+            throws ServerIOException {
+        return call().publish(path);
+    }
+
+    public Link unpublish(final String path)
+            throws ServerIOException {
+        return call().unpublish(path);
     }
 }

@@ -135,9 +135,40 @@ public interface CloudApi {
     Link makeFolder(@Query("path") String path)
             throws ServerIOException;
 
-    // TODO https://tech.yandex.ru/disk/api/reference/publish-docpage/
+    /**
+     * Publishing a file or folder
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/publish.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/publish-docpage/">russian</a></p>
+     */
+    @PUT("/v1/disk/resources/publish")
+    Link publish(@Query("path") String path)
+            throws ServerIOException;
 
-    // TODO https://tech.yandex.ru/disk/api/reference/public-docpage/
+    /**
+     * Closing access to a resource
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/publish.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/publish-docpage/">russian</a></p>
+     */
+    @PUT("/v1/disk/resources/unpublish")
+    Link unpublish(@Query("path") String path)
+            throws ServerIOException;
+
+    /**
+     * Metainformation about a public resource
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/public.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/public-docpage/">russian</a></p>
+     */
+    @GET("/v1/disk/public/resources")
+    Resource listPublicResources(@Query("public_key") String publicKey, @Query("path") String path,
+                                 @Query("fields") String fields, @Query("limit") int limit,
+                                 @Query("offset") int offset, @Query("sort") String sort,
+                                 @Query("preview_size") String previewSize)
+            throws ServerIOException;
+
+    // TODO
 
     /**
      * Metainformation about a file or folder in the Trash

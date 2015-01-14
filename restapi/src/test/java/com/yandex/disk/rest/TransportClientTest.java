@@ -68,7 +68,6 @@ public class TransportClientTest {
         Log.d("generateResources: done");
     }
 
-    @Ignore
     @Test
     public void testApiVersion() throws Exception {
         ApiVersion apiVersion = client.getApiVersion();
@@ -78,8 +77,7 @@ public class TransportClientTest {
         assertTrue("v1".equalsIgnoreCase(apiVersion.getApiVersion()));
     }
 
-    @Ignore
-    @Test
+    @Test(expected = ServerIOException.class)
     public void testOperation() throws Exception {
         // TODO complete test: make directory, make file inside directory, remove directory, check operation
         Operation operation = client.getOperation("5");
@@ -87,7 +85,6 @@ public class TransportClientTest {
         assertThat(operation.getStatus(), not(isEmptyOrNullString()));
     }
 
-    @Ignore
     @Test
     public void testCapacity() throws Exception {
         DiskCapacity capacity = client.getCapacity();
@@ -100,7 +97,6 @@ public class TransportClientTest {
         assertThat(capacity.getSystemFolders(), hasKey("downloads"));
     }
 
-    @Ignore
     @Test
     public void testListResources() throws Exception {
         final List<Resource> items = new ArrayList<>();
@@ -120,7 +116,6 @@ public class TransportClientTest {
         });
     }
 
-    @Ignore
     @Test
     public void testTrash() throws Exception {
         final List<Resource> items = new ArrayList<>();
@@ -146,7 +141,6 @@ public class TransportClientTest {
 
     }
 
-    @Ignore
     @Test
     public void testDownloadFile() throws Exception {
         String path = "/yac-qr.png";
@@ -168,7 +162,6 @@ public class TransportClientTest {
         assertTrue(local.delete());
     }
 
-    @Ignore
     @Test
     public void testHash() throws Exception {
         File file = new File("testResources/test-upload-001.bin");
@@ -178,7 +171,6 @@ public class TransportClientTest {
         assertTrue("18339f4b55f3771b5486595686d0d43ff63da17edd0b30edb7e95f69abce5fad".equalsIgnoreCase(hash.getSha256()));
     }
 
-    @Ignore
     @Test
     public void testSaveFromUrl() throws Exception {
         String url = "http://yastatic.net/morda-logo/i/apple-touch-icon/ru-76x76.png";
@@ -196,14 +188,12 @@ public class TransportClientTest {
         assertThat(operation.getStatus(), not(isEmptyOrNullString()));
     }
 
-    @Ignore
     @Test(expected = ServerIOException.class)   // TODO change the exception
     public void testUploadFileOverwriteFailed() throws Exception {
         String path = "/yac-qr.png";
         client.getUploadLink(path, false, null);
     }
 
-    @Ignore
     @Test
     public void testUploadFileResume() throws Exception {
         String name = "test-upload-002.bin";
@@ -251,7 +241,6 @@ public class TransportClientTest {
         }
     }
 
-    @Ignore
     @Test
     public void testMakeFolder() throws Exception {
         String path = "/0-test/make-folder-test";
@@ -262,13 +251,13 @@ public class TransportClientTest {
             ex.printStackTrace();
         }
 
-        Link saveLink = client.makeFolder(path);
-        Operation operation = client.getOperation(saveLink);
+        Link link = client.makeFolder(path);
+        Log.d("link: "+link);
+        Operation operation = client.getOperation(link);
         Log.d("operation: "+operation);
         assertTrue(operation.getStatus() == null);
     }
 
-    @Ignore
     @Test
     public void testCopyFolder() throws Exception {
         String from = "/0-test/copy-folder-test-src";
@@ -286,12 +275,12 @@ public class TransportClientTest {
         }
 
         Link link = client.copy(from, to, false);
+        Log.d("link: "+link);
         Operation operation = client.getOperation(link);
         Log.d("operation: "+operation);
         assertTrue(operation.getStatus() == null);
     }
 
-    @Ignore
     @Test
     public void testMoveFolder() throws Exception {
         String from = "/0-test/move-folder-test-src";
@@ -309,8 +298,45 @@ public class TransportClientTest {
         }
 
         Link link = client.move(from, to, false);
+        Log.d("link: "+link);
         Operation operation = client.getOperation(link);
         Log.d("operation: "+operation);
         assertTrue(operation.getStatus() == null);
+    }
+
+    @Test
+    public void testPublishAndUnpublish() throws Exception {
+        String path = "/0-test/publish-test";
+
+        try {
+            client.delete(path, false);
+        } catch (ServerIOException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            client.makeFolder(path);
+        } catch (ServerIOException ex) {
+            ex.printStackTrace();
+        }
+
+        client.publish(path);
+        client.listResources(path, new ListParsingHandler() {
+            @Override
+            public boolean handleItem(Resource item) {
+                assertThat(item.getPublicKey(), not(isEmptyOrNullString()));
+                assertThat(item.getPublicUrl(), not(isEmptyOrNullString()));
+                return true;
+            }
+        });
+
+        client.unpublish(path);
+        client.listResources(path, new ListParsingHandler() {
+            @Override
+            public boolean handleItem(Resource item) {
+                assertThat(item.getPublicKey(), isEmptyOrNullString());
+                assertThat(item.getPublicUrl(), isEmptyOrNullString());
+                return true;
+            }
+        });
     }
 }
