@@ -184,12 +184,9 @@ public interface CloudApi {
      * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/public.xml#save">english</a>,
      * <a href="https://tech.yandex.ru/disk/api/reference/public-docpage/#save">russian</a></p>
      */
-    @POST("/v1/disk/resources/upload")
-    Link savePublicResource(@Query("url") String url, @Query("path") String path, @Query("path") String name)
+    @POST("/v1/disk/public/resources/save-to-disk/")
+    Link savePublicResource(@Query("public_key") String publicKey, @Query("path") String path, @Query("name") String name)
             throws ServerIOException;
-
-
-    // TODO
 
     /**
      * Metainformation about a file or folder in the Trash
@@ -206,6 +203,8 @@ public interface CloudApi {
     /**
      * Cleaning the Trash
      *
+     * TODO write test
+     *
      * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/trash-delete.xml">english</a>,
      * <a href="https://tech.yandex.ru/disk/api/reference/trash-delete-docpage/">russian</a></p>
      */
@@ -216,11 +215,12 @@ public interface CloudApi {
     /**
      * Restoring a file or folder from the Trash
      *
+     * TODO write test
+     *
      * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/trash-restore.xml">english</a>,
      * <a href="https://tech.yandex.ru/disk/api/reference/trash-restore-docpage/">russian</a></p>
      */
     @PUT("/v1/disk/trash/resources/restore")
     Link restoreTrash(@Query("path") String path, @Query("name") String name, @Query("overwrite") boolean overwrite)
             throws ServerIOException;
-
 }

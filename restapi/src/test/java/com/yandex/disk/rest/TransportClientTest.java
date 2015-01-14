@@ -399,4 +399,45 @@ public class TransportClientTest {
             client.delete(path, true);
         }
     }
+
+    @Test
+    public void testDownloadAndSavePublicResource() throws Exception {
+        String path = "/yac-qr.png";
+        File local = new File("/tmp/" + path);
+        assertFalse(local.exists());
+
+        Link link = client.publish(path);
+        Log.d("link: "+link);
+        try {
+            final String[] publicKey = new String[1];
+            client.listResources(path, new ListParsingHandler() {
+                @Override
+                public void handleSelf(Resource item) {
+                    publicKey[0] = item.getPublicKey();
+                }
+            });
+
+            Link savedLink = client.savePublicResource(publicKey[0], null, null);
+            Log.d("savedLink: "+savedLink);
+            // TODO check saved file
+
+            client.downloadPublicResource(publicKey[0], "", local, null, new ProgressListener() {
+                @Override
+                public void updateProgress(long loaded, long total) {
+                    Log.d("updateProgress: " + loaded + " / " + total);
+                }
+
+                @Override
+                public boolean hasCancelled() {
+                    return false;
+                }
+            });
+            Log.d("length: " + local.length());
+            assertTrue(local.length() == 709L);
+            assertTrue(local.delete());
+
+        } finally {
+            client.unpublish(path);
+        }
+    }
 }

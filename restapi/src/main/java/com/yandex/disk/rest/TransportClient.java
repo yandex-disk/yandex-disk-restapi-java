@@ -178,12 +178,15 @@ public class TransportClient {
     private void parseListResponse(final Resource resource, final ListParsingHandler handler) {
         handler.handleSelf(resource);
         ResourceList items = resource.getItems();
-        int size = items.getItems().size();
-        for (Resource item : items.getItems()) {
+        int size = 0;
+        if (items != null) {
+            size = items.getItems().size();
+            for (Resource item : items.getItems()) {
 //            if (handler.hasCancelled()) { TODO
 //                return;
 //            }
-            handler.handleItem(item);
+                handler.handleItem(item);
+            }
         }
         handler.onPageFinished(size);
     }
@@ -252,5 +255,18 @@ public class TransportClient {
     public Link unpublish(final String path)
             throws ServerIOException {
         return call().unpublish(path);
+    }
+
+    public void downloadPublicResource(final String publicKey, final String path, final File saveTo,
+                                       final List<CustomHeader> headerList, final ProgressListener progressListener)
+            throws IOException, ServerException {
+        Link link = call(headerList).getPublicResourceDownloadLink(publicKey, path);
+        new HttpClientIO(client, getAllHeaders(headerList))
+                .downloadUrl(link.getHref(), new FileDownloadListener(saveTo, progressListener));
+    }
+
+    public Link savePublicResource(final String publicKey, final String path, final String name)
+            throws IOException, ServerException {
+        return call().savePublicResource(publicKey, path, name);
     }
 }
