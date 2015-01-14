@@ -145,6 +145,19 @@ public class TransportClient {
         parseListResponse(resource, handler);
     }
 
+    public void listPublicResources(final String publicKey, final String path, final ListParsingHandler handler)
+            throws IOException, ServerIOException {
+        listPublicResources(publicKey, path, null, 0, 0, null, null, handler);
+    }
+
+    // TODO make test with fields, limit, offset, sort and previewSize
+    public void listPublicResources(final String publicKey, final String path, final String fields, final int limit, final int offset,
+                              final String sort, final String previewSize, final ListParsingHandler handler)
+            throws IOException, ServerIOException {
+        Resource resource = call().listPublicResources(publicKey, path, fields, limit, offset, sort, previewSize);
+        parseListResponse(resource, handler);
+    }
+
     public void listTrash(final String path, final ListParsingHandler handler)
             throws IOException, ServerIOException {
         listTrash(path, null, 0, 0, null, null, handler);
@@ -163,6 +176,7 @@ public class TransportClient {
     }
 
     private void parseListResponse(final Resource resource, final ListParsingHandler handler) {
+        handler.handleSelf(resource);
         ResourceList items = resource.getItems();
         int size = items.getItems().size();
         for (Resource item : items.getItems()) {

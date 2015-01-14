@@ -21,5 +21,10 @@ public abstract class ListParsingHandler {
         return false;
     }
 
-    public abstract boolean handleItem(Resource item);
+    public void handleSelf(Resource item) {
+    }
+
+    public boolean handleItem(Resource item) {
+        return false;
+    }
 }

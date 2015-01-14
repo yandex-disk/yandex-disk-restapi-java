@@ -99,8 +99,14 @@ public class TransportClientTest {
 
     @Test
     public void testListResources() throws Exception {
-        final List<Resource> items = new ArrayList<>();
         client.listResources("/", new ListParsingHandler() {
+            final List<Resource> items = new ArrayList<>();
+
+            @Override
+            public void handleSelf(Resource item) {
+                Log.d("self: " + item);
+            }
+
             @Override
             public boolean handleItem(Resource item) {
                 items.add(item);
@@ -313,11 +319,7 @@ public class TransportClientTest {
         } catch (ServerIOException ex) {
             ex.printStackTrace();
         }
-        try {
-            client.makeFolder(path);
-        } catch (ServerIOException ex) {
-            ex.printStackTrace();
-        }
+        client.makeFolder(path);
 
         client.publish(path);
         client.listResources(path, new ListParsingHandler() {
@@ -338,5 +340,63 @@ public class TransportClientTest {
                 return true;
             }
         });
+    }
+
+    @Test
+    public void testListPublicResources() throws Exception {
+        String path = "/0-test/list-public-resources-test";
+
+        try {
+            client.delete(path, true);
+        } catch (ServerIOException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            client.makeFolder(path);
+        } catch (ServerIOException ex) {
+            ex.printStackTrace();
+        }
+        for (int i = 1; i < 6; i++) {
+            try {
+                client.makeFolder(path + "/folder-" + i);
+            } catch (ServerIOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        Link link = client.publish(path);
+        Log.d("link: "+link);
+
+        try {
+            final String[] publicKey = new String[1];
+            client.listResources(path, new ListParsingHandler() {
+                @Override
+                public void handleSelf(Resource item) {
+                    publicKey[0] = item.getPublicKey();
+                }
+            });
+
+            Log.d("publicKey: " + publicKey[0]);
+            client.listPublicResources(publicKey[0], null, new ListParsingHandler() {
+                final List<Resource> items = new ArrayList<>();
+
+                @Override
+                public boolean handleItem(Resource item) {
+                    items.add(item);
+                    Log.d("item: " + item);
+                    return true;
+                }
+
+                @Override
+                public void onPageFinished(int itemsOnPage) {
+                    assertThat(items, hasSize(itemsOnPage));
+                    assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
+                }
+            });
+
+        } finally {
+            client.unpublish(path);
+            client.delete(path, true);
+        }
     }
 }

@@ -12,12 +12,18 @@ public class ResourcePath {
         }
         String[] arr = str.split(SEPARATOR);    // TODO search first ':' instead of split
         if (arr.length != 2) {
-            throw new IllegalArgumentException();
-        }
-        prefix = arr[0];
-        path = arr[1];
-        if (prefix == null || path == null || prefix.length() == 0 || path.length() == 0) {
-            throw new IllegalArgumentException();
+            if (arr.length < 2) {
+                prefix = null;
+                path = str;
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } else {
+            prefix = arr[0];
+            path = arr[1];
+            if (prefix == null || path == null || prefix.length() == 0 || path.length() == 0) {
+                throw new IllegalArgumentException();
+            }
         }
     }
 

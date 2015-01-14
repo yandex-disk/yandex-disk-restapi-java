@@ -168,6 +168,27 @@ public interface CloudApi {
                                  @Query("preview_size") String previewSize)
             throws ServerIOException;
 
+    /**
+     * Downloading a public file or folder
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/public.xml#download">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/public-docpage/#download">russian</a></p>
+     */
+    @GET("/v1/disk/public/resources/download")
+    Link getPublicResourceDownloadLink(@Query("public_key") String publicKey, @Query("path") String path)
+            throws ServerIOException;
+
+    /**
+     * Saving a public file in "Downloads"
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/public.xml#save">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/public-docpage/#save">russian</a></p>
+     */
+    @POST("/v1/disk/resources/upload")
+    Link savePublicResource(@Query("url") String url, @Query("path") String path, @Query("path") String name)
+            throws ServerIOException;
+
+
     // TODO
 
     /**
