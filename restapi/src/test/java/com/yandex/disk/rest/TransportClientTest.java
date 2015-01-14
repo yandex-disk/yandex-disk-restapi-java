@@ -267,4 +267,50 @@ public class TransportClientTest {
         Log.d("operation: "+operation);
         assertTrue(operation.getStatus() == null);
     }
+
+    @Ignore
+    @Test
+    public void testCopyFolder() throws Exception {
+        String from = "/0-test/copy-folder-test-src";
+        String to = "/0-test/copy-folder-test-dst";
+
+        try {
+            client.makeFolder(from);
+        } catch (ServerIOException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            client.delete(to, false);
+        } catch (ServerIOException ex) {
+            ex.printStackTrace();
+        }
+
+        Link link = client.copy(from, to, false);
+        Operation operation = client.getOperation(link);
+        Log.d("operation: "+operation);
+        assertTrue(operation.getStatus() == null);
+    }
+
+    @Ignore
+    @Test
+    public void testMoveFolder() throws Exception {
+        String from = "/0-test/move-folder-test-src";
+        String to = "/0-test/move-folder-test-dst";
+
+        try {
+            client.makeFolder(from);
+        } catch (ServerIOException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            client.delete(to, false);
+        } catch (ServerIOException ex) {
+            ex.printStackTrace();
+        }
+
+        Link link = client.move(from, to, false);
+        Operation operation = client.getOperation(link);
+        Log.d("operation: "+operation);
+        assertTrue(operation.getStatus() == null);
+    }
 }

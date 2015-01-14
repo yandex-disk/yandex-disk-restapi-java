@@ -95,10 +95,25 @@ public interface CloudApi {
     Link getUploadLink(@Query("path") String path, @Query("overwrite") boolean overwrite)
             throws ServerIOException;
 
+    /**
+     * Copying a file or folder
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/copy.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/copy-docpage/">russian</a></p>
+     */
+    @POST("/v1/disk/resources/copy")
+    Link copy(@Query("from") String from, @Query("path") String path, @Query("overwrite") boolean overwrite)
+            throws ServerIOException;
 
-    // TODO https://tech.yandex.ru/disk/api/reference/copy-docpage/
-
-    // TODO https://tech.yandex.ru/disk/api/reference/move-docpage/
+    /**
+     * Moving a file or folder
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/move.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/move-docpage/">russian</a></p>
+     */
+    @POST("/v1/disk/resources/move")
+    Link move(@Query("from") String from, @Query("path") String path, @Query("overwrite") boolean overwrite)
+            throws ServerIOException;
 
     /**
      * Deleting a file or folder

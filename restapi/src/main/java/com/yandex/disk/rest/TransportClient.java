@@ -246,4 +246,22 @@ public class TransportClient {
         Log.d(TAG, "makeFolder: " + link);
         return link;
     }
+
+    public Link copy(final String from, final String path, final boolean overwrite)
+            throws ServerIOException, UnknownServerException {
+        Link link = getRestAdapterBuilder().build()
+                .create(CloudApi.class)
+                .copy(from, path, overwrite);
+        Log.d(TAG, "copy: " + link);
+        return link;
+    }
+
+    public Link move(final String from, final String path, final boolean overwrite)
+            throws ServerIOException, UnknownServerException {
+        Link link = getRestAdapterBuilder().build()
+                .create(CloudApi.class)
+                .move(from, path, overwrite);
+        Log.d(TAG, "move: " + link);
+        return link;
+    }
 }
