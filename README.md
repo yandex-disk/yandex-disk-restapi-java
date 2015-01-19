@@ -3,6 +3,7 @@ mobile-disk-restapi-java
 
 https://tech.yandex.ru/disk/rest/
 
+TODO Before any production use: replace Retrofit calls to HttpClientIO.getJson() or improve Retrofit code to manage HTTP 2xx codes
 
 Links:
 
