@@ -4,6 +4,8 @@ package com.yandex.disk.rest;
 //import android.net.SSLCertificateSocketFactory;
 
 import com.squareup.okhttp.OkHttpClient;
+import com.yandex.disk.rest.okhttp.HttpCodeInterceptor;
+import com.yandex.disk.rest.okhttp.LoggingInterceptor;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +21,9 @@ public class HttpClient extends OkClient {
 
     private static OkHttpClient makeClient() {
         OkHttpClient client = new OkHttpClient();
+
+//        client.networkInterceptors().add(new HttpCodeInterceptor());
+//        client.networkInterceptors().add(new LoggingInterceptor());
 
         client.setConnectTimeout(CONNECT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         client.setReadTimeout(READ_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);

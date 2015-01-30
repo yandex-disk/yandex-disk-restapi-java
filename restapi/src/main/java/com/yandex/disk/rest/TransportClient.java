@@ -23,8 +23,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
+import retrofit.Callback;
 import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class TransportClient {
 
@@ -102,8 +106,30 @@ public class TransportClient {
     }
 
     public ApiVersion getApiVersion()
-            throws IOException, ServerIOException {
-        return call().getApiVersion();
+            throws IOException, ServerIOException, UnknownServerException {
+        final CountDownLatch latch = new CountDownLatch(1);
+        final ApiVersion[] result = new ApiVersion[1];
+        call().getApiVersion(new Callback<ApiVersion>() {
+            @Override
+            public void success(ApiVersion apiVersion, Response response) {
+                result[0] = apiVersion;
+                apiVersion.setHttpCode(response.getStatus());
+                apiVersion.setHttpMessage(response.getReason());
+                latch.countDown();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+            }
+        });
+        try {
+            latch.await();
+        } catch (InterruptedException ex) {
+            // make compiler happy
+        }
+        return result[0];
+//        return new HttpClientIO(client, getAllHeaders(null))
+//                .getJson(serverURL.toExternalForm(), ApiVersion.class);
     }
 
     public Operation getOperation(final String operationId)

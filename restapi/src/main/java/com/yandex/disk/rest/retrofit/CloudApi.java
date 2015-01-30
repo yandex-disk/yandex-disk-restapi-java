@@ -7,6 +7,7 @@ import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
 
+import retrofit.Callback;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
 import retrofit.http.POST;
@@ -21,6 +22,10 @@ public interface CloudApi {
      */
     @GET("/")
     ApiVersion getApiVersion()
+            throws ServerIOException;
+
+    @GET("/")
+    void getApiVersion(Callback<ApiVersion> callback)
             throws ServerIOException;
 
     /**

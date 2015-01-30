@@ -44,7 +44,6 @@ public class HttpClientIO {
 
     public HttpClientIO(HttpClient client, List<CustomHeader> commonHeaders) {
         this.client = client.getClient();
-        this.client.networkInterceptors().add(new LoggingInterceptor());
         this.commonHeaders = commonHeaders;
     }
 
