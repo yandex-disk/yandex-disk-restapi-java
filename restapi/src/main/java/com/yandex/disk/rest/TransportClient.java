@@ -158,54 +158,38 @@ public class TransportClient {
         return call().getCapacity(fields);
     }
 
-    public Resource listResources(final String path)
+    // TODO make test with fields, sort, previewSize and previewCrop
+    public Resource listResources(final ResourcesArgs args)
             throws IOException, ServerIOException {
-        return listResources(path, null, null, null, null, null, false);
+        final Resource resource = call().listResources(args.getPath(), args.getFields(),
+                args.getLimit(), args.getOffset(), args.getSort(), args.getPreviewSize(),
+                args.getPreviewCrop());
+        if (args.getParsingHandler() != null) {
+            parseListResponse(resource, args.getParsingHandler());
+        }
+        return resource;
     }
 
-    public Resource listResources(final String path, final String fields, final Integer limit, final Integer offset,
-                                  final String sort, final String previewSize, boolean previewCrop)
+    public Resource listPublicResources(final ResourcesArgs args)
             throws IOException, ServerIOException {
-        return call().listResources(path, fields, limit, offset, sort, previewSize, previewCrop);
+        final Resource resource = call().listPublicResources(args.getPublicKey(), args.getPath(),
+                args.getFields(), args.getLimit(), args.getOffset(), args.getSort(),
+                args.getPreviewSize(), args.getPreviewCrop());
+        if (args.getParsingHandler() != null) {
+            parseListResponse(resource, args.getParsingHandler());
+        }
+        return resource;
     }
 
-    public void listResources(final String path, final ListParsingHandler handler)
+    public Resource listTrash(final ResourcesArgs args)
             throws IOException, ServerIOException {
-        listResources(path, null, null, null, null, null, false, handler);
-    }
-
-    // TODO make test with fields, limit, offset, sort and previewSize
-    public void listResources(final String path, final String fields, final Integer limit, final Integer offset,
-                              final String sort, final String previewSize, boolean previewCrop,
-                              final ListParsingHandler handler)
-            throws IOException, ServerIOException {
-        Resource resource = listResources(path, fields, limit, offset, sort, previewSize, previewCrop);
-        parseListResponse(resource, handler);
-    }
-
-    public void listPublicResources(final String publicKey, final String path, final ListParsingHandler handler)
-            throws IOException, ServerIOException {
-        listPublicResources(publicKey, path, null, 0, 0, null, null, handler);
-    }
-
-    // TODO make test with fields, limit, offset, sort and previewSize
-    public void listPublicResources(final String publicKey, final String path, final String fields, final int limit, final int offset,
-                              final String sort, final String previewSize, final ListParsingHandler handler)
-            throws IOException, ServerIOException {
-        Resource resource = call().listPublicResources(publicKey, path, fields, limit, offset, sort, previewSize);
-        parseListResponse(resource, handler);
-    }
-
-    public void listTrash(final String path, final ListParsingHandler handler)
-            throws IOException, ServerIOException {
-        listTrash(path, null, 0, 0, null, null, handler);
-    }
-
-    public void listTrash(final String path, final String fields, final int limit, final int offset,
-                          final String sort, final String previewSize, final ListParsingHandler handler)
-            throws IOException, ServerIOException {
-        Resource resource = call().listTrash(path, fields, limit, offset, sort, previewSize);
-        parseListResponse(resource, handler);
+        final Resource resource = call().listTrash(args.getPath(), args.getFields(),
+                args.getLimit(), args.getOffset(), args.getSort(), args.getPreviewSize(),
+                args.getPreviewCrop());
+        if (args.getParsingHandler() != null) {
+            parseListResponse(resource, args.getParsingHandler());
+        }
+        return resource;
     }
 
     public Link dropTrash(final String path)
@@ -213,7 +197,7 @@ public class TransportClient {
         return call().dropTrash(path);
     }
 
-    private void parseListResponse(final Resource resource, final ListParsingHandler handler) {
+    private void parseListResponse(final Resource resource, final ResourcesHandler handler) {
         handler.handleSelf(resource);
         ResourceList items = resource.getItems();
         int size = 0;

@@ -56,8 +56,9 @@ public interface CloudApi {
      */
     @GET("/v1/disk/resources")
     Resource listResources(@Query("path") String path, @Query("fields") String fields,
-                           @Query("limit") Integer limit, @Query("offset") Integer offset, @Query("sort") String sort,
-                           @Query("preview_size") String previewSize, @Query("preview_crop") boolean previewCrop)
+                           @Query("limit") Integer limit, @Query("offset") Integer offset,
+                           @Query("sort") String sort, @Query("preview_size") String previewSize,
+                           @Query("preview_crop") Boolean previewCrop)
             throws ServerIOException;
 
 
@@ -97,7 +98,7 @@ public interface CloudApi {
      * <a href="https://tech.yandex.ru/disk/api/reference/upload-docpage/">russian</a></p>
      */
     @GET("/v1/disk/resources/upload")
-    Link getUploadLink(@Query("path") String path, @Query("overwrite") boolean overwrite)
+    Link getUploadLink(@Query("path") String path, @Query("overwrite") Boolean overwrite)
             throws ServerIOException;
 
     /**
@@ -107,7 +108,8 @@ public interface CloudApi {
      * <a href="https://tech.yandex.ru/disk/api/reference/copy-docpage/">russian</a></p>
      */
     @POST("/v1/disk/resources/copy")
-    Link copy(@Query("from") String from, @Query("path") String path, @Query("overwrite") boolean overwrite)
+    Link copy(@Query("from") String from, @Query("path") String path,
+              @Query("overwrite") Boolean overwrite)
             throws ServerIOException;
 
     /**
@@ -117,7 +119,8 @@ public interface CloudApi {
      * <a href="https://tech.yandex.ru/disk/api/reference/move-docpage/">russian</a></p>
      */
     @POST("/v1/disk/resources/move")
-    Link move(@Query("from") String from, @Query("path") String path, @Query("overwrite") boolean overwrite)
+    Link move(@Query("from") String from, @Query("path") String path,
+              @Query("overwrite") Boolean overwrite)
             throws ServerIOException;
 
     /**
@@ -127,7 +130,7 @@ public interface CloudApi {
      * <a href="https://tech.yandex.ru/disk/api/reference/delete-docpage/">russian</a></p>
      */
     @DELETE("/v1/disk/resources")
-    Link delete(@Query("path") String path, @Query("permanently") boolean permanently)
+    Link delete(@Query("path") String path, @Query("permanently") Boolean permanently)
             throws ServerIOException;
 
     /**
@@ -168,9 +171,10 @@ public interface CloudApi {
      */
     @GET("/v1/disk/public/resources")
     Resource listPublicResources(@Query("public_key") String publicKey, @Query("path") String path,
-                                 @Query("fields") String fields, @Query("limit") int limit,
-                                 @Query("offset") int offset, @Query("sort") String sort,
-                                 @Query("preview_size") String previewSize)
+                                 @Query("fields") String fields, @Query("limit") Integer limit,
+                                 @Query("offset") Integer offset, @Query("sort") String sort,
+                                 @Query("preview_size") String previewSize,
+                                 @Query("preview_crop") Boolean previewCrop)
             throws ServerIOException;
 
     /**
@@ -180,7 +184,8 @@ public interface CloudApi {
      * <a href="https://tech.yandex.ru/disk/api/reference/public-docpage/#download">russian</a></p>
      */
     @GET("/v1/disk/public/resources/download")
-    Link getPublicResourceDownloadLink(@Query("public_key") String publicKey, @Query("path") String path)
+    Link getPublicResourceDownloadLink(@Query("public_key") String publicKey,
+                                       @Query("path") String path)
             throws ServerIOException;
 
     /**
@@ -190,7 +195,8 @@ public interface CloudApi {
      * <a href="https://tech.yandex.ru/disk/api/reference/public-docpage/#save">russian</a></p>
      */
     @POST("/v1/disk/public/resources/save-to-disk/")
-    Link savePublicResource(@Query("public_key") String publicKey, @Query("path") String path, @Query("name") String name)
+    Link savePublicResource(@Query("public_key") String publicKey, @Query("path") String path,
+                            @Query("name") String name)
             throws ServerIOException;
 
     /**
@@ -201,8 +207,9 @@ public interface CloudApi {
      */
     @GET("/v1/disk/trash/resources")
     Resource listTrash(@Query("path") String path, @Query("fields") String fields,
-                       @Query("limit") int limit, @Query("offset") int offset, @Query("sort") String sort,
-                       @Query("preview_size") String previewSize)
+                       @Query("limit") Integer limit, @Query("offset") Integer offset,
+                       @Query("sort") String sort, @Query("preview_size") String previewSize,
+                       @Query("preview_crop") Boolean previewCrop)
             throws ServerIOException;
 
     /**
@@ -226,6 +233,7 @@ public interface CloudApi {
      * <a href="https://tech.yandex.ru/disk/api/reference/trash-restore-docpage/">russian</a></p>
      */
     @PUT("/v1/disk/trash/resources/restore")
-    Link restoreTrash(@Query("path") String path, @Query("name") String name, @Query("overwrite") boolean overwrite)
+    Link restoreTrash(@Query("path") String path, @Query("name") String name,
+                      @Query("overwrite") Boolean overwrite)
             throws ServerIOException;
 }

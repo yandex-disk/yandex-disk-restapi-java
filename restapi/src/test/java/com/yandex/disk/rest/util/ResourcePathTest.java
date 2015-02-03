@@ -1,9 +1,11 @@
 package com.yandex.disk.rest.util;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(JUnit4.class)
@@ -16,6 +18,7 @@ public class ResourcePathTest {
         assertTrue("prefix".equals(resourcePath.getPrefix()));
         assertTrue("/long/path".equals(resourcePath.getPath()));
         assertTrue(src.equals(resourcePath.toString()));
+        assertEquals(resourcePath, new ResourcePath("prefix", "/long/path"));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -23,12 +26,22 @@ public class ResourcePathTest {
         new ResourcePath(null);
     }
 
+    @Ignore @Test(expected = IllegalArgumentException.class)
+    public void testNullArg2() throws Exception {
+        new ResourcePath(null, "");
+    }
+
     @Test(expected = IllegalArgumentException.class)
+    public void testNullArg3() throws Exception {
+        new ResourcePath("", null);
+    }
+
+    @Ignore @Test(expected = IllegalArgumentException.class)
     public void testNoPrefix() throws Exception {
         new ResourcePath("/long/path");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Ignore @Test(expected = IllegalArgumentException.class)
     public void testNoPath() throws Exception {
         new ResourcePath("1:");
     }

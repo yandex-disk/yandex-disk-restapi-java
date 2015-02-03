@@ -3,7 +3,7 @@ package com.yandex.disk.rest;
 
 import com.yandex.disk.rest.json.Resource;
 
-public abstract class ListParsingHandler {
+public abstract class ResourcesHandler {
 
     public void handleSelf(Resource item) {
     }

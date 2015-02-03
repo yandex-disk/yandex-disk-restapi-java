@@ -9,6 +9,7 @@ import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
 import com.yandex.disk.rest.json.ResourceList;
 import com.yandex.disk.rest.util.Hash;
+import com.yandex.disk.rest.util.ResourcePath;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -33,6 +34,7 @@ import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -100,20 +102,28 @@ public class TransportClientTest {
 
     @Test
     public void testListResources() throws Exception {
-        Resource resource = client.listResources("/");
+        int limit = 50;
+        Resource resource = client.listResources(new ResourcesArgs.Builder()
+                .setPath("/")
+                .setLimit(limit)
+                .setOffset(10)
+                .build());
+        assertTrue("dir".equals(resource.getType()));
+        assertEquals(resource.getPath(), new ResourcePath("disk", "/"));
         Log.d("self: " + resource);
+
         ResourceList items = resource.getItems();
         assertFalse(items == null);
         for (Resource item : items.getItems()) {
             Log.d("item: " + item);
         }
-        assertThat(items.getItems(), hasSize(20));
+        assertThat(items.getItems(), hasSize(limit));
         assertThat(items.getItems().get(0).getName(), not(isEmptyOrNullString()));
     }
 
     @Test
     public void testListResourcesHandler() throws Exception {
-        client.listResources("/", new ListParsingHandler() {
+        ResourcesHandler parsingHandler = new ResourcesHandler() {
             final List<Resource> items = new ArrayList<>();
 
             @Override
@@ -132,13 +142,17 @@ public class TransportClientTest {
                 assertThat(items, hasSize(itemsOnPage));
                 assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
             }
-        });
+        };
+        client.listResources(new ResourcesArgs.Builder()
+                .setPath("/")
+                .setParsingHandler(parsingHandler)
+                .build());
     }
 
     @Test
     public void testTrash() throws Exception {
         final List<Resource> items = new ArrayList<>();
-        client.listTrash("/", new ListParsingHandler() {
+        ResourcesHandler parsingHandler = new ResourcesHandler() {
             @Override
             public void handleItem(Resource item) {
                 items.add(item);
@@ -149,7 +163,11 @@ public class TransportClientTest {
                 assertThat(items, hasSize(itemsOnPage));
                 assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
             }
-        });
+        };
+        client.listTrash(new ResourcesArgs.Builder()
+                .setPath("/")
+                .setParsingHandler(parsingHandler)
+                .build());
 
 //        ListItem item = items.get(0);
 //        Log.d("item to delete: " + item);
@@ -334,22 +352,28 @@ public class TransportClientTest {
         client.makeFolder(path);
 
         client.publish(path);
-        client.listResources(path, new ListParsingHandler() {
-            @Override
-            public void handleItem(Resource item) {
-                assertThat(item.getPublicKey(), not(isEmptyOrNullString()));
-                assertThat(item.getPublicUrl(), not(isEmptyOrNullString()));
-            }
-        });
+        client.listResources(new ResourcesArgs.Builder()
+                .setPath(path)
+                .setParsingHandler(new ResourcesHandler() {
+                    @Override
+                    public void handleItem(Resource item) {
+                        assertThat(item.getPublicKey(), not(isEmptyOrNullString()));
+                        assertThat(item.getPublicUrl(), not(isEmptyOrNullString()));
+                    }
+                })
+                .build());
 
         client.unpublish(path);
-        client.listResources(path, new ListParsingHandler() {
-            @Override
-            public void handleItem(Resource item) {
-                assertThat(item.getPublicKey(), isEmptyOrNullString());
-                assertThat(item.getPublicUrl(), isEmptyOrNullString());
-            }
-        });
+        client.listResources(new ResourcesArgs.Builder()
+                .setPath(path)
+                .setParsingHandler(new ResourcesHandler() {
+                    @Override
+                    public void handleItem(Resource item) {
+                        assertThat(item.getPublicKey(), isEmptyOrNullString());
+                        assertThat(item.getPublicUrl(), isEmptyOrNullString());
+                    }
+                })
+                .build());
     }
 
     @Test
@@ -379,32 +403,42 @@ public class TransportClientTest {
 
         try {
             final String[] publicKey = new String[1];
-            client.listResources(path, new ListParsingHandler() {
-                @Override
-                public void handleSelf(Resource item) {
-                    publicKey[0] = item.getPublicKey();
-                }
-            });
-
+            client.listResources(new ResourcesArgs.Builder()
+                    .setPath(path)
+                    .setParsingHandler(new ResourcesHandler() {
+                        @Override
+                        public void handleSelf(Resource item) {
+                            publicKey[0] = item.getPublicKey();
+                        }
+                    })
+                    .build());
             Log.d("publicKey: " + publicKey[0]);
-            client.listPublicResources(publicKey[0], null, new ListParsingHandler() {
-                final List<Resource> items = new ArrayList<>();
 
-                @Override
-                public void handleItem(Resource item) {
-                    items.add(item);
-                    Log.d("item: " + item);
-                }
+            client.listPublicResources(new ResourcesArgs.Builder()
+                    .setPublicKey(publicKey[0])
+                    .setParsingHandler(new ResourcesHandler() {
+                        final List<Resource> items = new ArrayList<>();
 
-                @Override
-                public void onFinished(int itemsOnPage) {
-                    assertThat(items, hasSize(itemsOnPage));
-                    assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
-                }
-            });
+                        @Override
+                        public void handleItem(Resource item) {
+                            items.add(item);
+                            Log.d("item: " + item);
+                        }
+
+                        @Override
+                        public void onFinished(int itemsOnPage) {
+                            assertThat(items, hasSize(itemsOnPage));
+                            assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
+                        }
+                    })
+                    .build());
 
         } finally {
-            client.unpublish(path);
+            try {
+                client.unpublish(path);
+            } catch (ServerIOException ex) {
+                ex.printStackTrace();
+            }
             client.delete(path, true);
         }
     }
@@ -419,12 +453,15 @@ public class TransportClientTest {
         Log.d("link: "+link);
         try {
             final String[] publicKey = new String[1];
-            client.listResources(path, new ListParsingHandler() {
-                @Override
-                public void handleSelf(Resource item) {
-                    publicKey[0] = item.getPublicKey();
-                }
-            });
+            client.listResources(new ResourcesArgs.Builder()
+                    .setPath(path)
+                    .setParsingHandler(new ResourcesHandler() {
+                        @Override
+                        public void handleSelf(Resource item) {
+                            publicKey[0] = item.getPublicKey();
+                        }
+                    })
+                    .build());
 
             Link savedLink = client.savePublicResource(publicKey[0], null, null);
             Log.d("savedLink: "+savedLink);
