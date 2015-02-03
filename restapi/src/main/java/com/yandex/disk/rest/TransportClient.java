@@ -158,16 +158,28 @@ public class TransportClient {
         return call().getCapacity(fields);
     }
 
+    public Resource listResources(final String path)
+            throws IOException, ServerIOException {
+        return listResources(path, null, null, null, null, null, false);
+    }
+
+    public Resource listResources(final String path, final String fields, final Integer limit, final Integer offset,
+                                  final String sort, final String previewSize, boolean previewCrop)
+            throws IOException, ServerIOException {
+        return call().listResources(path, fields, limit, offset, sort, previewSize, previewCrop);
+    }
+
     public void listResources(final String path, final ListParsingHandler handler)
             throws IOException, ServerIOException {
-        listResources(path, null, 0, 0, null, null, handler);
+        listResources(path, null, null, null, null, null, false, handler);
     }
 
     // TODO make test with fields, limit, offset, sort and previewSize
-    public void listResources(final String path, final String fields, final int limit, final int offset,
-                              final String sort, final String previewSize, final ListParsingHandler handler)
+    public void listResources(final String path, final String fields, final Integer limit, final Integer offset,
+                              final String sort, final String previewSize, boolean previewCrop,
+                              final ListParsingHandler handler)
             throws IOException, ServerIOException {
-        Resource resource = call().listResources(path, fields, limit, offset, sort, previewSize);
+        Resource resource = listResources(path, fields, limit, offset, sort, previewSize, previewCrop);
         parseListResponse(resource, handler);
     }
 
@@ -208,13 +220,10 @@ public class TransportClient {
         if (items != null) {
             size = items.getItems().size();
             for (Resource item : items.getItems()) {
-//            if (handler.hasCancelled()) { TODO
-//                return;
-//            }
                 handler.handleItem(item);
             }
         }
-        handler.onPageFinished(size);
+        handler.onFinished(size);
     }
 
     public void downloadFile(final String path, final File saveTo, final List<CustomHeader> headerList,

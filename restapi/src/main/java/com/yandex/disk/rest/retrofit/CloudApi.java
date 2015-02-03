@@ -56,8 +56,8 @@ public interface CloudApi {
      */
     @GET("/v1/disk/resources")
     Resource listResources(@Query("path") String path, @Query("fields") String fields,
-                           @Query("limit") int limit, @Query("offset") int offset, @Query("sort") String sort,
-                           @Query("preview_size") String previewSize)
+                           @Query("limit") Integer limit, @Query("offset") Integer offset, @Query("sort") String sort,
+                           @Query("preview_size") String previewSize, @Query("preview_crop") boolean previewCrop)
             throws ServerIOException;
 
 

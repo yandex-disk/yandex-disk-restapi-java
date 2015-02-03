@@ -7,6 +7,7 @@ import com.yandex.disk.rest.json.DiskCapacity;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
+import com.yandex.disk.rest.json.ResourceList;
 import com.yandex.disk.rest.util.Hash;
 
 import org.junit.Before;
@@ -99,6 +100,19 @@ public class TransportClientTest {
 
     @Test
     public void testListResources() throws Exception {
+        Resource resource = client.listResources("/");
+        Log.d("self: " + resource);
+        ResourceList items = resource.getItems();
+        assertFalse(items == null);
+        for (Resource item : items.getItems()) {
+            Log.d("item: " + item);
+        }
+        assertThat(items.getItems(), hasSize(20));
+        assertThat(items.getItems().get(0).getName(), not(isEmptyOrNullString()));
+    }
+
+    @Test
+    public void testListResourcesHandler() throws Exception {
         client.listResources("/", new ListParsingHandler() {
             final List<Resource> items = new ArrayList<>();
 
@@ -108,14 +122,13 @@ public class TransportClientTest {
             }
 
             @Override
-            public boolean handleItem(Resource item) {
+            public void handleItem(Resource item) {
                 items.add(item);
                 Log.d("item: " + item);
-                return true;
             }
 
             @Override
-            public void onPageFinished(int itemsOnPage) {
+            public void onFinished(int itemsOnPage) {
                 assertThat(items, hasSize(itemsOnPage));
                 assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
             }
@@ -127,13 +140,12 @@ public class TransportClientTest {
         final List<Resource> items = new ArrayList<>();
         client.listTrash("/", new ListParsingHandler() {
             @Override
-            public boolean handleItem(Resource item) {
+            public void handleItem(Resource item) {
                 items.add(item);
-                return true;
             }
 
             @Override
-            public void onPageFinished(int itemsOnPage) {
+            public void onFinished(int itemsOnPage) {
                 assertThat(items, hasSize(itemsOnPage));
                 assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
             }
@@ -324,20 +336,18 @@ public class TransportClientTest {
         client.publish(path);
         client.listResources(path, new ListParsingHandler() {
             @Override
-            public boolean handleItem(Resource item) {
+            public void handleItem(Resource item) {
                 assertThat(item.getPublicKey(), not(isEmptyOrNullString()));
                 assertThat(item.getPublicUrl(), not(isEmptyOrNullString()));
-                return true;
             }
         });
 
         client.unpublish(path);
         client.listResources(path, new ListParsingHandler() {
             @Override
-            public boolean handleItem(Resource item) {
+            public void handleItem(Resource item) {
                 assertThat(item.getPublicKey(), isEmptyOrNullString());
                 assertThat(item.getPublicUrl(), isEmptyOrNullString());
-                return true;
             }
         });
     }
@@ -381,14 +391,13 @@ public class TransportClientTest {
                 final List<Resource> items = new ArrayList<>();
 
                 @Override
-                public boolean handleItem(Resource item) {
+                public void handleItem(Resource item) {
                     items.add(item);
                     Log.d("item: " + item);
-                    return true;
                 }
 
                 @Override
-                public void onPageFinished(int itemsOnPage) {
+                public void onFinished(int itemsOnPage) {
                     assertThat(items, hasSize(itemsOnPage));
                     assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
                 }
