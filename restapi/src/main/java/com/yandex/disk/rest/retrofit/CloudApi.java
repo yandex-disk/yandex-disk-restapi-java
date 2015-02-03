@@ -221,7 +221,7 @@ public interface CloudApi {
      * <a href="https://tech.yandex.ru/disk/api/reference/trash-delete-docpage/">russian</a></p>
      */
     @DELETE("/v1/disk/trash/resources")
-    Link dropTrash(@Query("path") String path)
+    void dropTrash(@Query("path") String path, Callback<Link> callback)
             throws ServerIOException;
 
     /**

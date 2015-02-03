@@ -3,10 +3,13 @@ package com.yandex.disk.rest;
 
 //import android.net.SSLCertificateSocketFactory;
 
+import com.squareup.okhttp.Dispatcher;
 import com.squareup.okhttp.OkHttpClient;
 import com.yandex.disk.rest.okhttp.HttpCodeInterceptor;
 import com.yandex.disk.rest.okhttp.LoggingInterceptor;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 //import retrofit.client.OkClient;
@@ -21,6 +24,9 @@ public class HttpClient extends OkClient {
 
     private static OkHttpClient makeClient() {
         OkHttpClient client = new OkHttpClient();
+
+//        ExecutorService executor = Executors.newSingleThreadExecutor();
+//        client.setDispatcher(new Dispatcher(executor));
 
 //        client.networkInterceptors().add(new HttpCodeInterceptor());
 //        client.networkInterceptors().add(new LoggingInterceptor());

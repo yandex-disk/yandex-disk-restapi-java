@@ -192,9 +192,14 @@ public class TransportClient {
         return resource;
     }
 
-    public Link dropTrash(final String path)
+    public void dropTrash(final String path, final Callback<Link> callback)
             throws IOException, ServerIOException {
-        return call().dropTrash(path);
+        call().dropTrash(path, callback);
+    }
+
+    public Link restoreTrash(final String path, final String name, final Boolean overwrite)
+            throws IOException, ServerIOException {
+        return call().restoreTrash(path, name, overwrite);
     }
 
     private void parseListResponse(final Resource resource, final ResourcesHandler handler) {
