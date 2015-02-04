@@ -19,7 +19,9 @@ import com.yandex.disk.rest.util.Hash;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +43,7 @@ public class TransportClient {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String USER_AGENT_HEADER = "User-Agent";
     private static final String USER_AGENT = "Cloud API Android Client Example/1.0";
+    private static final String UTF8 = "UTF-8";
 
     private static URL serverURL;
 
@@ -107,7 +110,7 @@ public class TransportClient {
 
     public ApiVersion getApiVersion()
             throws IOException, ServerIOException, UnknownServerException {
-        final CountDownLatch latch = new CountDownLatch(1);
+/*        final CountDownLatch latch = new CountDownLatch(1);
         final ApiVersion[] result = new ApiVersion[1];
         call().getApiVersion(new Callback<ApiVersion>() {
             @Override
@@ -127,9 +130,10 @@ public class TransportClient {
         } catch (InterruptedException ex) {
             // make compiler happy
         }
-        return result[0];
+        return result[0];*/
 //        return new HttpClientIO(client, getAllHeaders(null))
 //                .getJson(serverURL.toExternalForm(), ApiVersion.class);
+        return call().getApiVersion();
     }
 
     public Operation getOperation(final String operationId)
@@ -197,10 +201,24 @@ public class TransportClient {
         call().dropTrash(path, callback);
     }
 
+    public Link dropTrash(final String path)
+            throws IOException, ServerIOException, UnknownServerException, URISyntaxException {
+        return new HttpClientIO(client, getAllHeaders(null))
+                .dropTrash(getUrl() + "/v1/disk/trash/resources?path=" + URLEncoder.encode(path, UTF8));
+    }
+
+    public void restoreTrash(final String path, final String name, final Boolean overwrite,
+                             final Callback<Link> callback)
+            throws IOException, ServerIOException {
+        call().restoreTrash(path, name, overwrite, callback);
+    }
+
+/*
     public Link restoreTrash(final String path, final String name, final Boolean overwrite)
             throws IOException, ServerIOException {
         return call().restoreTrash(path, name, overwrite);
     }
+*/
 
     private void parseListResponse(final Resource resource, final ResourcesHandler handler) {
         handler.handleSelf(resource);

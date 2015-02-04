@@ -233,7 +233,7 @@ public interface CloudApi {
      * <a href="https://tech.yandex.ru/disk/api/reference/trash-restore-docpage/">russian</a></p>
      */
     @PUT("/v1/disk/trash/resources/restore")
-    Link restoreTrash(@Query("path") String path, @Query("name") String name,
-                      @Query("overwrite") Boolean overwrite)
+    void restoreTrash(@Query("path") String path, @Query("name") String name,
+                      @Query("overwrite") Boolean overwrite, Callback<Link> callback)
             throws ServerIOException;
 }

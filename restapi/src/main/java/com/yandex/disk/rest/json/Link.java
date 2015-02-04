@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
  * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/response-objects.xml#link">english</a>,
  * <a href="https://tech.yandex.ru/disk/api/reference/response-objects-docpage/#link">russian</a></p>
  */
-public class Link {
+public class Link extends HttpStatus {
 
     @SerializedName("href")
     String href;
@@ -35,6 +35,7 @@ public class Link {
                 "href='" + href + '\'' +
                 ", method='" + method + '\'' +
                 ", templated=" + templated +
+                ", " + super.toString() +
                 '}';
     }
 }

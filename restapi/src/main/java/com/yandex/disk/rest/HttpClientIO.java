@@ -18,7 +18,8 @@ import com.yandex.disk.rest.exceptions.RemoteFileNotFoundException;
 import com.yandex.disk.rest.exceptions.ServerNotAuthorizedException;
 import com.yandex.disk.rest.exceptions.UnknownServerException;
 import com.yandex.disk.rest.exceptions.UserNotInitializedException;
-import com.yandex.disk.rest.okhttp.LoggingInterceptor;
+import com.yandex.disk.rest.json.HttpStatus;
+import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.util.Hash;
 
 import java.io.File;
@@ -38,6 +39,9 @@ public class HttpClientIO {
     private static final String SIZE_HEADER = "Size";
     private static final String CONTENT_LENGTH_HEADER = "Content-Length";
     private static final String CONTENT_RANGE_HEADER = "Content-Range";
+
+    private static final String METHOD_GET = "GET";
+    private static final String METHOD_DELETE = "DELETE";
 
     private OkHttpClient client;
     private List<CustomHeader> commonHeaders;
@@ -338,5 +342,62 @@ public class HttpClientIO {
                 responseBody.close();
             }
         }
+    }
+
+    public Link dropTrash(String url)
+            throws IOException {
+        return getJson(METHOD_DELETE, url, Link.class, new ResponseHandler<Link>() {
+            @Override
+            public Link onResponse(Response response, Class<Link> classOfT)
+                    throws IOException {
+                switch (response.code()) {
+                    case 202:
+                        Link result = parseResponse(response, classOfT);
+                        result.setResult(HttpStatus.Result.inProgress);
+                        return result;
+                    case 204:
+                        Link ok = new Link();
+                        ok.setResult(HttpStatus.Result.done);
+                        return ok;
+                }
+                Link ok = new Link();
+                ok.setResult(HttpStatus.Result.error);
+                return ok;
+            }
+        });
+    }
+
+    private <T extends HttpStatus> T getJson(String method, String url, Class<T> classOfT,
+                                             ResponseHandler<T> handler)
+            throws IOException {
+        Request request = buildRequest()
+                .method(method, null)
+                .url(url)
+                .build();
+
+        Response response = client
+                .newCall(request)
+                .execute();
+
+        return handler.onResponse(response, classOfT);
+    }
+
+    private <T extends HttpStatus> T parseResponse(Response response, Class<T> classOfT)
+            throws IOException {
+        ResponseBody responseBody = null;
+        try {
+            responseBody = response.body();
+            Gson gson = new Gson();
+            return gson.fromJson(responseBody.charStream(), classOfT);
+        } finally {
+            if (responseBody != null) {
+                responseBody.close();
+            }
+        }
+    }
+
+    private interface ResponseHandler <T extends HttpStatus> {
+        T onResponse(Response response, Class<T> classOfT)
+                throws IOException;
     }
 }

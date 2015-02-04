@@ -2,7 +2,7 @@ package com.yandex.disk.rest.json;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ApiVersion extends HttpResponse {
+public class ApiVersion extends HttpStatus {
 
     @SerializedName("build")
     String build;

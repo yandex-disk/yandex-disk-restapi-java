@@ -29,7 +29,7 @@ public class HttpClient extends OkClient {
 //        client.setDispatcher(new Dispatcher(executor));
 
 //        client.networkInterceptors().add(new HttpCodeInterceptor());
-//        client.networkInterceptors().add(new LoggingInterceptor());
+        client.networkInterceptors().add(new LoggingInterceptor());
 
         client.setConnectTimeout(CONNECT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         client.setReadTimeout(READ_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
