@@ -147,7 +147,7 @@ public class TransportClient {
             throw new WrongMethodException("Method in Link object is not GET");
         }
         Operation operation = new HttpClientIO(client, getAllHeaders(null))
-                .getJson(link.getHref(), Operation.class);
+                .getOperation(link.getHref());
         Log.d(TAG, "getOperation: " + operation);
         return operation;
     }

@@ -19,6 +19,7 @@ import com.yandex.disk.rest.exceptions.ServerNotAuthorizedException;
 import com.yandex.disk.rest.exceptions.UnknownServerException;
 import com.yandex.disk.rest.exceptions.UserNotInitializedException;
 import com.yandex.disk.rest.json.Link;
+import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.util.Hash;
 
 import java.io.File;
@@ -39,6 +40,7 @@ public class HttpClientIO {
     private static final String CONTENT_LENGTH_HEADER = "Content-Length";
     private static final String CONTENT_RANGE_HEADER = "Content-Range";
 
+    private static final String METHOD_GET = "GET";
     private static final String METHOD_DELETE = "DELETE";
     private static final String METHOD_PUT = "PUT";
 
@@ -315,22 +317,60 @@ public class HttpClientIO {
         }
     }
 
-    public <T> T getJson(String url, Class<T> classOfT)
+    public Operation getOperation(String url)
             throws IOException, UnknownServerException {
-        Request request = buildRequest()
-                .url(url)
-                .get()
-                .build();
-
-        Response response = client
-                .newCall(request)
-                .execute();
-
+        Response response = call(METHOD_GET, url);
         int code = response.code();
         if (!response.isSuccessful()) {
             throw new UnknownServerException("Error in GET: code=" + code + " url " + url);
         }
+        return parseJson(response, Operation.class);
+    }
 
+    public Link delete(String url)
+            throws IOException {
+        Response response = call(METHOD_DELETE, url);
+        switch (response.code()) {
+            case 202:
+                Link result = parseJson(response, Link.class);
+                result.setHttpStatus(Link.HttpStatus.inProgress);
+                return result;
+            case 204:
+                return Link.DONE;
+            // TODO 4xx
+        }
+        return Link.ERROR;
+    }
+
+    public Link put(String url)
+            throws IOException {
+        Response response = call(METHOD_PUT, url);
+        switch (response.code()) {
+            case 201:
+                Link done = parseJson(response, Link.class);
+                done.setHttpStatus(Link.HttpStatus.done);
+                return done;
+            case 202:
+                Link inProgress = parseJson(response, Link.class);
+                inProgress.setHttpStatus(Link.HttpStatus.inProgress);
+                return inProgress;
+            // TODO 4xx
+        }
+        return Link.ERROR;
+    }
+
+    private Response call(String method, String url)
+            throws IOException {
+        Request request = buildRequest()
+                .method(method, null)
+                .url(url)
+                .build();
+        return client.newCall(request)
+                .execute();
+    }
+
+    private <T> T parseJson(Response response, Class<T> classOfT)
+            throws IOException {
         ResponseBody responseBody = null;
         try {
             responseBody = response.body();
@@ -341,78 +381,5 @@ public class HttpClientIO {
                 responseBody.close();
             }
         }
-    }
-
-    public Link delete(String url)
-            throws IOException {
-        return getLink(METHOD_DELETE, url, new ResponseHandler() {
-            @Override
-            public Link onResponse(Response response)
-                    throws IOException {
-                switch (response.code()) {
-                    case 202:
-                        Link result = parseResponse(response);
-                        result.setHttpStatus(Link.HttpStatus.inProgress);
-                        return result;
-                    case 204:
-                        return Link.DONE;
-                }
-                return Link.ERROR;
-            }
-        });
-    }
-
-    public Link put(String url)
-            throws IOException {
-        return getLink(METHOD_PUT, url, new ResponseHandler() {
-            @Override
-            public Link onResponse(Response response)
-                    throws IOException {
-                switch (response.code()) {
-                    case 201:
-                        Link done = parseResponse(response);
-                        done.setHttpStatus(Link.HttpStatus.done);
-                        return done;
-                    case 202:
-                        Link inProgress = parseResponse(response);
-                        inProgress.setHttpStatus(Link.HttpStatus.inProgress);
-                        return inProgress;
-                }
-                return Link.ERROR;
-            }
-        });
-    }
-
-    private Link getLink(String method, String url, ResponseHandler handler)
-            throws IOException {
-        Request request = buildRequest()
-                .method(method, null)
-                .url(url)
-                .build();
-
-        Response response = client
-                .newCall(request)
-                .execute();
-
-        return handler.onResponse(response);
-    }
-
-    private Link parseResponse(Response response)
-            throws IOException {
-        ResponseBody responseBody = null;
-        try {
-            responseBody = response.body();
-            Gson gson = new Gson();
-            return gson.fromJson(responseBody.charStream(), Link.class);
-        } finally {
-            if (responseBody != null) {
-                responseBody.close();
-            }
-        }
-    }
-
-    private interface ResponseHandler {
-        Link onResponse(Response response)
-                throws IOException;
     }
 }
