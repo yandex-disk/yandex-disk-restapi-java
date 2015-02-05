@@ -18,7 +18,6 @@ import com.yandex.disk.rest.exceptions.RemoteFileNotFoundException;
 import com.yandex.disk.rest.exceptions.ServerNotAuthorizedException;
 import com.yandex.disk.rest.exceptions.UnknownServerException;
 import com.yandex.disk.rest.exceptions.UserNotInitializedException;
-import com.yandex.disk.rest.json.HttpStatus;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.util.Hash;
 
@@ -344,31 +343,26 @@ public class HttpClientIO {
         }
     }
 
-    public Link dropTrash(String url)
+    public Link delete(String url)
             throws IOException {
-        return getJson(METHOD_DELETE, url, Link.class, new ResponseHandler<Link>() {
+        return getLink(METHOD_DELETE, url, new ResponseHandler() {
             @Override
-            public Link onResponse(Response response, Class<Link> classOfT)
+            public Link onResponse(Response response)
                     throws IOException {
                 switch (response.code()) {
                     case 202:
-                        Link result = parseResponse(response, classOfT);
-                        result.setResult(HttpStatus.Result.inProgress);
+                        Link result = parseResponse(response);
+                        result.setHttpStatus(Link.HttpStatus.inProgress);
                         return result;
                     case 204:
-                        Link ok = new Link();
-                        ok.setResult(HttpStatus.Result.done);
-                        return ok;
+                        return Link.DONE;
                 }
-                Link ok = new Link();
-                ok.setResult(HttpStatus.Result.error);
-                return ok;
+                return Link.ERROR;
             }
         });
     }
 
-    private <T extends HttpStatus> T getJson(String method, String url, Class<T> classOfT,
-                                             ResponseHandler<T> handler)
+    private Link getLink(String method, String url, ResponseHandler handler)
             throws IOException {
         Request request = buildRequest()
                 .method(method, null)
@@ -379,16 +373,16 @@ public class HttpClientIO {
                 .newCall(request)
                 .execute();
 
-        return handler.onResponse(response, classOfT);
+        return handler.onResponse(response);
     }
 
-    private <T extends HttpStatus> T parseResponse(Response response, Class<T> classOfT)
+    private Link parseResponse(Response response)
             throws IOException {
         ResponseBody responseBody = null;
         try {
             responseBody = response.body();
             Gson gson = new Gson();
-            return gson.fromJson(responseBody.charStream(), classOfT);
+            return gson.fromJson(responseBody.charStream(), Link.class);
         } finally {
             if (responseBody != null) {
                 responseBody.close();
@@ -396,8 +390,8 @@ public class HttpClientIO {
         }
     }
 
-    private interface ResponseHandler <T extends HttpStatus> {
-        T onResponse(Response response, Class<T> classOfT)
+    private interface ResponseHandler {
+        Link onResponse(Response response)
                 throws IOException;
     }
 }

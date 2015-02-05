@@ -8,11 +8,22 @@ import com.google.gson.annotations.SerializedName;
  */
 public class Operation {
 
+    private static final String IN_PROGRESS = "in-progress";
+    private static final String SUCCESS = "success";
+
     @SerializedName("status")
     String status;
 
     public String getStatus() {
         return status;
+    }
+
+    public boolean isInProgress() {
+        return IN_PROGRESS.equals(status);
+    }
+
+    public boolean isSuccess() {
+        return SUCCESS.equals(status);
     }
 
     @Override

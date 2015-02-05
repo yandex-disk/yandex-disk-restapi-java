@@ -6,7 +6,6 @@ import com.yandex.disk.rest.exceptions.UnknownServerException;
 import com.yandex.disk.rest.exceptions.WrongMethodException;
 import com.yandex.disk.rest.json.ApiVersion;
 import com.yandex.disk.rest.json.DiskCapacity;
-import com.yandex.disk.rest.json.HttpStatus;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
@@ -23,15 +22,11 @@ import org.junit.runners.JUnit4;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.CountDownLatch;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -195,27 +190,47 @@ public class TransportClientTest {
             ex.printStackTrace();
         }
         Link link = client.makeFolder(path);
-        Log.d("link: "+link);
-        Operation operation = client.getOperation(link);
-        Log.d("operation: "+operation);
-        assertTrue(operation.getStatus() == null);
+        assertTrue(link.getHref() != null);
+        assertTrue(link.getHref().equals("https://cloud-api.yandex.net/v1/disk/resources?path="
+                + URLEncoder.encode("disk:" + path, "UTF-8")));
 
-        client.delete(path, false);
+        String sub = path + "/sub1";
+        Link link2 = client.makeFolder(sub);
+        assertTrue(link2.getHref() != null);
+        assertTrue(link2.getHref().equals("https://cloud-api.yandex.net/v1/disk/resources?path="
+                + URLEncoder.encode("disk:" + sub, "UTF-8")));
 
-        Link result = client.dropTrash(name);
-        switch (result.getResult()) {
+        testOperation(client.delete(path, false));
+        testOperation(client.dropTrash(name));
+    }
+
+    private void testOperation(Link link)
+            throws InterruptedException, WrongMethodException, UnknownServerException, IOException {
+        switch (link.getHttpStatus()) {
             case done:
+                Log.d("testDropTrash: done");
                 break;
             case inProgress:
-                Log.d("testDropTrash: link: " + link);
-                Operation dropOp = client.getOperation(link);
-                Log.d("testDropTrash: dropOp: " + dropOp);
-                assertThat(dropOp.getStatus(), not(isEmptyOrNullString()));
+                Operation operation = checkProgress(link);
+                Log.d("testDropTrash: dropOp: " + operation);
+                assertThat(operation.getStatus(), not(isEmptyOrNullString()));
+                assertTrue(operation.isSuccess());
                 break;
             case error:
             default:
                 throw new AssertionError();
         }
+    }
+
+    private Operation checkProgress(Link link)
+            throws UnknownServerException, IOException, WrongMethodException, InterruptedException {
+        Log.d("checkProgress: link: " + link);
+        Operation op;
+        do {
+            op = client.getOperation(link);
+            Thread.sleep(500);
+        } while(op.isInProgress());
+        return op;
     }
 
     @Test

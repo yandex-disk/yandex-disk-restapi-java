@@ -2,7 +2,7 @@ package com.yandex.disk.rest.json;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ApiVersion extends HttpStatus {
+public class ApiVersion {
 
     @SerializedName("build")
     String build;
@@ -23,7 +23,6 @@ public class ApiVersion extends HttpStatus {
         return "ApiVersion{" +
                 "build='" + build + '\'' +
                 ", apiVersion='" + apiVersion + '\'' +
-                ", " + super.toString() +
                 '}';
     }
 }

@@ -204,7 +204,7 @@ public class TransportClient {
     public Link dropTrash(final String path)
             throws IOException, ServerIOException, UnknownServerException, URISyntaxException {
         return new HttpClientIO(client, getAllHeaders(null))
-                .dropTrash(getUrl() + "/v1/disk/trash/resources?path=" + URLEncoder.encode(path, UTF8));
+                .delete(getUrl() + "/v1/disk/trash/resources?path=" + URLEncoder.encode(path, UTF8));
     }
 
     public void restoreTrash(final String path, final String name, final Boolean overwrite,
@@ -268,10 +268,11 @@ public class TransportClient {
         clientIO.uploadFile(link.getHref(), localSource, startOffset, progressListener);
     }
 
-    // TODO catch 202 vs 204 http code from server
     public Link delete(final String path, final boolean permanently)
-            throws ServerIOException {
-        return call().delete(path, permanently);
+            throws ServerIOException, IOException {
+        return new HttpClientIO(client, getAllHeaders(null))
+                .delete(getUrl() + "/v1/disk/resources?path=" + URLEncoder.encode(path, UTF8)
+                        + "&permanently=" + permanently);
     }
 
     public Link makeFolder(final String path)
