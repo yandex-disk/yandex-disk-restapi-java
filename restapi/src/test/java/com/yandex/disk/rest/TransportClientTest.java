@@ -179,6 +179,36 @@ public class TransportClientTest {
                 .build());
     }
 
+    private void checkResult(Link link)
+            throws InterruptedException, WrongMethodException, UnknownServerException, IOException {
+        switch (link.getHttpStatus()) {
+            case done:
+                break;
+            case inProgress:
+                Operation operation = client.waitProgress(link, new Runnable() {
+                    int i = 0;
+
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(1000);
+                            if (++i > 100) {
+                                throw new AssertionError();
+                            }
+                        } catch (InterruptedException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                });
+                assertThat(operation.getStatus(), not(isEmptyOrNullString()));
+                assertTrue(operation.isSuccess());
+                break;
+            case error:
+            default:
+                throw new AssertionError();
+        }
+    }
+
     @Test
     public void testDropTrash() throws Exception {
         String name = "/drop-trash-test";
@@ -200,52 +230,27 @@ public class TransportClientTest {
         assertTrue(link2.getHref().equals("https://cloud-api.yandex.net/v1/disk/resources?path="
                 + URLEncoder.encode("disk:" + sub, "UTF-8")));
 
-        testOperation(client.delete(path, false));
-        testOperation(client.dropTrash(name));
-    }
-
-    private void testOperation(Link link)
-            throws InterruptedException, WrongMethodException, UnknownServerException, IOException {
-        switch (link.getHttpStatus()) {
-            case done:
-                Log.d("testDropTrash: done");
-                break;
-            case inProgress:
-                Operation operation = checkProgress(link);
-                Log.d("testDropTrash: dropOp: " + operation);
-                assertThat(operation.getStatus(), not(isEmptyOrNullString()));
-                assertTrue(operation.isSuccess());
-                break;
-            case error:
-            default:
-                throw new AssertionError();
-        }
-    }
-
-    private Operation checkProgress(Link link)
-            throws UnknownServerException, IOException, WrongMethodException, InterruptedException {
-        Log.d("checkProgress: link: " + link);
-        Operation op;
-        do {
-            op = client.getOperation(link);
-            Thread.sleep(500);
-        } while(op.isInProgress());
-        return op;
+        checkResult(client.delete(path, false));
+        checkResult(client.dropTrash(name));
     }
 
     @Test
     public void testRestoreTrash() throws Exception {
-        // TODO
-    }
+        String name = "/restore-trash-test";
+        String path = "/0-test"+name;
 
-    @Test(expected = ServerIOException.class)
-    public void testDropTrashFailed() throws Exception {
-//        client.dropTrash("-::::::::::");
-    }
+        try {
+            client.delete(path, true);
+        } catch (ServerIOException ex) {
+            ex.printStackTrace();
+        }
+        Link link = client.makeFolder(path);
+        assertTrue(link.getHref() != null);
+        assertTrue(link.getHref().equals("https://cloud-api.yandex.net/v1/disk/resources?path="
+                + URLEncoder.encode("disk:" + path, "UTF-8")));
 
-    @Test(expected = ServerIOException.class)
-    public void testRestoreTrashFailed() throws Exception {
-//        client.restoreTrash("-::::::::::", "-::::::::::", null);
+        checkResult(client.delete(path, false));
+        checkResult(client.restoreTrash(name, null, null));
     }
 
     @Test

@@ -39,8 +39,8 @@ public class HttpClientIO {
     private static final String CONTENT_LENGTH_HEADER = "Content-Length";
     private static final String CONTENT_RANGE_HEADER = "Content-Range";
 
-    private static final String METHOD_GET = "GET";
     private static final String METHOD_DELETE = "DELETE";
+    private static final String METHOD_PUT = "PUT";
 
     private OkHttpClient client;
     private List<CustomHeader> commonHeaders;
@@ -356,6 +356,27 @@ public class HttpClientIO {
                         return result;
                     case 204:
                         return Link.DONE;
+                }
+                return Link.ERROR;
+            }
+        });
+    }
+
+    public Link put(String url)
+            throws IOException {
+        return getLink(METHOD_PUT, url, new ResponseHandler() {
+            @Override
+            public Link onResponse(Response response)
+                    throws IOException {
+                switch (response.code()) {
+                    case 201:
+                        Link done = parseResponse(response);
+                        done.setHttpStatus(Link.HttpStatus.done);
+                        return done;
+                    case 202:
+                        Link inProgress = parseResponse(response);
+                        inProgress.setHttpStatus(Link.HttpStatus.inProgress);
+                        return inProgress;
                 }
                 return Link.ERROR;
             }

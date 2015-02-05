@@ -152,6 +152,17 @@ public class TransportClient {
         return operation;
     }
 
+    public Operation waitProgress(final Link link, final Runnable waiting)
+            throws UnknownServerException, IOException, WrongMethodException {
+        while (true) {
+            Operation operation = getOperation(link);
+            if (!operation.isInProgress()) {
+                return operation;
+            }
+            waiting.run();
+        }
+    }
+
     public DiskCapacity getCapacity()
             throws IOException, ServerIOException {
         return getCapacity(null);
@@ -213,12 +224,18 @@ public class TransportClient {
         call().restoreTrash(path, name, overwrite, callback);
     }
 
-/*
     public Link restoreTrash(final String path, final String name, final Boolean overwrite)
             throws IOException, ServerIOException {
-        return call().restoreTrash(path, name, overwrite);
+        String url = getUrl() + "/v1/disk/trash/resources/restore?path=" + URLEncoder.encode(path, UTF8);
+        if (name != null) {
+            url += "&name=" + URLEncoder.encode(name, UTF8);
+        }
+        if (overwrite != null) {
+            url += "&overwrite=" + overwrite;
+        }
+        return new HttpClientIO(client, getAllHeaders(null))
+                .put(url);
     }
-*/
 
     private void parseListResponse(final Resource resource, final ResourcesHandler handler) {
         handler.handleSelf(resource);
