@@ -1,10 +1,9 @@
 package com.yandex.disk.rest;
 
-import com.yandex.disk.rest.exceptions.ServerClientInitException;
 import com.yandex.disk.rest.exceptions.ServerException;
 import com.yandex.disk.rest.exceptions.ServerIOException;
-import com.yandex.disk.rest.exceptions.UnknownServerException;
 import com.yandex.disk.rest.exceptions.WrongMethodException;
+import com.yandex.disk.rest.exceptions.http.HttpCodeException;
 import com.yandex.disk.rest.json.ApiVersion;
 import com.yandex.disk.rest.json.DiskCapacity;
 import com.yandex.disk.rest.json.Link;
@@ -25,12 +24,9 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class TransportClient {
 
@@ -58,8 +54,7 @@ public class TransportClient {
     private final List<CustomHeader> commonHeaders;
     private final HttpClient client;
 
-    public TransportClient(final Credentials credentials, final int networkTimeout)
-            throws ServerClientInitException {
+    public TransportClient(final Credentials credentials, final int networkTimeout) {
         this.commonHeaders = fillCommonHeaders(credentials.getToken());
         this.client = new HttpClient();
     }
@@ -80,8 +75,7 @@ public class TransportClient {
         return Collections.unmodifiableList(list);
     }
 
-    public static TransportClient getInstance(final Credentials credentials)
-            throws ServerClientInitException {
+    public static TransportClient getInstance(final Credentials credentials) {
         return new TransportClient(credentials, NETWORK_TIMEOUT);
     }
 
@@ -109,7 +103,7 @@ public class TransportClient {
     }
 
     public ApiVersion getApiVersion()
-            throws IOException, ServerIOException, UnknownServerException {
+            throws IOException, ServerIOException {
 /*        final CountDownLatch latch = new CountDownLatch(1);
         final ApiVersion[] result = new ApiVersion[1];
         call().getApiVersion(new Callback<ApiVersion>() {
@@ -142,7 +136,7 @@ public class TransportClient {
     }
 
     public Operation getOperation(final Link link)
-            throws IOException, UnknownServerException, WrongMethodException {
+            throws IOException, WrongMethodException, HttpCodeException {
         if (!"GET".equalsIgnoreCase(link.getMethod())) {
             throw new WrongMethodException("Method in Link object is not GET");
         }
@@ -153,7 +147,7 @@ public class TransportClient {
     }
 
     public Operation waitProgress(final Link link, final Runnable waiting)
-            throws UnknownServerException, IOException, WrongMethodException {
+            throws IOException, WrongMethodException, HttpCodeException {
         while (true) {
             Operation operation = getOperation(link);
             if (!operation.isInProgress()) {
@@ -213,7 +207,7 @@ public class TransportClient {
     }
 
     public Link dropTrash(final String path)
-            throws IOException, ServerIOException, UnknownServerException, URISyntaxException {
+            throws IOException, ServerIOException, URISyntaxException {
         return new HttpClientIO(client, getAllHeaders(null))
                 .delete(getUrl() + "/v1/disk/trash/resources?path=" + URLEncoder.encode(path, UTF8));
     }
@@ -259,7 +253,7 @@ public class TransportClient {
     }
 
     public Link saveFromUrl(final String url, final String serverPath, final List<CustomHeader> headerList)
-            throws ServerIOException, UnknownServerException {
+            throws ServerIOException {
         return call(headerList).saveFromUrl(url, serverPath);
     }
 
@@ -303,7 +297,7 @@ public class TransportClient {
     }
 
     public Link move(final String from, final String path, final boolean overwrite)
-            throws ServerIOException, UnknownServerException {
+            throws ServerIOException {
         return call().move(from, path, overwrite);
     }
 

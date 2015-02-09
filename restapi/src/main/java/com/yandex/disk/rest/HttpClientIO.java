@@ -9,15 +9,10 @@ import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
 import com.yandex.disk.rest.exceptions.CancelledDownloadException;
 import com.yandex.disk.rest.exceptions.DownloadNoSpaceAvailableException;
-import com.yandex.disk.rest.exceptions.FileModifiedException;
-import com.yandex.disk.rest.exceptions.FileNotModifiedException;
-import com.yandex.disk.rest.exceptions.IntermediateFolderNotExistException;
-import com.yandex.disk.rest.exceptions.PreconditionFailedException;
-import com.yandex.disk.rest.exceptions.RangeNotSatisfiableException;
-import com.yandex.disk.rest.exceptions.RemoteFileNotFoundException;
-import com.yandex.disk.rest.exceptions.ServerNotAuthorizedException;
-import com.yandex.disk.rest.exceptions.UnknownServerException;
-import com.yandex.disk.rest.exceptions.UserNotInitializedException;
+import com.yandex.disk.rest.exceptions.http.FileNotModifiedException;
+import com.yandex.disk.rest.exceptions.http.HttpCodeException;
+import com.yandex.disk.rest.exceptions.http.NotFoundException;
+import com.yandex.disk.rest.exceptions.http.RangeNotSatisfiableException;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.util.Hash;
@@ -61,9 +56,13 @@ public class HttpClientIO {
     }
 
     public void downloadUrl(final String url, final DownloadListener downloadListener)
-            throws IOException, UserNotInitializedException, PreconditionFailedException, ServerNotAuthorizedException,
-            CancelledDownloadException, UnknownServerException, FileNotModifiedException, RemoteFileNotFoundException,
-            DownloadNoSpaceAvailableException, RangeNotSatisfiableException, FileModifiedException {
+            throws IOException, CancelledDownloadException, NotFoundException,
+            DownloadNoSpaceAvailableException, FileNotModifiedException,
+            RangeNotSatisfiableException, HttpCodeException {
+
+            /* UserNotInitializedException, PreconditionFailedException, ServerNotAuthorizedException,
+            UnknownServerException, RemoteFileNotFoundException,
+            FileModifiedException,*/
 
         Request.Builder req = buildRequest()
                 .url(url);
@@ -99,19 +98,15 @@ public class HttpClientIO {
                 partialContent = true;
                 break;
             case 304:
-//                consumeContent(httpResponse);
-                throw new FileNotModifiedException();
+                throw new FileNotModifiedException(code);
             case 404:
-//                consumeContent(httpResponse);
-                throw new RemoteFileNotFoundException("error while downloading file " + url);
+                throw new NotFoundException(code);
             case 416:
-//                consumeContent(httpResponse);
-                throw new RangeNotSatisfiableException("error while downloading file " + url);
+                throw new RangeNotSatisfiableException(code);
             default:
-//                consumeContent(httpResponse);
 //                checkStatusCodes(httpResponse, "GET '" + url + "'");
-                throw new UnknownServerException("error while downloading: code=" + code + " file " + url);
 //                break;
+                throw new HttpCodeException(code);  // TODO XXX
         }
 
         ResponseBody responseBody = response.body();
@@ -134,22 +129,6 @@ public class HttpClientIO {
                 contentLength = 0;
             }
         }
-
-/*
-        TODO XXX
-
-        String serverEtag = (String) httpContext.getAttribute(ATTR_ETAG_FROM_REDIRECT);
-        if (!partialContent) {
-            downloadListener.setEtag(serverEtag);
-        } else {
-            if (serverEtag != null && !serverEtag.equals(etag)) {
-                response.consumeContent();
-                throw new FileModifiedException("file changed, new etag is '" + serverEtag  +"'");
-            } else {
-                //Etag hasn't changed
-            }
-        }
-*/
 
         OutputStream os = null;
         try {
@@ -197,11 +176,12 @@ public class HttpClientIO {
             } catch (IOException ex) {
                 // nothing
             }
-//            try {
-//                response.consumeContent();
-//            } catch (IOException e) {
-//                Log.w(TAG, e);
-//            }
+            try {
+                // TODO not needed ?
+                response.body().close();
+            } catch (IOException e) {
+                Log.w(TAG, e);
+            }
         }
     }
 
@@ -227,20 +207,22 @@ public class HttpClientIO {
         }
     }
 
-    public void uploadFile(final String url, final File file, final long startOffset, final ProgressListener progressListener)
-            throws IntermediateFolderNotExistException, IOException, UserNotInitializedException, PreconditionFailedException,
-            ServerNotAuthorizedException, UnknownServerException {
+    public void uploadFile(final String url, final File file, final long startOffset,
+                           final ProgressListener progressListener)
+            throws IOException, HttpCodeException {
         Log.d(TAG, "uploadFile: put to url: "+url);
 
         MediaType mediaType = MediaType.parse("application/octet-stream");  // TODO
-        RequestBody requestBody = RequestBodyProgress.create(mediaType, file, startOffset, progressListener);
+        RequestBody requestBody = RequestBodyProgress.create(mediaType, file, startOffset,
+                progressListener);
         Request.Builder requestBuilder = buildRequest()
                 .removeHeader(TransportClient.AUTHORIZATION_HEADER)
                 .url(url)
                 .put(requestBody);
         if (startOffset > 0) {
             StringBuilder contentRange = new StringBuilder();
-            contentRange.append("bytes ").append(startOffset).append("-").append(file.length() - 1).append("/").append(file.length());
+            contentRange.append("bytes ").append(startOffset).append("-").append(file.length() - 1)
+                    .append("/").append(file.length());
             Log.d(TAG, CONTENT_RANGE_HEADER + ": " + contentRange);
             requestBuilder.addHeader(CONTENT_RANGE_HEADER, contentRange.toString());
         }
@@ -270,13 +252,14 @@ public class HttpClientIO {
             // TODO more codes?
 
             default:
-                throw new UnknownServerException("error while uploading: code=" + code + " file " + url);
+                throw new HttpCodeException(code);
+//                throw new UnknownServerException("error while uploading: code=" + code + " file " + url);
         }
     }
 
     public long headUrl(String url, Hash hash)
-            throws IOException, NumberFormatException, UserNotInitializedException, UnknownServerException,
-            PreconditionFailedException, ServerNotAuthorizedException {
+            throws IOException, // NumberFormatException, UserNotInitializedException,
+            HttpCodeException {
 
         Request request = buildRequest()
                 .removeHeader(TransportClient.AUTHORIZATION_HEADER)
@@ -313,16 +296,16 @@ public class HttpClientIO {
             // TODO more codes?
 
             default:
-                throw new UnknownServerException("Error while downloading: code=" + code + " url " + url);
+                throw new HttpCodeException(code);
         }
     }
 
     public Operation getOperation(String url)
-            throws IOException, UnknownServerException {
+            throws IOException, HttpCodeException {
         Response response = call(METHOD_GET, url);
         int code = response.code();
         if (!response.isSuccessful()) {
-            throw new UnknownServerException("Error in GET: code=" + code + " url " + url);
+            throw new HttpCodeException(code);
         }
         return parseJson(response, Operation.class);
     }

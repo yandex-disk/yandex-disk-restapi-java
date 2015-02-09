@@ -2,8 +2,8 @@ package com.yandex.disk.rest;
 
 import com.yandex.disk.rest.exceptions.CancelledUploadingException;
 import com.yandex.disk.rest.exceptions.ServerIOException;
-import com.yandex.disk.rest.exceptions.UnknownServerException;
 import com.yandex.disk.rest.exceptions.WrongMethodException;
+import com.yandex.disk.rest.exceptions.http.HttpCodeException;
 import com.yandex.disk.rest.json.ApiVersion;
 import com.yandex.disk.rest.json.DiskCapacity;
 import com.yandex.disk.rest.json.Link;
@@ -180,7 +180,7 @@ public class TransportClientTest {
     }
 
     private void checkResult(Link link)
-            throws InterruptedException, WrongMethodException, UnknownServerException, IOException {
+            throws IOException, InterruptedException, WrongMethodException, HttpCodeException {
         switch (link.getHttpStatus()) {
             case done:
                 break;

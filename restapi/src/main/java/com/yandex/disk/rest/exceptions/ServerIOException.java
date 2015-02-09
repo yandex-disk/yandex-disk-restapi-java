@@ -10,6 +10,10 @@ import java.io.IOException;
 
 public class ServerIOException extends ServerException {
 
+    public ServerIOException() {
+        super();
+    }
+
     public ServerIOException(String message) {
         super(message);
     }
