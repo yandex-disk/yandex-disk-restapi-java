@@ -1,15 +1,18 @@
 package com.yandex.disk.rest;
 
+import retrofit.mime.TypedOutput;
+
 public class ResourcesArgs {
 
-    private String path, fields, sort, previewSize, publicKey;
+    private String path, fields, sort, previewSize, publicKey, mediaType;
     private Integer limit, offset;
     private Boolean previewCrop;
     private ResourcesHandler parsingHandler;
+    private TypedOutput body;
 
     private ResourcesArgs(String path, String fields, String sort, String previewSize,
                           Integer limit, Integer offset, Boolean previewCrop, String publicKey,
-                          ResourcesHandler parsingHandler) {
+                          String mediaType, TypedOutput body, ResourcesHandler parsingHandler) {
         this.path = path;
         this.fields = fields;
         this.sort = sort;
@@ -18,6 +21,8 @@ public class ResourcesArgs {
         this.offset = offset;
         this.previewCrop = previewCrop;
         this.publicKey = publicKey;
+        this.mediaType = mediaType;
+        this.body = body;
         this.parsingHandler = parsingHandler;
     }
 
@@ -41,6 +46,10 @@ public class ResourcesArgs {
         return publicKey;
     }
 
+    public String getMediaType() {
+        return mediaType;
+    }
+
     public Integer getLimit() {
         return limit;
     }
@@ -51,6 +60,10 @@ public class ResourcesArgs {
 
     public Boolean getPreviewCrop() {
         return previewCrop;
+    }
+
+    public TypedOutput getBody() {
+        return body;
     }
 
     public ResourcesHandler getParsingHandler() {
@@ -68,19 +81,22 @@ public class ResourcesArgs {
                 ", previewSize='" + previewSize + '\'' +
                 ", previewCrop=" + previewCrop +
                 ", publicKey=" + publicKey +
+                ", mediaType=" + mediaType +
+                ", body=" + body +
                 ", parsingHandler=" + (parsingHandler != null) +
                 '}';
     }
 
     public static class Builder {
-        private String path, fields, sort, previewSize, publicKey;
+        private String path, fields, sort, previewSize, publicKey, mediaType;
         private Integer limit, offset;
         private Boolean previewCrop;
         private ResourcesHandler parsingHandler;
+        private TypedOutput body;
 
         public ResourcesArgs build() {
             return new ResourcesArgs(path, fields, sort, previewSize, limit, offset, previewCrop,
-                    publicKey, parsingHandler);
+                    publicKey, mediaType, body, parsingHandler);
         }
 
         public Builder setPath(String path) {
@@ -123,8 +139,18 @@ public class ResourcesArgs {
             return this;
         }
 
+        public Builder setMediaType(String mediaType) {
+            this.mediaType = mediaType;
+            return this;
+        }
+
         public Builder setParsingHandler(ResourcesHandler parsingHandler) {
             this.parsingHandler = parsingHandler;
+            return this;
+        }
+
+        public Builder setBody(TypedOutput body) {
+            this.body = body;
             return this;
         }
     }

@@ -166,12 +166,40 @@ public class TransportClient {
         return call().getCapacity(fields);
     }
 
-    // TODO make test with fields, sort, previewSize and previewCrop
     public Resource listResources(final ResourcesArgs args)
             throws IOException, ServerIOException {
         final Resource resource = call().listResources(args.getPath(), args.getFields(),
                 args.getLimit(), args.getOffset(), args.getSort(), args.getPreviewSize(),
                 args.getPreviewCrop());
+        if (args.getParsingHandler() != null) {
+            parseListResponse(resource, args.getParsingHandler());
+        }
+        return resource;
+    }
+
+    public ResourceList flatListResources(final ResourcesArgs args)
+            throws IOException, ServerIOException {
+        final ResourceList resourceList = call().flatListResources(args.getLimit(), args.getMediaType(),
+                args.getOffset(), args.getFields(), args.getPreviewSize(), args.getPreviewCrop());
+        if (args.getParsingHandler() != null) {
+            parseListResponse(resourceList, args.getParsingHandler());
+        }
+        return resourceList;
+    }
+
+    public ResourceList uploadedListResources(final ResourcesArgs args)
+            throws IOException, ServerIOException {
+        final ResourceList resourceList = call().uploadedListResources(args.getLimit(), args.getMediaType(),
+                args.getOffset(), args.getFields(), args.getPreviewSize(), args.getPreviewCrop());
+        if (args.getParsingHandler() != null) {
+            parseListResponse(resourceList, args.getParsingHandler());
+        }
+        return resourceList;
+    }
+
+    public Resource patchResource(final ResourcesArgs args)
+            throws ServerIOException {
+        final Resource resource = call().patchResource(args.getPath(), args.getFields(), args.getBody());
         if (args.getParsingHandler() != null) {
             parseListResponse(resource, args.getParsingHandler());
         }
@@ -236,6 +264,18 @@ public class TransportClient {
         if (items != null) {
             size = items.getItems().size();
             for (Resource item : items.getItems()) {
+                handler.handleItem(item);
+            }
+        }
+        handler.onFinished(size);
+    }
+
+    private void parseListResponse(final ResourceList resourceList, final ResourcesHandler handler) {
+        List<Resource> items = resourceList.getItems();
+        int size = 0;
+        if (items != null) {
+            size = items.size();
+            for (Resource item : items) {
                 handler.handleItem(item);
             }
         }

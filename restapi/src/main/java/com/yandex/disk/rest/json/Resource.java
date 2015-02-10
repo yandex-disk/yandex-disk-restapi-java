@@ -48,6 +48,9 @@ public class Resource {
     @SerializedName("size")
     long size;
 
+    @SerializedName("custom_properties")
+    Object properties;
+
     public String getPublicKey() {
         return publicKey;
     }
@@ -96,6 +99,10 @@ public class Resource {
         return size;
     }
 
+    public Object getProperties() {
+        return properties;
+    }
+
     @Override
     public String toString() {
         return "Resource{" +
@@ -111,6 +118,7 @@ public class Resource {
                 ", type='" + type + '\'' +
                 ", mimeType='" + mimeType + '\'' +
                 ", size=" + size +
+                ", properties=" + properties +
                 '}';
     }
 }

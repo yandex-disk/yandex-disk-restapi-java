@@ -1,5 +1,8 @@
 package com.yandex.disk.rest;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.yandex.disk.rest.exceptions.CancelledUploadingException;
 import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.exceptions.WrongMethodException;
@@ -14,7 +17,6 @@ import com.yandex.disk.rest.util.Hash;
 import com.yandex.disk.rest.util.ResourcePath;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -24,9 +26,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import retrofit.converter.GsonConverter;
+import retrofit.mime.TypedOutput;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -151,6 +157,127 @@ public class TransportClientTest {
                 .setPath("/")
                 .setParsingHandler(parsingHandler)
                 .build());
+    }
+
+    @Test
+    public void testFlatListResources() throws Exception {
+        int limit = 50;
+        ResourceList resourceList = client.flatListResources(new ResourcesArgs.Builder()
+                .setMediaType("video")
+                .setLimit(limit)
+                .setOffset(10)
+                .build());
+        Log.d("resourceList: " + resourceList);
+        assertEquals(resourceList.getPath(), null);
+
+        List<Resource> items = resourceList.getItems();
+        assertFalse(items == null);
+        for (Resource item : items) {
+            Log.d("item: " + item);
+            assertTrue(item.getMimeType().contains("video"));
+        }
+        assertThat(items, hasSize(limit));
+        assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
+    }
+
+    @Test
+    public void testFlatListResourcesHandler() throws Exception {
+        ResourcesHandler parsingHandler = new ResourcesHandler() {
+            final List<Resource> items = new ArrayList<>();
+
+            @Override
+            public void handleSelf(Resource item) {
+                throw new AssertionError();
+            }
+
+            @Override
+            public void handleItem(Resource item) {
+                items.add(item);
+                Log.d("item: " + item);
+            }
+
+            @Override
+            public void onFinished(int itemsOnPage) {
+                assertThat(items, hasSize(itemsOnPage));
+                assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
+            }
+        };
+        client.flatListResources(new ResourcesArgs.Builder()
+                .setMediaType("audio")
+                .setParsingHandler(parsingHandler)
+                .build());
+    }
+
+    @Test
+    public void testUploadedListResources() throws Exception {
+        int limit = 50;
+        ResourceList resourceList = client.uploadedListResources(new ResourcesArgs.Builder()
+                .setMediaType("video")
+                .setLimit(limit)
+                .setOffset(10)
+                .build());
+        Log.d("resourceList: " + resourceList);
+        assertEquals(resourceList.getPath(), null);
+
+        List<Resource> items = resourceList.getItems();
+        assertFalse(items == null);
+        for (Resource item : items) {
+            Log.d("item: " + item);
+            assertTrue(item.getMimeType().contains("video"));
+        }
+        assertThat(items, hasSize(limit));
+        assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
+    }
+
+    @Test
+    public void testUploadedListResourcesHandler() throws Exception {
+        ResourcesHandler parsingHandler = new ResourcesHandler() {
+            final List<Resource> items = new ArrayList<>();
+
+            @Override
+            public void handleSelf(Resource item) {
+                throw new AssertionError();
+            }
+
+            @Override
+            public void handleItem(Resource item) {
+                items.add(item);
+                Log.d("item: " + item);
+            }
+
+            @Override
+            public void onFinished(int itemsOnPage) {
+                assertThat(items, hasSize(itemsOnPage));
+                assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
+            }
+        };
+        client.uploadedListResources(new ResourcesArgs.Builder()
+                .setMediaType("audio")
+                .setParsingHandler(parsingHandler)
+                .build());
+    }
+
+    @Test
+    public void testPatchResource() throws Exception {
+        Map<String,Object> fooBar = new LinkedHashMap<>();
+        fooBar.put("foo", 1);
+        fooBar.put("bar", 2);
+        Map <String, Map<String,Object>> properties = new LinkedHashMap<>();
+        properties.put("custom_properties", fooBar);
+
+        Gson gson = new GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .setPrettyPrinting()
+                .create();
+        TypedOutput body = new GsonConverter(gson).toBody(properties);
+
+        Resource resource = client.patchResource(new ResourcesArgs.Builder()
+                        .setPath("/0-test")
+                        .setBody(body)
+                        .build());
+        assertTrue("dir".equals(resource.getType()));
+        assertEquals(resource.getPath(), new ResourcePath("disk", "/0-test"));
+        Log.d("self: " + resource);
     }
 
     @Test

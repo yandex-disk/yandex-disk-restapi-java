@@ -6,14 +6,18 @@ import com.yandex.disk.rest.json.DiskCapacity;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
+import com.yandex.disk.rest.json.ResourceList;
 
 import retrofit.Callback;
+import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
+import retrofit.http.PATCH;
 import retrofit.http.POST;
 import retrofit.http.PUT;
 import retrofit.http.Path;
 import retrofit.http.Query;
+import retrofit.mime.TypedOutput;
 
 public interface CloudApi {
 
@@ -58,12 +62,48 @@ public interface CloudApi {
             throws ServerIOException;
 
 
-    // TODO https://tech.yandex.ru/disk/api/reference/all-files-docpage/
+    /**
+     * Flat list of all files
+     *
+     * <br/><br/><tt>TODO link to API reference in english is broken</tt>
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/all-files.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/all-files-docpage/">russian</a></p>
+     */
+    @GET("/v1/disk/resources/files")
+    ResourceList flatListResources(@Query("limit") Integer limit, @Query("media_type") String mediaType,
+                                   @Query("offset") Integer offset, @Query("fields") String fields,
+                                   @Query("preview_size") String previewSize,
+                                   @Query("preview_crop") Boolean previewCrop)
+            throws ServerIOException;
 
-    // TODO https://tech.yandex.ru/disk/api/reference/recent-upload-docpage/
+    /**
+     * Latest uploaded files
+     *
+     * <br/><br/><tt>TODO link to API reference in english is broken</tt>
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/recent-upload.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/recent-upload-docpage/">russian</a></p>
+     */
+    @GET("/v1/disk/resources/last-uploaded")
+    ResourceList uploadedListResources(@Query("limit") Integer limit, @Query("media_type") String mediaType,
+                                       @Query("offset") Integer offset, @Query("fields") String fields,
+                                       @Query("preview_size") String previewSize,
+                                       @Query("preview_crop") Boolean previewCrop)
+            throws ServerIOException;
 
-    // TODO https://tech.yandex.ru/disk/api/reference/meta-add-docpage/
-
+    /**
+     * Latest uploaded files
+     *
+     * <br/><br/><tt>TODO link to API reference in english is broken</tt>
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/meta-add.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/meta-add-docpage/">russian</a></p>
+     */
+    @PATCH("/v1/disk/resources/")
+    Resource patchResource(@Query("path") String path, @Query("fields") String fields,
+                           @Body TypedOutput body)
+            throws ServerIOException;
 
     /**
      * Downloading a file from Disk
@@ -211,8 +251,6 @@ public interface CloudApi {
     /**
      * Cleaning the Trash
      *
-     * TODO write test
-     *
      * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/trash-delete.xml">english</a>,
      * <a href="https://tech.yandex.ru/disk/api/reference/trash-delete-docpage/">russian</a></p>
      */
@@ -222,8 +260,6 @@ public interface CloudApi {
 
     /**
      * Restoring a file or folder from the Trash
-     *
-     * TODO write test
      *
      * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/trash-restore.xml">english</a>,
      * <a href="https://tech.yandex.ru/disk/api/reference/trash-restore-docpage/">russian</a></p>
