@@ -24,10 +24,6 @@ public interface CloudApi {
     ApiVersion getApiVersion()
             throws ServerIOException;
 
-    @GET("/")
-    void getApiVersion(Callback<ApiVersion> callback)
-            throws ServerIOException;
-
     /**
      * Operation status
      *

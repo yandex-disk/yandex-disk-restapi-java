@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +44,7 @@ public class TransportClient {
 
     static {
         try {
-            serverURL = new URL("https://cloud-api.yandex.net:443");
+            serverURL = new URL("https://cloud-api.yandex.net");
         } catch (MalformedURLException ex) {
             throw new RuntimeException(ex);
         }
@@ -79,7 +78,7 @@ public class TransportClient {
         return new TransportClient(credentials, NETWORK_TIMEOUT);
     }
 
-    private String getUrl() {
+    /* package */ String getUrl() {
         return serverURL.toExternalForm();
     }
 
@@ -209,7 +208,9 @@ public class TransportClient {
     public Link dropTrash(final String path)
             throws IOException, ServerIOException, URISyntaxException {
         return new HttpClientIO(client, getAllHeaders(null))
-                .delete(getUrl() + "/v1/disk/trash/resources?path=" + URLEncoder.encode(path, UTF8));
+                .delete(new QueryBuilder(getUrl() + "/v1/disk/trash/resources")
+                        .add("path", path)
+                        .build());
     }
 
     public void restoreTrash(final String path, final String name, final Boolean overwrite,
@@ -220,15 +221,12 @@ public class TransportClient {
 
     public Link restoreTrash(final String path, final String name, final Boolean overwrite)
             throws IOException, ServerIOException {
-        String url = getUrl() + "/v1/disk/trash/resources/restore?path=" + URLEncoder.encode(path, UTF8);
-        if (name != null) {
-            url += "&name=" + URLEncoder.encode(name, UTF8);
-        }
-        if (overwrite != null) {
-            url += "&overwrite=" + overwrite;
-        }
         return new HttpClientIO(client, getAllHeaders(null))
-                .put(url);
+                .put(new QueryBuilder(getUrl() + "/v1/disk/trash/resources/restore")
+                        .add("path", path)
+                        .add("name", name)
+                        .add("overwrite", overwrite)
+                        .build());
     }
 
     private void parseListResponse(final Resource resource, final ResourcesHandler handler) {
@@ -282,8 +280,10 @@ public class TransportClient {
     public Link delete(final String path, final boolean permanently)
             throws ServerIOException, IOException {
         return new HttpClientIO(client, getAllHeaders(null))
-                .delete(getUrl() + "/v1/disk/resources?path=" + URLEncoder.encode(path, UTF8)
-                        + "&permanently=" + permanently);
+                .delete(new QueryBuilder(getUrl() + "/v1/disk/resources")
+                        .add("path", path)
+                        .add("permanently", permanently)
+                        .build());
     }
 
     public Link makeFolder(final String path)

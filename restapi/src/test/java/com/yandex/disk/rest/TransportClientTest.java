@@ -69,7 +69,8 @@ public class TransportClientTest {
 
     private void generateResources() throws Exception {
         // TODO move to proper directory
-        Runtime.getRuntime().exec("/usr/bin/env dd if=/dev/urandom of=testResources/test-upload-002.bin bs=1m count=1")
+        Runtime.getRuntime()
+                .exec("/usr/bin/env dd if=/dev/urandom of=testResources/test-upload-002.bin bs=1m count=1")
                 .waitFor();
         Log.d("generateResources: done");
     }
@@ -221,13 +222,13 @@ public class TransportClientTest {
         }
         Link link = client.makeFolder(path);
         assertTrue(link.getHref() != null);
-        assertTrue(link.getHref().equals("https://cloud-api.yandex.net/v1/disk/resources?path="
+        assertTrue(link.getHref().equals(client.getUrl() + "/v1/disk/resources?path="
                 + URLEncoder.encode("disk:" + path, "UTF-8")));
 
         String sub = path + "/sub1";
         Link link2 = client.makeFolder(sub);
         assertTrue(link2.getHref() != null);
-        assertTrue(link2.getHref().equals("https://cloud-api.yandex.net/v1/disk/resources?path="
+        assertTrue(link2.getHref().equals(client.getUrl() + "/v1/disk/resources?path="
                 + URLEncoder.encode("disk:" + sub, "UTF-8")));
 
         checkResult(client.delete(path, false));
@@ -246,7 +247,7 @@ public class TransportClientTest {
         }
         Link link = client.makeFolder(path);
         assertTrue(link.getHref() != null);
-        assertTrue(link.getHref().equals("https://cloud-api.yandex.net/v1/disk/resources?path="
+        assertTrue(link.getHref().equals(client.getUrl() + "/v1/disk/resources?path="
                 + URLEncoder.encode("disk:" + path, "UTF-8")));
 
         checkResult(client.delete(path, false));
