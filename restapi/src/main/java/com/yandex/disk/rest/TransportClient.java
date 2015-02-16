@@ -33,15 +33,11 @@ public class TransportClient {
 
     private static final RestAdapter.LogLevel LOG_LEVEL = RestAdapter.LogLevel.FULL;
 
-    private static final int NETWORK_TIMEOUT = 30000;
-
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String USER_AGENT_HEADER = "User-Agent";
     private static final String USER_AGENT = "Cloud API Android Client Example/1.0";
-    private static final String UTF8 = "UTF-8";
 
     private static URL serverURL;
-
     static {
         try {
             serverURL = new URL("https://cloud-api.yandex.net");
@@ -53,7 +49,11 @@ public class TransportClient {
     private final List<CustomHeader> commonHeaders;
     private final HttpClient client;
 
-    public TransportClient(final Credentials credentials, final int networkTimeout) {
+    public static TransportClient getInstance(final Credentials credentials) {
+        return new TransportClient(credentials);
+    }
+
+    private TransportClient(final Credentials credentials) {
         this.commonHeaders = fillCommonHeaders(credentials.getToken());
         this.client = new HttpClient();
     }
@@ -72,10 +72,6 @@ public class TransportClient {
         List<CustomHeader> list = new ArrayList<>(commonHeaders);
         list.addAll(headerList);
         return Collections.unmodifiableList(list);
-    }
-
-    public static TransportClient getInstance(final Credentials credentials) {
-        return new TransportClient(credentials, NETWORK_TIMEOUT);
     }
 
     /* package */ String getUrl() {
@@ -103,29 +99,6 @@ public class TransportClient {
 
     public ApiVersion getApiVersion()
             throws IOException, ServerIOException {
-/*        final CountDownLatch latch = new CountDownLatch(1);
-        final ApiVersion[] result = new ApiVersion[1];
-        call().getApiVersion(new Callback<ApiVersion>() {
-            @Override
-            public void success(ApiVersion apiVersion, Response response) {
-                result[0] = apiVersion;
-                apiVersion.setHttpCode(response.getStatus());
-                apiVersion.setHttpMessage(response.getReason());
-                latch.countDown();
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-            }
-        });
-        try {
-            latch.await();
-        } catch (InterruptedException ex) {
-            // make compiler happy
-        }
-        return result[0];*/
-//        return new HttpClientIO(client, getAllHeaders(null))
-//                .getJson(serverURL.toExternalForm(), ApiVersion.class);
         return call().getApiVersion();
     }
 

@@ -12,8 +12,6 @@ public class HttpClient extends OkClient {
     private static final int READ_TIMEOUT_MILLIS = 30 * 1000;
     private static final int WRITE_TIMEOUT_MILLIS = 30 * 1000;
 
-    private final OkHttpClient client;
-
     private static OkHttpClient makeClient() {
         OkHttpClient client = new OkHttpClient();
 

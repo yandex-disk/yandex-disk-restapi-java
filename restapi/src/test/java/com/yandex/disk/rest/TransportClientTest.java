@@ -90,14 +90,6 @@ public class TransportClientTest {
         assertTrue("v1".equalsIgnoreCase(apiVersion.getApiVersion()));
     }
 
-    @Test(expected = ServerIOException.class)
-    public void testOperation() throws Exception {
-        // TODO complete test: make directory, make file inside directory, remove directory, check operation
-        Operation operation = client.getOperation("5");
-        Log.d("operation: " + operation);
-        assertThat(operation.getStatus(), not(isEmptyOrNullString()));
-    }
-
     @Test
     public void testCapacity() throws Exception {
         DiskCapacity capacity = client.getCapacity();
