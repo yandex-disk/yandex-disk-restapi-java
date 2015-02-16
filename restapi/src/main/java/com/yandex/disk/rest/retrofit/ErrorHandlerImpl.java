@@ -1,7 +1,6 @@
 package com.yandex.disk.rest.retrofit;
 
 import com.google.gson.Gson;
-import com.yandex.disk.rest.Log;
 import com.yandex.disk.rest.exceptions.NetworkIOException;
 import com.yandex.disk.rest.exceptions.RetrofitConversionException;
 import com.yandex.disk.rest.exceptions.ServerIOException;
@@ -26,6 +25,9 @@ import com.yandex.disk.rest.exceptions.http.UnprocessableEntityException;
 import com.yandex.disk.rest.exceptions.http.UnsupportedMediaTypeException;
 import com.yandex.disk.rest.json.ApiError;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -36,7 +38,7 @@ import retrofit.client.Response;
 
 public class ErrorHandlerImpl implements ErrorHandler {
 
-    private static final String TAG = "ErrorHandlerImpl";
+    private static final Logger logger = LoggerFactory.getLogger(ErrorHandlerImpl.class);
 
     @Override
     public Throwable handleError(RetrofitError retrofitError) {
@@ -52,7 +54,7 @@ public class ErrorHandlerImpl implements ErrorHandler {
                 case HTTP:
                     Response response = retrofitError.getResponse();
                     int httpCode = response.getStatus();
-                    Log.d(TAG, "getStatus=" + httpCode);
+                    logger.debug("getStatus=" + httpCode);
                     Reader reader = new InputStreamReader(response.getBody().in());
                     ApiError apiError = new Gson().fromJson(reader, ApiError.class);
                     switch (httpCode) {
@@ -103,7 +105,7 @@ public class ErrorHandlerImpl implements ErrorHandler {
                     return new ServerIOException("ErrorHandler: unhandled error " + kind.name());
             }
         } catch (IOException ex) {
-            Log.d(TAG, "errorHandler", retrofitError);
+            logger.debug("errorHandler", retrofitError);
             return new ServerIOException(ex);
         }
     }

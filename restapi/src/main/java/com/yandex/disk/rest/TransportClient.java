@@ -15,6 +15,9 @@ import com.yandex.disk.rest.retrofit.ErrorHandlerImpl;
 import com.yandex.disk.rest.retrofit.RequestInterceptorImpl;
 import com.yandex.disk.rest.util.Hash;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -29,7 +32,7 @@ import retrofit.RestAdapter;
 
 public class TransportClient {
 
-    private static final String TAG = "TransportClient";
+    private static final Logger logger = LoggerFactory.getLogger(TransportClient.class);
 
     private static final RestAdapter.LogLevel LOG_LEVEL = RestAdapter.LogLevel.FULL;
 
@@ -114,7 +117,7 @@ public class TransportClient {
         }
         Operation operation = new HttpClientIO(client, getAllHeaders(null))
                 .getOperation(link.getHref());
-        Log.d(TAG, "getOperation: " + operation);
+        logger.debug("getOperation: " + operation);
         return operation;
     }
 
@@ -285,7 +288,7 @@ public class TransportClient {
         if (resumeUpload) {
             Hash hash = Hash.getHash(localSource);
             startOffset = clientIO.headUrl(link.getHref(), hash);
-            Log.d("head: startOffset="+startOffset);
+            logger.debug("head: startOffset="+startOffset);
         }
         clientIO.uploadFile(link.getHref(), localSource, startOffset, progressListener);
     }

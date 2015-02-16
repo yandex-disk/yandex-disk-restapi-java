@@ -20,6 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,11 +52,13 @@ import static org.junit.Assert.assertTrue;
 @RunWith(JUnit4.class)
 public class TransportClientTest {
 
+    private static final Logger logger = LoggerFactory.getLogger(TransportClientTest.class);
+
     private TransportClient client;
 
     @Before
     public void setUp() throws Exception {
-        Log.d("pwd: " + new File(".").getAbsolutePath());
+        logger.debug("pwd: " + new File(".").getAbsolutePath());
 
         FileInputStream propertiesFile = new FileInputStream("local.properties");
         Properties properties = new Properties();
@@ -78,13 +82,13 @@ public class TransportClientTest {
         Runtime.getRuntime()
                 .exec("/usr/bin/env dd if=/dev/urandom of=testResources/test-upload-002.bin bs=1m count=1")
                 .waitFor();
-        Log.d("generateResources: done");
+        logger.debug("generateResources: done");
     }
 
     @Test
     public void testApiVersion() throws Exception {
         ApiVersion apiVersion = client.getApiVersion();
-        Log.d("apiVersion: " + apiVersion);
+        logger.debug("apiVersion: " + apiVersion);
         assertThat(apiVersion.getBuild(), not(isEmptyOrNullString()));
         assertTrue("2.6.35".equalsIgnoreCase(apiVersion.getBuild()));
         assertTrue("v1".equalsIgnoreCase(apiVersion.getApiVersion()));
@@ -93,7 +97,7 @@ public class TransportClientTest {
     @Test
     public void testCapacity() throws Exception {
         DiskCapacity capacity = client.getCapacity();
-        Log.d("capacity: " + capacity);
+        logger.debug("capacity: " + capacity);
         assertThat(capacity.getTotalSpace(), greaterThan(0L));
         assertThat(capacity.getTrashSize(), greaterThanOrEqualTo(0L));
         assertThat(capacity.getUsedSpace(), greaterThanOrEqualTo(0L));
@@ -112,12 +116,12 @@ public class TransportClientTest {
                 .build());
         assertTrue("dir".equals(resource.getType()));
         assertEquals(resource.getPath(), new ResourcePath("disk", "/"));
-        Log.d("self: " + resource);
+        logger.debug("self: " + resource);
 
         ResourceList items = resource.getItems();
         assertFalse(items == null);
         for (Resource item : items.getItems()) {
-            Log.d("item: " + item);
+            logger.debug("item: " + item);
         }
         assertThat(items.getItems(), hasSize(limit));
         assertThat(items.getItems().get(0).getName(), not(isEmptyOrNullString()));
@@ -130,13 +134,13 @@ public class TransportClientTest {
 
             @Override
             public void handleSelf(Resource item) {
-                Log.d("self: " + item);
+                logger.debug("self: " + item);
             }
 
             @Override
             public void handleItem(Resource item) {
                 items.add(item);
-                Log.d("item: " + item);
+                logger.debug("item: " + item);
             }
 
             @Override
@@ -159,13 +163,13 @@ public class TransportClientTest {
                 .setLimit(limit)
                 .setOffset(10)
                 .build());
-        Log.d("resourceList: " + resourceList);
+        logger.debug("resourceList: " + resourceList);
         assertEquals(resourceList.getPath(), null);
 
         List<Resource> items = resourceList.getItems();
         assertFalse(items == null);
         for (Resource item : items) {
-            Log.d("item: " + item);
+            logger.debug("item: " + item);
             assertTrue(item.getMimeType().contains("video"));
         }
         assertThat(items, hasSize(limit));
@@ -185,7 +189,7 @@ public class TransportClientTest {
             @Override
             public void handleItem(Resource item) {
                 items.add(item);
-                Log.d("item: " + item);
+                logger.debug("item: " + item);
             }
 
             @Override
@@ -208,13 +212,13 @@ public class TransportClientTest {
                 .setLimit(limit)
                 .setOffset(10)
                 .build());
-        Log.d("resourceList: " + resourceList);
+        logger.debug("resourceList: " + resourceList);
         assertEquals(resourceList.getPath(), null);
 
         List<Resource> items = resourceList.getItems();
         assertFalse(items == null);
         for (Resource item : items) {
-            Log.d("item: " + item);
+            logger.debug("item: " + item);
             assertTrue(item.getMimeType().contains("video"));
         }
         assertThat(items, hasSize(limit));
@@ -234,7 +238,7 @@ public class TransportClientTest {
             @Override
             public void handleItem(Resource item) {
                 items.add(item);
-                Log.d("item: " + item);
+                logger.debug("item: " + item);
             }
 
             @Override
@@ -269,7 +273,7 @@ public class TransportClientTest {
                         .build());
         assertTrue("dir".equals(resource.getType()));
         assertEquals(resource.getPath(), new ResourcePath("disk", "/0-test"));
-        Log.d("self: " + resource);
+        logger.debug("self: " + resource);
     }
 
     @Test
@@ -278,7 +282,7 @@ public class TransportClientTest {
         ResourcesHandler parsingHandler = new ResourcesHandler() {
             @Override
             public void handleItem(Resource item) {
-                Log.d("item: " + item);
+                logger.debug("item: " + item);
                 items.add(item);
 //                if (new ResourcePath("trash", "/.TheUnarchiverTemp0").equals(item.getPath())) {
 //                    assertEquals(item.getOriginPath(), new ResourcePath("disk", "/apple/.TheUnarchiverTemp0"));
@@ -381,7 +385,7 @@ public class TransportClientTest {
         client.downloadFile(path, local, null, new ProgressListener() {
             @Override
             public void updateProgress(long loaded, long total) {
-                Log.d("updateProgress: " + loaded + " / " + total);
+                logger.debug("updateProgress: " + loaded + " / " + total);
             }
 
             @Override
@@ -389,7 +393,7 @@ public class TransportClientTest {
                 return false;
             }
         });
-        Log.d("length: " + local.length());
+        logger.debug("length: " + local.length());
         assertTrue(local.length() == 709L);
         assertTrue(local.delete());
     }
@@ -416,7 +420,7 @@ public class TransportClientTest {
 
         Link saveLink = client.saveFromUrl(url, path, null);
         Operation operation = client.getOperation(saveLink);
-        Log.d("operation: "+operation);
+        logger.debug("operation: "+operation);
         assertThat(operation.getStatus(), not(isEmptyOrNullString()));
     }
 
@@ -446,7 +450,7 @@ public class TransportClientTest {
 
                     @Override
                     public void updateProgress(long loaded, long total) {
-                        Log.d("updateProgress: pass=" + pass + ": " + loaded + " / " + total);
+                        logger.debug("updateProgress: pass=" + pass + ": " + loaded + " / " + total);
                         if (pass == 0 && loaded >= 10240) {
                             doCancel = true;
                         }
@@ -458,13 +462,13 @@ public class TransportClientTest {
                     @Override
                     public boolean hasCancelled() {
                         if (doCancel) {
-                            Log.d("cancelled");
+                            logger.debug("cancelled");
                         }
                         return doCancel;
                     }
                 });
             } catch (CancelledUploadingException ex) {
-                Log.d("CancelledUploadingException");
+                logger.debug("CancelledUploadingException");
             } catch (IOException ex) {
                 if (pass >= lastPass) {
                     throw ex;
@@ -484,9 +488,9 @@ public class TransportClientTest {
         }
 
         Link link = client.makeFolder(path);
-        Log.d("link: "+link);
+        logger.debug("link: "+link);
         Operation operation = client.getOperation(link);
-        Log.d("operation: "+operation);
+        logger.debug("operation: "+operation);
         assertTrue(operation.getStatus() == null);
     }
 
@@ -507,9 +511,9 @@ public class TransportClientTest {
         }
 
         Link link = client.copy(from, to, false);
-        Log.d("link: "+link);
+        logger.debug("link: "+link);
         Operation operation = client.getOperation(link);
-        Log.d("operation: "+operation);
+        logger.debug("operation: "+operation);
         assertTrue(operation.getStatus() == null);
     }
 
@@ -530,9 +534,9 @@ public class TransportClientTest {
         }
 
         Link link = client.move(from, to, false);
-        Log.d("link: "+link);
+        logger.debug("link: "+link);
         Operation operation = client.getOperation(link);
-        Log.d("operation: "+operation);
+        logger.debug("operation: "+operation);
         assertTrue(operation.getStatus() == null);
     }
 
@@ -595,7 +599,7 @@ public class TransportClientTest {
         }
 
         Link link = client.publish(path);
-        Log.d("link: "+link);
+        logger.debug("link: "+link);
 
         try {
             final String[] publicKey = new String[1];
@@ -608,7 +612,7 @@ public class TransportClientTest {
                         }
                     })
                     .build());
-            Log.d("publicKey: " + publicKey[0]);
+            logger.debug("publicKey: " + publicKey[0]);
 
             client.listPublicResources(new ResourcesArgs.Builder()
                     .setPublicKey(publicKey[0])
@@ -618,7 +622,7 @@ public class TransportClientTest {
                         @Override
                         public void handleItem(Resource item) {
                             items.add(item);
-                            Log.d("item: " + item);
+                            logger.debug("item: " + item);
                         }
 
                         @Override
@@ -646,7 +650,7 @@ public class TransportClientTest {
         assertFalse(local.exists());
 
         Link link = client.publish(path);
-        Log.d("link: "+link);
+        logger.debug("link: "+link);
         try {
             final String[] publicKey = new String[1];
             client.listResources(new ResourcesArgs.Builder()
@@ -660,13 +664,13 @@ public class TransportClientTest {
                     .build());
 
             Link savedLink = client.savePublicResource(publicKey[0], null, null);
-            Log.d("savedLink: "+savedLink);
+            logger.debug("savedLink: "+savedLink);
             // TODO check saved file
 
             client.downloadPublicResource(publicKey[0], "", local, null, new ProgressListener() {
                 @Override
                 public void updateProgress(long loaded, long total) {
-                    Log.d("updateProgress: " + loaded + " / " + total);
+                    logger.debug("updateProgress: " + loaded + " / " + total);
                 }
 
                 @Override
@@ -674,7 +678,7 @@ public class TransportClientTest {
                     return false;
                 }
             });
-            Log.d("length: " + local.length());
+            logger.debug("length: " + local.length());
             assertTrue(local.length() == 709L);
             assertTrue(local.delete());
 

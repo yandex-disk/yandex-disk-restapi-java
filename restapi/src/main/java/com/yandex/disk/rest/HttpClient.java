@@ -4,9 +4,14 @@ package com.yandex.disk.rest;
 import com.squareup.okhttp.OkHttpClient;
 import com.yandex.disk.rest.okhttp.LoggingInterceptor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.TimeUnit;
 
 public class HttpClient extends OkClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(HttpClient.class);
 
     private static final int CONNECT_TIMEOUT_MILLIS = 30 * 1000;
     private static final int READ_TIMEOUT_MILLIS = 30 * 1000;
@@ -15,7 +20,9 @@ public class HttpClient extends OkClient {
     private static OkHttpClient makeClient() {
         OkHttpClient client = new OkHttpClient();
 
-        client.networkInterceptors().add(new LoggingInterceptor());
+        if (logger.isDebugEnabled()) {
+            client.networkInterceptors().add(new LoggingInterceptor());
+        }
 
         client.setConnectTimeout(CONNECT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         client.setReadTimeout(READ_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);

@@ -5,6 +5,9 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.internal.Util;
 import com.yandex.disk.rest.exceptions.CancelledUploadingException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -16,6 +19,8 @@ import okio.Okio;
 import okio.Source;
 
 public abstract class RequestBodyProgress {
+
+    private static final Logger logger = LoggerFactory.getLogger(RequestBodyProgress.class);
 
     private static final int SIZE = 2048;
 
@@ -77,7 +82,7 @@ public abstract class RequestBodyProgress {
                         loaded += readCount;
                         updateProgress(loaded);
                     }
-                    Log.d("loaded: " + loaded);
+                    logger.debug("loaded: " + loaded);
                 } finally {
                     Util.closeQuietly(source);
                     Util.closeQuietly(inputStream);

@@ -17,6 +17,9 @@ import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.util.Hash;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +30,7 @@ import java.util.regex.Pattern;
 
 public class HttpClientIO {
 
-    private static final String TAG = "HttpClientIO";
+    private static final Logger logger = LoggerFactory.getLogger(HttpClientIO.class);
 
     private static final String ETAG_HEADER = "Etag";
     private static final String SHA256_HEADER = "Sha256";
@@ -73,13 +76,13 @@ public class HttpClientIO {
             ifTag = "If-Range";
             StringBuilder contentRange = new StringBuilder();
             contentRange.append("bytes=").append(length).append("-");
-            Log.d(TAG, "Range: " + contentRange);
+            logger.debug("Range: " + contentRange);
             req.addHeader("Range", contentRange.toString());
         }
 
         String etag = downloadListener.getETag();
         if (etag != null) {
-            Log.d(TAG, ifTag + ": " + etag);
+            logger.debug(ifTag + ": " + etag);
             req.addHeader(ifTag, etag);
         }
 
@@ -111,12 +114,12 @@ public class HttpClientIO {
 
         ResponseBody responseBody = response.body();
         long contentLength = responseBody.contentLength();
-        Log.d(TAG, "download: contentLength=" + contentLength);
+        logger.debug("download: contentLength=" + contentLength);
 
         long loaded;
         if (partialContent) {
             ContentRangeResponse contentRangeResponse = parseContentRangeHeader(response.header("Content-Range"));
-            Log.d(TAG, "download: contentRangeResponse=" + contentRangeResponse);
+            logger.debug("download: contentRangeResponse=" + contentRangeResponse);
             if (contentRangeResponse != null) {
                 loaded = contentRangeResponse.getStart();
                 contentLength = contentRangeResponse.getSize();
@@ -145,7 +148,7 @@ public class HttpClientIO {
             final byte[] downloadBuffer = new byte[1024];
             while ((count = content.read(downloadBuffer)) != -1) {
                 if (downloadListener.hasCancelled()) {
-                    Log.i(TAG, "Downloading " + url + " canceled");
+                    logger.info("Downloading " + url + " canceled");
                     client.cancel(req);  // TODO XXX untested get.abort();
                     throw new CancelledDownloadException();
                 }
@@ -156,7 +159,7 @@ public class HttpClientIO {
         } catch (CancelledDownloadException ex) {
             throw ex;
         } catch (Exception e) {
-            Log.w(TAG, e);
+            logger.warn(e.getMessage(), e);
             client.cancel(req);  // TODO XXX untested get.abort();
             if (e instanceof IOException) {
                 throw (IOException) e;
@@ -180,7 +183,7 @@ public class HttpClientIO {
                 // TODO not needed ?
                 response.body().close();
             } catch (IOException e) {
-                Log.w(TAG, e);
+                logger.warn(e.getMessage(), e);
             }
         }
     }
@@ -191,7 +194,7 @@ public class HttpClientIO {
         if (header == null) {
             return null;
         }
-//        Log.d(TAG, header.getName()+": "+header.getValue());
+//        logger.debug(header.getName()+": "+header.getValue());
         Matcher matcher = CONTENT_RANGE_HEADER_PATTERN.matcher(header);
         if (!matcher.matches()) {
             return null;
@@ -199,10 +202,10 @@ public class HttpClientIO {
         try {
             return new ContentRangeResponse(Long.parseLong(matcher.group(1)), Long.parseLong(matcher.group(2)));
         } catch (IllegalStateException ex) {
-            Log.d(TAG, "parseContentRangeHeader: " + header, ex);
+            logger.error("parseContentRangeHeader: " + header, ex);
             return null;
         } catch (NumberFormatException ex) {
-            Log.d(TAG, "parseContentRangeHeader: " + header, ex);
+            logger.error("parseContentRangeHeader: " + header, ex);
             return null;
         }
     }
@@ -210,7 +213,7 @@ public class HttpClientIO {
     public void uploadFile(final String url, final File file, final long startOffset,
                            final ProgressListener progressListener)
             throws IOException, HttpCodeException {
-        Log.d(TAG, "uploadFile: put to url: "+url);
+        logger.debug("uploadFile: put to url: "+url);
 
         MediaType mediaType = MediaType.parse("application/octet-stream");  // TODO
         RequestBody requestBody = RequestBodyProgress.create(mediaType, file, startOffset,
@@ -223,7 +226,7 @@ public class HttpClientIO {
             StringBuilder contentRange = new StringBuilder();
             contentRange.append("bytes ").append(startOffset).append("-").append(file.length() - 1)
                     .append("/").append(file.length());
-            Log.d(TAG, CONTENT_RANGE_HEADER + ": " + contentRange);
+            logger.debug(CONTENT_RANGE_HEADER + ": " + contentRange);
             requestBuilder.addHeader(CONTENT_RANGE_HEADER, contentRange.toString());
         }
         Request request = requestBuilder.build();
@@ -231,22 +234,22 @@ public class HttpClientIO {
         Response response = client
                 .newCall(request)
                 .execute();
-//        Log.d(TAG, "uploadFile: networkResponse: "+response.networkResponse());
-//        Log.d(TAG, "uploadFile: priorResponse: "+response.priorResponse());
-//        Log.d(TAG, "uploadFile: headers: \n>>>\n"+response.headers()+"<<<");
+//        logger.debug("uploadFile: networkResponse: "+response.networkResponse());
+//        logger.debug("uploadFile: priorResponse: "+response.priorResponse());
+//        logger.debug("uploadFile: headers: \n>>>\n"+response.headers()+"<<<");
 
         String statusLine = response.message();
-        Log.d(TAG, "headUrl: " + statusLine + " for url " + url);
+        logger.debug("headUrl: " + statusLine + " for url " + url);
 
         int code = response.code();
 
         ResponseBody responseBody = response.body();
-//        Log.d(TAG, "upload: " + responseBody.string());
+//        logger.debug("upload: " + responseBody.string());
         responseBody.close();
 
         switch (code) {
             case 201:
-                Log.d(TAG, "uploadFile: file uploaded successfully: "+file);
+                logger.debug("uploadFile: file uploaded successfully: "+file);
                 break;
 
             // TODO more codes?
@@ -273,12 +276,12 @@ public class HttpClientIO {
         Response response = client
                 .newCall(request)
                 .execute();
-//        Log.d(TAG, "headUrl: networkResponse: "+response.networkResponse());
-//        Log.d(TAG, "headUrl: priorResponse: "+response.priorResponse());
-//        Log.d(TAG, "headUrl: headers: \n>>>\n"+response.headers()+"<<<");
+//        logger.debug("headUrl: networkResponse: "+response.networkResponse());
+//        logger.debug("headUrl: priorResponse: "+response.priorResponse());
+//        logger.debug("headUrl: headers: \n>>>\n"+response.headers()+"<<<");
 
         String statusLine = response.message();
-        Log.d(TAG, "headUrl: " + statusLine + " for url " + url);
+        logger.debug("headUrl: " + statusLine + " for url " + url);
 
         int code = response.code();
 
