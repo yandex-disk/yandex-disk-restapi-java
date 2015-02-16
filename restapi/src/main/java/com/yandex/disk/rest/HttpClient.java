@@ -1,18 +1,10 @@
 
 package com.yandex.disk.rest;
 
-//import android.net.SSLCertificateSocketFactory;
-
-import com.squareup.okhttp.Dispatcher;
 import com.squareup.okhttp.OkHttpClient;
-import com.yandex.disk.rest.okhttp.HttpCodeInterceptor;
 import com.yandex.disk.rest.okhttp.LoggingInterceptor;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-//import retrofit.client.OkClient;
 
 public class HttpClient extends OkClient {
 
@@ -20,31 +12,19 @@ public class HttpClient extends OkClient {
     private static final int READ_TIMEOUT_MILLIS = 30 * 1000;
     private static final int WRITE_TIMEOUT_MILLIS = 30 * 1000;
 
-//    private final OkHttpClient client;
+    private final OkHttpClient client;
 
     private static OkHttpClient makeClient() {
         OkHttpClient client = new OkHttpClient();
 
-//        ExecutorService executor = Executors.newSingleThreadExecutor();
-//        client.setDispatcher(new Dispatcher(executor));
-
-//        client.networkInterceptors().add(new HttpCodeInterceptor());
         client.networkInterceptors().add(new LoggingInterceptor());
 
         client.setConnectTimeout(CONNECT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         client.setReadTimeout(READ_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
         client.setWriteTimeout(WRITE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
 
-        Log.d("getConnectTimeout: " + client.getConnectTimeout());
-        Log.d("getReadTimeout: " + client.getReadTimeout());
-        Log.d("getWriteTimeout: " + client.getWriteTimeout());
-
         client.setFollowSslRedirects(true);
         client.setFollowRedirects(true);
-
-        // TODO XXX pinning
-        // https://github.com/square/okhttp/blob/master/samples/guide/src/main/java/com/squareup/okhttp/recipes/CertificatePinning.java
-//        client.setSslSocketFactory(SSLCertificateSocketFactory.getDefault(CONNECT_TIMEOUT_MILLIS, null));
 
         return client;
     }

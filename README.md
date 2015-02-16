@@ -13,3 +13,5 @@ https://github.com/square/okhttp/tree/master/samples/guide/src/main/java/com/squ
 
 https://github.yandex-team.ru/MPFS/MPFS/blob/master/common/lib/mpfs/platform/exceptions.py
 https://github.yandex-team.ru/MPFS/MPFS/blob/master/common/lib/mpfs/platform/v1/disk/exceptions.py
+
+https://stash.desktop.dev.yandex.net/projects/CLOUD/repos/disk-client/browse/core/core/core_impl.cpp#918
