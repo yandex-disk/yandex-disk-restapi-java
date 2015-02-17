@@ -1,35 +1,11 @@
 
 package com.yandex.disk.rest;
 
-//import org.apache.http.message.AbstractHttpMessage;
+public interface Credentials {
 
-public class Credentials {
+    public String getUser();
 
-    private String user, token;
+    public String getToken();
 
-    public Credentials(String user, String token) {
-        this.user = user;
-        this.token = token;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-//    public void addAuthHeader(AbstractHttpMessage req) {
-//        req.addHeader("X-Yandex-SDK-Version", "android, 1.0");
-//        req.addHeader("Authorization", "OAuth "+token);
-//    }
+//    public void addAuthHeader(AbstractHttpMessage req);
 }

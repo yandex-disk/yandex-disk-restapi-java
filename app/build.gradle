@@ -1,8 +1,9 @@
 apply plugin: 'com.android.application'
+apply plugin: 'idea'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.1"
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         applicationId "com.yandex.disk.rest.example"
@@ -26,5 +27,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.2'
+//    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:support-v4:21.0.3'
+    compile 'org.slf4j:slf4j-android:1.7.10'
+    compile project (':restapi')
 }

@@ -61,6 +61,14 @@ public class TransportClient {
         this.client = new HttpClient();
     }
 
+    public void shutdown() {
+        // TODO nothing yet
+    }
+
+    public static void shutdown(TransportClient client) {
+        client.shutdown();
+    }
+
     private static List<CustomHeader> fillCommonHeaders(final String token) {
         List<CustomHeader> list = new ArrayList<>();
         list.add(new CustomHeader(USER_AGENT_HEADER, USER_AGENT));
