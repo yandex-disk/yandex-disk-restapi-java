@@ -16,7 +16,6 @@ import com.yandex.disk.rest.ResourcesHandler;
 import com.yandex.disk.rest.TransportClient;
 import com.yandex.disk.rest.exceptions.ServerException;
 import com.yandex.disk.rest.json.Resource;
-import com.yandex.disk.rest.json.ResourceList;
 
 import java.io.IOException;
 import java.text.Collator;
@@ -37,7 +36,7 @@ public class ListExampleLoader extends AsyncTaskLoader<List<ListItem>> {
     private Exception exception;
     private boolean hasCancelled;
 
-    private static final int ITEMS_PER_REQUEST = 100;
+    private static final int ITEMS_PER_REQUEST = 20;
 
     private static Collator collator = Collator.getInstance();
     static {
@@ -78,34 +77,34 @@ public class ListExampleLoader extends AsyncTaskLoader<List<ListItem>> {
     public List<ListItem> loadInBackground() {
         fileItemList = new ArrayList<>();
         hasCancelled = false;
+        int offset = 0;
         TransportClient client = null;
         try {
             client = TransportClient.getInstance(credentials);
-            // for() {
-            client.listResources(new ResourcesArgs.Builder()
-                    .setPath(dir)
-                    .setLimit(ITEMS_PER_REQUEST)
-//                    .setOffset(0)
-                    .setParsingHandler(new ResourcesHandler() {
-                        @Override
-                        public void handleItem(Resource item) {
-                            fileItemList.add(ListItemUtils.convert(item));
-                        }
-
-                        @Override
-                        public void onFinished(int itemsOnPage) {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run () {
-                                    Collections.sort(fileItemList, FILE_ITEM_COMPARATOR);
-                                    deliverResult(new ArrayList<>(fileItemList));
-                                }
-                            });
-                        }
-                    })
-                    .build());
-            // } for
-            Collections.sort(fileItemList, FILE_ITEM_COMPARATOR);
+            int size;
+            do {
+                Resource resource = client.listResources(new ResourcesArgs.Builder()
+                        .setPath(dir)
+                        .setSort(ResourcesArgs.Sort.name)
+                        .setLimit(ITEMS_PER_REQUEST)
+                        .setOffset(offset)
+                        .setParsingHandler(new ResourcesHandler() {
+                            @Override
+                            public void handleItem(Resource item) {
+                                fileItemList.add(ListItemUtils.convert(item));
+                            }
+                        })
+                        .build());
+                offset += ITEMS_PER_REQUEST;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Collections.sort(fileItemList, FILE_ITEM_COMPARATOR);
+                        deliverResult(new ArrayList<>(fileItemList));
+                    }
+                });
+                size = resource.getItems().getItems().size();
+            } while (!hasCancelled && size >= ITEMS_PER_REQUEST);
             return fileItemList;
         } catch (ServerException ex) {
             Log.d(TAG, "loadInBackground", ex);

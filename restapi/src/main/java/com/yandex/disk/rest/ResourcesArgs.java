@@ -4,6 +4,10 @@ import retrofit.mime.TypedOutput;
 
 public class ResourcesArgs {
 
+    public enum Sort {
+        name, path, created, modified, size
+    }
+
     private String path, fields, sort, previewSize, publicKey, mediaType;
     private Integer limit, offset;
     private Boolean previewCrop;
@@ -111,6 +115,11 @@ public class ResourcesArgs {
 
         public Builder setSort(String sort) {
             this.sort = sort;
+            return this;
+        }
+
+        public Builder setSort(Sort sort) {
+            this.sort = sort.name();
             return this;
         }
 
