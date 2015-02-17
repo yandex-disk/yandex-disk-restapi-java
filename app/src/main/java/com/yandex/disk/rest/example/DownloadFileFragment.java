@@ -147,13 +147,10 @@ public class DownloadFileFragment extends IODialogFragment {
             new Thread(new Runnable() {
                 @Override
                 public void run () {
-/*
-TODO XXX
-
                     TransportClient client = null;
                     try {
                         client = TransportClient.getInstance(credentials);
-                        client.downloadFile(item.getFullPath(), result, DownloadFileRetainedFragment.this);
+                        client.downloadFile(item.getFullPath(), result, null, DownloadFileRetainedFragment.this);
                         downloadComplete();
                     } catch (IOException ex) {
                         Log.d(TAG, "loadFile", ex);
@@ -166,7 +163,6 @@ TODO XXX
                             client.shutdown();
                         }
                     }
-*/
                 }
             }).start();
         }
