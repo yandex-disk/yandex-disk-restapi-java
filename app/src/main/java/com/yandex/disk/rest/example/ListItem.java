@@ -47,6 +47,10 @@ public class ListItem implements Parcelable {
             this.lastModified = parseDateTime(lastModified);
         }
 
+        public void setLastModified(long lastModified) {
+            this.lastModified = lastModified;
+        }
+
         public void setEtag(String etag) {
             this.etag = etag;
         }

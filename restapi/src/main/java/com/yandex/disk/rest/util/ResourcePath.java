@@ -16,7 +16,9 @@ public class ResourcePath {
                 prefix = null;
                 path = str;
             } else {
-                throw new IllegalArgumentException();
+//                throw new IllegalArgumentException();   // TODO XXX
+                prefix = null;
+                path = str;
             }
         } else {
             prefix = arr[0];

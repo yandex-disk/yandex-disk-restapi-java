@@ -45,6 +45,12 @@ public class Resource {
     @SerializedName("mime_type")
     String mimeType;
 
+    @SerializedName("media_type")
+    String mediaType;
+
+    @SerializedName("preview")
+    String preview;
+
     @SerializedName("size")
     long size;
 
@@ -91,8 +97,20 @@ public class Resource {
         return type;
     }
 
+    public boolean isDir() {
+        return "dir".equalsIgnoreCase(type);
+    }
+
     public String getMimeType() {
         return mimeType;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public String getPreview() {
+        return preview;
     }
 
     public long getSize() {
@@ -117,6 +135,8 @@ public class Resource {
                 ", md5='" + md5 + '\'' +
                 ", type='" + type + '\'' +
                 ", mimeType='" + mimeType + '\'' +
+                ", mediaType='" + mediaType + '\'' +
+                ", preview='" + preview + '\'' +
                 ", size=" + size +
                 ", properties=" + properties +
                 '}';
