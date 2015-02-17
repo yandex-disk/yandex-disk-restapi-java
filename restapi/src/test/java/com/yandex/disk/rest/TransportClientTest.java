@@ -73,7 +73,7 @@ public class TransportClientTest {
         assertThat(user, notNullValue());
         assertThat(token, notNullValue());
 
-        Credentials credentials = new CredentialsImpl(user, token);
+        Credentials credentials = new Credentials(user, token);
 
         client = TransportClient.getInstance(credentials);
 
@@ -711,26 +711,6 @@ public class TransportClientTest {
 
         } finally {
             client.unpublish(path);
-        }
-    }
-
-    private static class CredentialsImpl implements Credentials {
-
-        private final String user, token;
-
-        private CredentialsImpl(String user, String token) {
-            this.user = user;
-            this.token = token;
-        }
-
-        @Override
-        public String getUser() {
-            return user;
-        }
-
-        @Override
-        public String getToken() {
-            return token;
         }
     }
 }

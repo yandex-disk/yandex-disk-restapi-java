@@ -9,39 +9,11 @@ package com.yandex.disk.rest.example;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Credentials implements Parcelable, com.yandex.disk.rest.Credentials {
-
-    private String user, token;
+public class Credentials extends com.yandex.disk.rest.Credentials implements Parcelable {
 
     public Credentials(String user, String token) {
-        this.user = user;
-        this.token = token;
+        super(user, token);
     }
-
-    @Override
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    @Override
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-/*
-    public void addAuthHeader(AbstractHttpMessage req) {
-        req.addHeader("X-Yandex-SDK-Version", "android, 1.0");
-        req.addHeader("Authorization", "OAuth "+token);
-    }
-*/
 
     public static final Parcelable.Creator<Credentials> CREATOR = new Parcelable.Creator<Credentials>() {
 

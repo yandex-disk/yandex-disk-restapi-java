@@ -219,7 +219,7 @@ public class HttpClientIO {
         RequestBody requestBody = RequestBodyProgress.create(mediaType, file, startOffset,
                 progressListener);
         Request.Builder requestBuilder = buildRequest()
-                .removeHeader(TransportClient.AUTHORIZATION_HEADER)
+                .removeHeader(Credentials.AUTHORIZATION_HEADER)
                 .url(url)
                 .put(requestBody);
         if (startOffset > 0) {
@@ -265,7 +265,7 @@ public class HttpClientIO {
             HttpCodeException {
 
         Request request = buildRequest()
-                .removeHeader(TransportClient.AUTHORIZATION_HEADER)
+                .removeHeader(Credentials.AUTHORIZATION_HEADER)
                 .url(url)
                 .head()
                 .addHeader(ETAG_HEADER, hash.getMd5())

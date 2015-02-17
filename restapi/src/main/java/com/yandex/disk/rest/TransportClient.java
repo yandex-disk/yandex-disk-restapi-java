@@ -36,10 +36,6 @@ public class TransportClient {
 
     private static final RestAdapter.LogLevel LOG_LEVEL = RestAdapter.LogLevel.FULL;
 
-    public static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String USER_AGENT_HEADER = "User-Agent";
-    private static final String USER_AGENT = "Cloud API Android Client Example/1.0";
-
     private static URL serverURL;
     static {
         try {
@@ -57,23 +53,17 @@ public class TransportClient {
     }
 
     private TransportClient(final Credentials credentials) {
-        this.commonHeaders = fillCommonHeaders(credentials.getToken());
+        this.commonHeaders = credentials.getHeaders();
         this.client = new HttpClient();
     }
 
     public void shutdown() {
+//        client.getClient().cancel()
         // TODO nothing yet
     }
 
     public static void shutdown(TransportClient client) {
         client.shutdown();
-    }
-
-    private static List<CustomHeader> fillCommonHeaders(final String token) {
-        List<CustomHeader> list = new ArrayList<>();
-        list.add(new CustomHeader(USER_AGENT_HEADER, USER_AGENT));
-        list.add(new CustomHeader(AUTHORIZATION_HEADER, "OAuth " + token));
-        return Collections.unmodifiableList(list);
     }
 
     private List<CustomHeader> getAllHeaders(final List<CustomHeader> headerList) {
