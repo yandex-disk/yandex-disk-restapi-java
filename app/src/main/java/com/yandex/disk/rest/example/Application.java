@@ -6,11 +6,16 @@
 
 package com.yandex.disk.rest.example;
 
+import com.facebook.stetho.Stetho;
+
 public class Application extends android.app.Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
-//        LogCatHandler.setup(this);
+        Stetho.newInitializerBuilder(this)
+                .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+                .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
+                .build();
     }
 }

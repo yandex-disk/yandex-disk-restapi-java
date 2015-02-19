@@ -18,6 +18,8 @@ import com.yandex.disk.rest.exceptions.ServerException;
 import com.yandex.disk.rest.json.Resource;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,7 +82,7 @@ public class ListExampleLoader extends AsyncTaskLoader<List<ListItem>> {
         int offset = 0;
         TransportClient client = null;
         try {
-            client = TransportClient.getInstance(credentials);
+            client = TransportClientUtil.getInstance(getContext(), credentials);
             int size;
             do {
                 Resource resource = client.listResources(new ResourcesArgs.Builder()
@@ -106,10 +108,7 @@ public class ListExampleLoader extends AsyncTaskLoader<List<ListItem>> {
                 size = resource.getItems().getItems().size();
             } while (!hasCancelled && size >= ITEMS_PER_REQUEST);
             return fileItemList;
-        } catch (ServerException ex) {
-            Log.d(TAG, "loadInBackground", ex);
-            exception = ex;
-        } catch (IOException ex) {
+        } catch (IOException | ServerException | NoSuchAlgorithmException | KeyManagementException ex) {
             Log.d(TAG, "loadInBackground", ex);
             exception = ex;
         } finally {

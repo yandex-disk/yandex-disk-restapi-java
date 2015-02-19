@@ -75,7 +75,7 @@ public class TransportClientTest {
 
         Credentials credentials = new Credentials(user, token);
 
-        client = TransportClient.getInstance(credentials);
+        client = new TransportClient(credentials);
 
         generateResources();
     }

@@ -21,6 +21,8 @@ import com.yandex.disk.rest.exceptions.ServerException;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 public class DownloadFileFragment extends IODialogFragment {
 
@@ -149,13 +151,10 @@ public class DownloadFileFragment extends IODialogFragment {
                 public void run () {
                     TransportClient client = null;
                     try {
-                        client = TransportClient.getInstance(credentials);
+                        client = TransportClientUtil.getInstance(context, credentials);
                         client.downloadFile(item.getFullPath(), result, null, DownloadFileRetainedFragment.this);
                         downloadComplete();
-                    } catch (IOException ex) {
-                        Log.d(TAG, "loadFile", ex);
-                        sendException(ex);
-                    } catch (ServerException ex) {
+                    } catch (IOException | ServerException | NoSuchAlgorithmException | KeyManagementException ex) {
                         Log.d(TAG, "loadFile", ex);
                         sendException(ex);
                     } finally {

@@ -17,10 +17,13 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.yandex.disk.rest.TransportClient;
 import com.yandex.disk.rest.exceptions.ServerException;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 public class MakeItemPublicFragment extends IODialogFragment {
 
@@ -127,13 +130,13 @@ public class MakeItemPublicFragment extends IODialogFragment {
                 protected String doInBackground(Void... params) {
                     TransportClient client = null;
                     try {
-                        client = TransportClient.getInstance(credentials);
+                        client = TransportClientUtil.getInstance(context, credentials);
                         if (makePublicOrExpire) {
                             return client.publish(path).getHref();
                         } else {
                             client.unpublish(path);
                         }
-                    } catch (ServerException ex) {
+                    } catch (ServerException | NoSuchAlgorithmException | KeyManagementException ex) {
                         Log.d(TAG, "makePublicOrExpire", ex);
                         sendException(ex);
                     } finally {

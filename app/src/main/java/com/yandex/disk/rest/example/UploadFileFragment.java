@@ -15,7 +15,6 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.Toast;
 import com.yandex.disk.rest.example.Credentials;
-import com.yandex.disk.rest.TransportClient;
 import com.yandex.disk.rest.ProgressListener;
 import com.yandex.disk.rest.exceptions.CancelledUploadingException;
 import com.yandex.disk.rest.exceptions.ServerException;

@@ -16,9 +16,12 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.yandex.disk.rest.example.Credentials;
 import com.yandex.disk.rest.TransportClient;
 import com.yandex.disk.rest.exceptions.ServerException;
+
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 public class MakeFolderFragment extends IODialogFragment {
 
@@ -120,9 +123,9 @@ public class MakeFolderFragment extends IODialogFragment {
                 protected Void doInBackground(Void... params) {
                     TransportClient client = null;
                     try {
-                        client = TransportClient.getInstance(credentials);
+                        client = TransportClientUtil.getInstance(context, credentials);
                         client.makeFolder(path);
-                    } catch (ServerException ex) {
+                    } catch (ServerException | NoSuchAlgorithmException | KeyManagementException ex) {
                         Log.d(TAG, "makeFolder", ex);
                         sendException(ex);
                     } finally {

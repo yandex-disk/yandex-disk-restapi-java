@@ -48,13 +48,13 @@ public class TransportClient {
     private final List<CustomHeader> commonHeaders;
     private final HttpClient client;
 
-    public static TransportClient getInstance(final Credentials credentials) {
-        return new TransportClient(credentials);
+    public TransportClient(final Credentials credentials) {
+        this(credentials, new HttpClient());
     }
 
-    private TransportClient(final Credentials credentials) {
+    public TransportClient(Credentials credentials, HttpClient client) {
         this.commonHeaders = credentials.getHeaders();
-        this.client = new HttpClient();
+        this.client = client;
     }
 
     public void shutdown() {

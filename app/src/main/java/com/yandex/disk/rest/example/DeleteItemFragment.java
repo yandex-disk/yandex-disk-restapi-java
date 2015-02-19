@@ -20,6 +20,8 @@ import com.yandex.disk.rest.TransportClient;
 import com.yandex.disk.rest.exceptions.ServerException;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 public class DeleteItemFragment extends IODialogFragment {
 
@@ -126,12 +128,9 @@ public class DeleteItemFragment extends IODialogFragment {
                 protected Void doInBackground(Void... params) {
                     TransportClient client = null;
                     try {
-                        client = TransportClient.getInstance(credentials);
+                        client = TransportClientUtil.getInstance(context, credentials);
                         client.delete(path, false);     // TODO XXX
-                    } catch (IOException ex) {
-                        Log.d(TAG, "deleteItem", ex);
-                        sendException(ex);
-                    } catch (ServerException ex) {
+                    } catch (IOException | ServerException | NoSuchAlgorithmException | KeyManagementException ex) {
                         Log.d(TAG, "deleteItem", ex);
                         sendException(ex);
                     } finally {
