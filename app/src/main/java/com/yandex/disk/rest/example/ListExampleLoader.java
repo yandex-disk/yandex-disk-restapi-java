@@ -47,12 +47,12 @@ public class ListExampleLoader extends AsyncTaskLoader<List<ListItem>> {
     private final Comparator<ListItem> FILE_ITEM_COMPARATOR = new Comparator<ListItem>() {
         @Override
         public int compare(ListItem f1, ListItem f2) {
-            if (f1.isCollection() && !f2.isCollection()) {
+            if (f1.isDir() && !f2.isDir()) {
                 return -1;
-            } else if (f2.isCollection() && !f1.isCollection()) {
+            } else if (f2.isDir() && !f1.isDir()) {
                 return 1;
             } else {
-                return collator.compare(f1.getDisplayName(), f2.getDisplayName());
+                return collator.compare(f1.getName(), f2.getName());
             }
         }
     };
@@ -93,7 +93,7 @@ public class ListExampleLoader extends AsyncTaskLoader<List<ListItem>> {
                         .setParsingHandler(new ResourcesHandler() {
                             @Override
                             public void handleItem(Resource item) {
-                                fileItemList.add(ListItemUtils.convert(item));
+                                fileItemList.add(new ListItem(item));
                             }
                         })
                         .build());

@@ -129,7 +129,7 @@ public class DeleteItemFragment extends IODialogFragment {
                     TransportClient client = null;
                     try {
                         client = TransportClientUtil.getInstance(context, credentials);
-                        client.delete(path, false);     // TODO XXX
+                        client.delete(path, false);
                     } catch (IOException | ServerException | NoSuchAlgorithmException | KeyManagementException ex) {
                         Log.d(TAG, "deleteItem", ex);
                         sendException(ex);

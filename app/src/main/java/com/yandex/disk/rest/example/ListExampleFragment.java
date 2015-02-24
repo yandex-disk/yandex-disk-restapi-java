@@ -91,7 +91,7 @@ public class ListExampleFragment extends ListFragment implements LoaderManager.L
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        menu.setHeaderTitle(getListItem(menuInfo).getDisplayName());
+        menu.setHeaderTitle(getListItem(menuInfo).getName());
 
         MenuInflater inflater = getActivity().getMenuInflater();
         inflater.inflate(R.menu.example_context_menu, menu);
@@ -106,7 +106,7 @@ public class ListExampleFragment extends ListFragment implements LoaderManager.L
                 if (listItem.getPublicUrl() != null) {
                     ShowPublicUrlDialogFragment.newInstance(credentials, listItem).show(getFragmentManager(), "showPublicUrlDialog");
                 } else {
-                    MakeItemPublicFragment.newInstance(credentials, listItem.getFullPath(), true).show(getFragmentManager(), "makeItemPublic");
+                    MakeItemPublicFragment.newInstance(credentials, listItem.getPath(), true).show(getFragmentManager(), "makeItemPublic");
                 }
                 return true;
             case R.id.example_context_move:
@@ -208,8 +208,8 @@ public class ListExampleFragment extends ListFragment implements LoaderManager.L
     public void onListItemClick(ListView listView, View view, int position, long id) {
         ListItem item = (ListItem) getListAdapter().getItem(position);
         Log.d(TAG, "onListItemClick(): "+item);
-        if (item.isCollection()) {
-            changeDir(item.getFullPath());
+        if (item.isDir()) {
+            changeDir(item.getPath());
         } else {
             downloadFile(item);
         }
@@ -266,8 +266,8 @@ public class ListExampleFragment extends ListFragment implements LoaderManager.L
             }
 
             ListItem item = getItem(position);
-            ((TextView)view.findViewById(android.R.id.text1)).setText(item.getDisplayName());
-            ((TextView)view.findViewById(android.R.id.text2)).setText(item.isCollection() ? "" : ""+item.getContentLength());
+            ((TextView)view.findViewById(android.R.id.text1)).setText(item.getName());
+            ((TextView)view.findViewById(android.R.id.text2)).setText(item.isDir() ? "" : ""+item.getContentLength());
 
             return view;
         }
@@ -333,14 +333,14 @@ public class ListExampleFragment extends ListFragment implements LoaderManager.L
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             return new AlertDialog.Builder(getActivity())
-                    .setTitle(listItem.isCollection() ? R.string.example_delete_folder_title : R.string.example_delete_file_title)
-                    .setMessage(listItem.getDisplayName())
+                    .setTitle(listItem.isDir() ? R.string.example_delete_folder_title : R.string.example_delete_file_title)
+                    .setMessage(listItem.getName())
                     .setPositiveButton(R.string.example_delete_item_positive_button, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
-                            DeleteItemFragment.newInstance(credentials, listItem.getFullPath(), listItem.getDisplayName(),
-                                                           listItem.isCollection()).show(getFragmentManager(), "deleteItem");
+                            DeleteItemFragment.newInstance(credentials, listItem.getPath(), listItem.getName(),
+                                                           listItem.isDir()).show(getFragmentManager(), "deleteItem");
                         }
                     })
                     .setNegativeButton(R.string.example_delete_item_negative_button, null)
@@ -366,7 +366,7 @@ public class ListExampleFragment extends ListFragment implements LoaderManager.L
                         public void onClick (DialogInterface dialog, int which) {
                             String name = ((EditText) view.findViewById(R.id.example_edit_text_in_dialog)).getText().toString();
                             dialog.dismiss();
-                            RenameMoveItemFragment.newInstance(credentials, listItem.getFullPath(),
+                            RenameMoveItemFragment.newInstance(credentials, listItem.getPath(),
                                                                name /* assume this is full path */ ).show(getFragmentManager(), "renameMoveItem");
                         }
                     })
@@ -390,7 +390,7 @@ public class ListExampleFragment extends ListFragment implements LoaderManager.L
                         @Override
                         public void onClick (DialogInterface dialog, int which) {
                             dialog.dismiss();
-                            MakeItemPublicFragment.newInstance(credentials, listItem.getFullPath(), false).show(getFragmentManager(), "makeItemPublic");
+                            MakeItemPublicFragment.newInstance(credentials, listItem.getPath(), false).show(getFragmentManager(), "makeItemPublic");
                         }
                     })
                     .setNegativeButton(R.string.example_publish_show_url_negative_button, null)

@@ -125,7 +125,7 @@ public class RenameMoveItemFragment extends IODialogFragment {
                     TransportClient client = null;
                     try {
                         client = TransportClientUtil.getInstance(context, credentials);
-                        client.move(srcPath, dstPath, false);   // TODO XXX
+                        client.move(srcPath, dstPath, false);
                     } catch (ServerException | NoSuchAlgorithmException | KeyManagementException ex) {
                         Log.d(TAG, "renameMoveItem", ex);
                         sendException(ex);

@@ -5,12 +5,7 @@ mobile-disk-restapi-java
 TODO
 ====
 
-app:
-ListItem ported from SDK example and must be completely rewritten
-Fix all file actions (only list and download are working now)
-Add certificate pinning to example app
-
-restapi:
+Migrate tests to separate account
 Consider to remove Retrofit at all
 Exceptions hierarchy fix
 Consider json pull parser

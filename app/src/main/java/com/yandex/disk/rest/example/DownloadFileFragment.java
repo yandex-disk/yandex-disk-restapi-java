@@ -85,7 +85,7 @@ public class DownloadFileFragment extends IODialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         dialog = new ProgressDialog(getActivity());
         dialog.setTitle(R.string.example_loading_file_title);
-        dialog.setMessage(item.getDisplayName());
+        dialog.setMessage(item.getName());
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dialog.setIndeterminate(true);
         dialog.setButton(ProgressDialog.BUTTON_NEUTRAL, getString(R.string.example_loading_file_cancel_button), new DialogInterface.OnClickListener() {
@@ -144,7 +144,7 @@ public class DownloadFileFragment extends IODialogFragment {
         private File result;
 
         public void loadFile(final Context context, final Credentials credentials, final ListItem item) {
-            result = new File(context.getFilesDir(), new File(item.getFullPath()).getName());
+            result = new File(context.getFilesDir(), new File(item.getPath()).getName());
 
             new Thread(new Runnable() {
                 @Override
@@ -152,7 +152,7 @@ public class DownloadFileFragment extends IODialogFragment {
                     TransportClient client = null;
                     try {
                         client = TransportClientUtil.getInstance(context, credentials);
-                        client.downloadFile(item.getFullPath(), result, null, DownloadFileRetainedFragment.this);
+                        client.downloadFile(item.getPath(), result, null, DownloadFileRetainedFragment.this);
                         downloadComplete();
                     } catch (IOException | ServerException | NoSuchAlgorithmException | KeyManagementException ex) {
                         Log.d(TAG, "loadFile", ex);
