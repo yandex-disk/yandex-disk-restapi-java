@@ -37,5 +37,5 @@ dependencies {
     compile 'com.facebook.stetho:stetho:1.0.0'
     compile 'com.facebook.stetho:stetho-okhttp:1.0.0'
     compile 'com.yandex.android:sslpinning-core:1.03'        // TODO remove from public release
-    compile project (':restapi')
+    compile project (':disk-restapi-sdk')
 }

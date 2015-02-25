@@ -1,2 +1,2 @@
+include ':disk-restapi-sdk'
 include ':app'
-include ':restapi'
