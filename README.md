@@ -2,6 +2,13 @@ mobile-disk-restapi-java
 ========================
 
 
+Usage:
+
+    dependencies {
+        compile 'com.yandex.android:disk-restapi-sdk:1.0-SNAPSHOT'
+    }
+
+
 TODO
 ====
 
