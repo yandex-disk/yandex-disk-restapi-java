@@ -23,8 +23,8 @@ public class LoggingInterceptor implements Interceptor {
 
         Response src = chain.proceed(request);
         Response response = src.newBuilder()
-                .addHeader("Y-Code", String.valueOf(src.code()))
-                .addHeader("Y-Message", src.message())
+                .addHeader("Debug-Code", String.valueOf(src.code()))
+                .addHeader("Debug-Message", src.message())
                 .build();
 
         long t2 = System.nanoTime();

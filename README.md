@@ -12,7 +12,9 @@ Usage:
 TODO
 ====
 
+Upload code in example application
 Migrate tests to separate account
+ResourcePath fix
 Consider to remove Retrofit at all
 Exceptions hierarchy fix
 Consider json pull parser
