@@ -86,16 +86,6 @@ public class TransportClientTest {
         Credentials credentials = new Credentials(user, token);
 
         client = new TransportClient(credentials);
-
-        generateResources();
-    }
-
-    private void generateResources() throws Exception {
-        // TODO move to proper directory
-        Runtime.getRuntime()
-                .exec("/usr/bin/env dd if=/dev/urandom of=/tmp/test-upload-002.bin bs=1m count=1")
-                .waitFor();
-        logger.info("generateResources: done");
     }
 
     @Test
@@ -468,18 +458,21 @@ public class TransportClientTest {
         client.getUploadLink(path, false, null);
     }
 
-    @Ignore // TODO
     @Test
     public void testUploadFileResume() throws Exception {
         String name = "test-upload-002.bin";
         String serverPath = "/0-test/" + name;
-//        String serverPath = "/0-test/" + UUID.randomUUID().toString();
-        File local = new File("/tmp/" + name);
+        String localPath = "/tmp/" + name;
+
+        Runtime.getRuntime()
+                .exec("/usr/bin/env dd if=/dev/urandom of=" + localPath + " bs=1M count=1")
+                .waitFor();
+
+        File local = new File(localPath);
         assertTrue(local.exists());
         assertTrue(local.length() == 1048576);
 
         Link link = client.getUploadLink(serverPath, true, null);
-
         final int lastPass = 2;
         for (int i = 0; i <= lastPass; i++) {
             final int pass = i;
