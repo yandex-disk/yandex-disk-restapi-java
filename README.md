@@ -13,7 +13,6 @@ TODO
 ====
 
 Upload code in example application
-ResourcePath fix
 Consider to remove Retrofit at all
 Exceptions hierarchy fix
 Consider json pull parser

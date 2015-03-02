@@ -2,7 +2,7 @@ package com.yandex.disk.rest.util;
 
 public class ResourcePath {
 
-    private final static String SEPARATOR = ":";
+    private final static char SEPARATOR = ':';
 
     private final String prefix, path;
 
@@ -10,27 +10,24 @@ public class ResourcePath {
         if (str == null) {
             throw new IllegalArgumentException();
         }
-        String[] arr = str.split(SEPARATOR);    // TODO search first ':' instead of split
-        if (arr.length != 2) {
-            if (arr.length < 2) {
-                prefix = null;
-                path = str;
-            } else {
-//                throw new IllegalArgumentException();   // TODO XXX
-                prefix = null;
-                path = str;
-            }
+        int index = str.indexOf(SEPARATOR);
+        if (index == -1) {
+            prefix = null;
+            path = str;
         } else {
-            prefix = arr[0];
-            path = arr[1];
-            if (prefix == null || path == null || prefix.length() == 0 || path.length() == 0) {
+            prefix = str.substring(0, index);
+            path = str.substring(index + 1);
+            if (prefix.length() == 0) {
                 throw new IllegalArgumentException();
             }
+        }
+        if (path.length() == 0) {
+            throw new IllegalArgumentException();
         }
     }
 
     public ResourcePath(String prefix, String path) {
-        if (path == null) {
+        if (prefix == null || path == null || prefix.length() == 0 || path.length() == 0) {
             throw new IllegalArgumentException();
         }
         this.prefix = prefix;
@@ -67,6 +64,6 @@ public class ResourcePath {
 
     @Override
     public String toString() {
-        return prefix + SEPARATOR + path;
+        return (prefix != null ? prefix + SEPARATOR : "") + path;
     }
 }
