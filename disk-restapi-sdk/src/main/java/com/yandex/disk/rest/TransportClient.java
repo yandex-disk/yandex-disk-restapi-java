@@ -34,7 +34,9 @@ public class TransportClient {
 
     private static final Logger logger = LoggerFactory.getLogger(TransportClient.class);
 
-    private static final RestAdapter.LogLevel LOG_LEVEL = RestAdapter.LogLevel.FULL;
+    private static final RestAdapter.LogLevel LOG_LEVEL = logger.isDebugEnabled()
+            ? RestAdapter.LogLevel.FULL
+            : RestAdapter.LogLevel.NONE;
 
     private static URL serverURL;
     static {
@@ -286,7 +288,7 @@ public class TransportClient {
         if (resumeUpload) {
             Hash hash = Hash.getHash(localSource);
             startOffset = clientIO.headUrl(link.getHref(), hash);
-            logger.debug("head: startOffset="+startOffset);
+            logger.debug("head: startOffset=" + startOffset);
         }
         clientIO.uploadFile(link.getHref(), localSource, startOffset, progressListener);
     }
