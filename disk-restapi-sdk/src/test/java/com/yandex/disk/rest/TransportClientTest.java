@@ -93,7 +93,7 @@ public class TransportClientTest {
         ApiVersion apiVersion = client.getApiVersion();
         logger.info("apiVersion: " + apiVersion);
         assertThat(apiVersion.getBuild(), not(isEmptyOrNullString()));
-        assertTrue("2.7.20".equalsIgnoreCase(apiVersion.getBuild()));
+        assertTrue("2.8.26".equalsIgnoreCase(apiVersion.getBuild()));
         assertTrue("v1".equalsIgnoreCase(apiVersion.getApiVersion()));
     }
 

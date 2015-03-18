@@ -3,6 +3,7 @@ package com.yandex.disk.rest;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.yandex.disk.rest.okhttp.LoggingInterceptor;
+import retrofit.client.OkClient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,8 @@ public class HttpClient extends OkClient {
     private static final int CONNECT_TIMEOUT_MILLIS = 30 * 1000;
     private static final int READ_TIMEOUT_MILLIS = 30 * 1000;
     private static final int WRITE_TIMEOUT_MILLIS = 30 * 1000;
+
+    protected OkHttpClient client;
 
     private static OkHttpClient makeClient() {
         OkHttpClient client = new OkHttpClient();
@@ -39,6 +42,7 @@ public class HttpClient extends OkClient {
     }
 
     public HttpClient(final OkHttpClient client) {
+        super(client);
         this.client = client;
     }
 
