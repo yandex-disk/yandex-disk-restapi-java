@@ -9,10 +9,15 @@ import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
 import com.yandex.disk.rest.exceptions.CancelledDownloadException;
 import com.yandex.disk.rest.exceptions.DownloadNoSpaceAvailableException;
+import com.yandex.disk.rest.exceptions.http.ConflictException;
 import com.yandex.disk.rest.exceptions.http.FileNotModifiedException;
+import com.yandex.disk.rest.exceptions.http.FileTooBigException;
 import com.yandex.disk.rest.exceptions.http.HttpCodeException;
+import com.yandex.disk.rest.exceptions.http.InsufficientStorageException;
 import com.yandex.disk.rest.exceptions.http.NotFoundException;
+import com.yandex.disk.rest.exceptions.http.PreconditionFailedException;
 import com.yandex.disk.rest.exceptions.http.RangeNotSatisfiableException;
+import com.yandex.disk.rest.exceptions.http.ServiceUnavailableException;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.util.Hash;
@@ -104,7 +109,7 @@ import java.util.regex.Pattern;
             case 416:
                 throw new RangeNotSatisfiableException(code);
             default:
-                throw new HttpCodeException(code);  // TODO XXX
+                throw new HttpCodeException(code);
         }
 
         ResponseBody responseBody = response.body();
@@ -225,9 +230,6 @@ import java.util.regex.Pattern;
         Response response = client
                 .newCall(request)
                 .execute();
-//        logger.debug("uploadFile: networkResponse: "+response.networkResponse());
-//        logger.debug("uploadFile: priorResponse: "+response.priorResponse());
-//        logger.debug("uploadFile: headers: \n>>>\n"+response.headers()+"<<<");
 
         String statusLine = response.message();
         logger.debug("headUrl: " + statusLine + " for url " + url);
@@ -235,21 +237,27 @@ import java.util.regex.Pattern;
         int code = response.code();
 
         ResponseBody responseBody = response.body();
-//        logger.debug("upload: " + responseBody.string());
         responseBody.close();
 
         switch (code) {
             case 201:
+            case 202:
                 logger.debug("uploadFile: file uploaded successfully: "+file);
                 break;
-//            case 409:
-//                throw new IntermediateFolderNotExistException("Parent folder not exists for folder in url '"+url+"'");
-
-            // TODO more codes?
-
+            case 404:
+                throw new NotFoundException(code, null);
+            case 409:
+                throw new ConflictException(code, null);
+            case 412:
+                throw new PreconditionFailedException(code, null);
+            case 413:
+                throw new FileTooBigException(code, null);
+            case 503:
+                throw new ServiceUnavailableException(code, null);
+            case 507:
+                throw new InsufficientStorageException(code, null);
             default:
                 throw new HttpCodeException(code);
-//                throw new UnknownServerException("error while uploading: code=" + code + " file " + url);
         }
     }
 

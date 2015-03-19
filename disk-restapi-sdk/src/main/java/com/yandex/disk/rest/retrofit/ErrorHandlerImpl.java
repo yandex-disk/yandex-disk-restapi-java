@@ -13,6 +13,7 @@ import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.exceptions.http.BadGatewayException;
 import com.yandex.disk.rest.exceptions.http.BadRequestException;
 import com.yandex.disk.rest.exceptions.http.ConflictException;
+import com.yandex.disk.rest.exceptions.http.FileTooBigException;
 import com.yandex.disk.rest.exceptions.http.ForbiddenException;
 import com.yandex.disk.rest.exceptions.http.GoneException;
 import com.yandex.disk.rest.exceptions.http.HttpCodeException;
@@ -87,6 +88,8 @@ public class ErrorHandlerImpl implements ErrorHandler {
                         return new GoneException(httpCode, apiError);
                     case 412:
                         return new PreconditionFailedException(httpCode, apiError);
+                    case 413:
+                        return new FileTooBigException(httpCode, apiError);
                     case 415:
                         return new UnsupportedMediaTypeException(httpCode, apiError);
                     case 422:
