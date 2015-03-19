@@ -1,5 +1,6 @@
 package com.yandex.disk.rest.retrofit;
 
+import com.yandex.disk.rest.exceptions.NetworkIOException;
 import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.json.ApiVersion;
 import com.yandex.disk.rest.json.DiskCapacity;
@@ -26,7 +27,7 @@ public interface CloudApi {
      */
     @GET("/")
     ApiVersion getApiVersion()
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Operation status
@@ -36,7 +37,7 @@ public interface CloudApi {
      */
     @GET("/v1/disk/operations/{operation_id}")
     Operation getOperation(@Path("operation_id") String operationId)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Data about a user's Disk
@@ -46,7 +47,7 @@ public interface CloudApi {
      */
     @GET("/v1/disk")
     DiskCapacity getCapacity(@Query("fields") String fields)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Metainformation about a file or folder
@@ -59,8 +60,7 @@ public interface CloudApi {
                            @Query("limit") Integer limit, @Query("offset") Integer offset,
                            @Query("sort") String sort, @Query("preview_size") String previewSize,
                            @Query("preview_crop") Boolean previewCrop)
-            throws ServerIOException;
-
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Flat list of all files
@@ -75,7 +75,7 @@ public interface CloudApi {
                                    @Query("offset") Integer offset, @Query("fields") String fields,
                                    @Query("preview_size") String previewSize,
                                    @Query("preview_crop") Boolean previewCrop)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Latest uploaded files
@@ -90,7 +90,7 @@ public interface CloudApi {
                                        @Query("offset") Integer offset, @Query("fields") String fields,
                                        @Query("preview_size") String previewSize,
                                        @Query("preview_crop") Boolean previewCrop)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Latest uploaded files
@@ -103,7 +103,7 @@ public interface CloudApi {
     @PATCH("/v1/disk/resources/")
     Resource patchResource(@Query("path") String path, @Query("fields") String fields,
                            @Body TypedOutput body)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Downloading a file from Disk
@@ -113,7 +113,7 @@ public interface CloudApi {
      */
     @GET("/v1/disk/resources/download")
     Link getDownloadLink(@Query("path") String path)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Uploading a file to Disk from external resource
@@ -125,7 +125,7 @@ public interface CloudApi {
      */
     @POST("/v1/disk/resources/upload")
     Link saveFromUrl(@Query("url") String url, @Query("path") String path)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Uploading a file to Disk
@@ -135,7 +135,7 @@ public interface CloudApi {
      */
     @GET("/v1/disk/resources/upload")
     Link getUploadLink(@Query("path") String path, @Query("overwrite") Boolean overwrite)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Copying a file or folder
@@ -146,7 +146,7 @@ public interface CloudApi {
     @POST("/v1/disk/resources/copy")
     Link copy(@Query("from") String from, @Query("path") String path,
               @Query("overwrite") Boolean overwrite)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Moving a file or folder
@@ -157,7 +157,7 @@ public interface CloudApi {
     @POST("/v1/disk/resources/move")
     Link move(@Query("from") String from, @Query("path") String path,
               @Query("overwrite") Boolean overwrite)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Deleting a file or folder
@@ -167,7 +167,7 @@ public interface CloudApi {
      */
     @DELETE("/v1/disk/resources")
     Link delete(@Query("path") String path, @Query("permanently") Boolean permanently)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Creating a folder
@@ -177,7 +177,7 @@ public interface CloudApi {
      */
     @PUT("/v1/disk/resources")
     Link makeFolder(@Query("path") String path)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Publishing a file or folder
@@ -187,7 +187,7 @@ public interface CloudApi {
      */
     @PUT("/v1/disk/resources/publish")
     Link publish(@Query("path") String path)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Closing access to a resource
@@ -197,7 +197,7 @@ public interface CloudApi {
      */
     @PUT("/v1/disk/resources/unpublish")
     Link unpublish(@Query("path") String path)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Metainformation about a public resource
@@ -211,7 +211,7 @@ public interface CloudApi {
                                  @Query("offset") Integer offset, @Query("sort") String sort,
                                  @Query("preview_size") String previewSize,
                                  @Query("preview_crop") Boolean previewCrop)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Downloading a public file or folder
@@ -222,7 +222,7 @@ public interface CloudApi {
     @GET("/v1/disk/public/resources/download")
     Link getPublicResourceDownloadLink(@Query("public_key") String publicKey,
                                        @Query("path") String path)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Saving a public file in "Downloads"
@@ -233,7 +233,7 @@ public interface CloudApi {
     @POST("/v1/disk/public/resources/save-to-disk/")
     Link savePublicResource(@Query("public_key") String publicKey, @Query("path") String path,
                             @Query("name") String name)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Metainformation about a file or folder in the Trash
@@ -246,7 +246,7 @@ public interface CloudApi {
                        @Query("limit") Integer limit, @Query("offset") Integer offset,
                        @Query("sort") String sort, @Query("preview_size") String previewSize,
                        @Query("preview_crop") Boolean previewCrop)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Cleaning the Trash
@@ -256,7 +256,7 @@ public interface CloudApi {
      */
     @DELETE("/v1/disk/trash/resources")
     void dropTrash(@Query("path") String path, Callback<Link> callback)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 
     /**
      * Restoring a file or folder from the Trash
@@ -267,5 +267,5 @@ public interface CloudApi {
     @PUT("/v1/disk/trash/resources/restore")
     void restoreTrash(@Query("path") String path, @Query("name") String name,
                       @Query("overwrite") Boolean overwrite, Callback<Link> callback)
-            throws ServerIOException;
+            throws NetworkIOException, ServerIOException;
 }

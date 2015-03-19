@@ -19,6 +19,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.yandex.disk.rest.TransportClient;
+import com.yandex.disk.rest.exceptions.NetworkIOException;
 import com.yandex.disk.rest.exceptions.ServerException;
 
 import java.io.IOException;
@@ -136,7 +137,7 @@ public class MakeItemPublicFragment extends IODialogFragment {
                         } else {
                             client.unpublish(path);
                         }
-                    } catch (ServerException | NoSuchAlgorithmException | KeyManagementException ex) {
+                    } catch (ServerException | NoSuchAlgorithmException | KeyManagementException | NetworkIOException ex) {
                         Log.d(TAG, "makePublicOrExpire", ex);
                         sendException(ex);
                     } finally {

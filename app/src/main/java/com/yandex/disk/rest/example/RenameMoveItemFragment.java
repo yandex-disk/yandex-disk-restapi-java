@@ -17,6 +17,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.yandex.disk.rest.TransportClient;
+import com.yandex.disk.rest.exceptions.NetworkIOException;
 import com.yandex.disk.rest.exceptions.ServerException;
 
 import java.io.IOException;
@@ -126,7 +127,7 @@ public class RenameMoveItemFragment extends IODialogFragment {
                     try {
                         client = TransportClientUtil.getInstance(context, credentials);
                         client.move(srcPath, dstPath, false);
-                    } catch (ServerException | NoSuchAlgorithmException | KeyManagementException ex) {
+                    } catch (ServerException | NoSuchAlgorithmException | KeyManagementException | NetworkIOException ex) {
                         Log.d(TAG, "renameMoveItem", ex);
                         sendException(ex);
                     } finally {

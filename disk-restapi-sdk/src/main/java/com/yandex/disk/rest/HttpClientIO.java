@@ -59,13 +59,8 @@ public class HttpClientIO {
     }
 
     public void downloadUrl(final String url, final DownloadListener downloadListener)
-            throws IOException, CancelledDownloadException, NotFoundException,
-            DownloadNoSpaceAvailableException, FileNotModifiedException,
-            RangeNotSatisfiableException, HttpCodeException {
-
-            /* UserNotInitializedException, PreconditionFailedException, ServerNotAuthorizedException,
-            UnknownServerException, RemoteFileNotFoundException,
-            FileModifiedException,*/
+            throws IOException, CancelledDownloadException, DownloadNoSpaceAvailableException,
+            HttpCodeException {
 
         Request.Builder req = buildRequest()
                 .url(url);

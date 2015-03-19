@@ -6,8 +6,6 @@
 
 package com.yandex.disk.rest.exceptions;
 
-import java.io.IOException;
-
 public class ServerIOException extends ServerException {
 
     public ServerIOException() {
@@ -21,9 +19,4 @@ public class ServerIOException extends ServerException {
     public ServerIOException(Throwable e) {
         super(e);
     }
-
-    public ServerIOException(String message, IOException e) {
-        super(message, e);
-    }
-
 }

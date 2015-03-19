@@ -1,5 +1,6 @@
 package com.yandex.disk.rest;
 
+import com.yandex.disk.rest.exceptions.NetworkIOException;
 import com.yandex.disk.rest.exceptions.ServerException;
 import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.exceptions.WrongMethodException;
@@ -174,7 +175,7 @@ public class TransportClient {
     }
 
     public Resource patchResource(final ResourcesArgs args)
-            throws ServerIOException {
+            throws ServerIOException, NetworkIOException {
         final Resource resource = call().patchResource(args.getPath(), args.getFields(), args.getBody());
         if (args.getParsingHandler() != null) {
             parseListResponse(resource, args.getParsingHandler());
@@ -267,12 +268,12 @@ public class TransportClient {
     }
 
     public Link saveFromUrl(final String url, final String serverPath, final List<CustomHeader> headerList)
-            throws ServerIOException {
+            throws ServerIOException, NetworkIOException {
         return call(headerList).saveFromUrl(url, serverPath);
     }
 
     public Link getUploadLink(final String serverPath, final boolean overwrite, final List<CustomHeader> headerList)
-            throws ServerIOException, WrongMethodException {
+            throws ServerIOException, WrongMethodException, NetworkIOException {
         Link link = call(headerList).getUploadLink(serverPath, overwrite);
         if (!"PUT".equalsIgnoreCase(link.getMethod())) {
             throw new WrongMethodException("Method in Link object is not PUT");
@@ -303,27 +304,27 @@ public class TransportClient {
     }
 
     public Link makeFolder(final String path)
-            throws ServerIOException {
+            throws ServerIOException, NetworkIOException {
         return call().makeFolder(path);
     }
 
     public Link copy(final String from, final String path, final boolean overwrite)
-            throws ServerIOException {
+            throws ServerIOException, NetworkIOException {
         return call().copy(from, path, overwrite);
     }
 
     public Link move(final String from, final String path, final boolean overwrite)
-            throws ServerIOException {
+            throws ServerIOException, NetworkIOException {
         return call().move(from, path, overwrite);
     }
 
     public Link publish(final String path)
-            throws ServerIOException {
+            throws ServerIOException, NetworkIOException {
         return call().publish(path);
     }
 
     public Link unpublish(final String path)
-            throws ServerIOException {
+            throws ServerIOException, NetworkIOException {
         return call().unpublish(path);
     }
 

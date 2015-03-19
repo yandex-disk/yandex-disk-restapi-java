@@ -6,7 +6,7 @@ import java.io.IOException;
  * {@link retrofit.RetrofitError.Kind#NETWORK}
  */
 public class NetworkIOException extends IOException {
-    public NetworkIOException(String message) {
-        super(message);
+    public NetworkIOException(Throwable ex) {
+        super(ex);
     }
 }
