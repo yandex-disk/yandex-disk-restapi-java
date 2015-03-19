@@ -21,7 +21,6 @@ import com.yandex.disk.rest.retrofit.CloudApi;
 import com.yandex.disk.rest.retrofit.ErrorHandlerImpl;
 import com.yandex.disk.rest.retrofit.RequestInterceptorImpl;
 import com.yandex.disk.rest.util.Hash;
-import com.yandex.disk.rest.util.QueryBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +37,9 @@ import java.util.List;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 
-public class TransportClient {
+public class RestClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(TransportClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestClient.class);
 
     private static final RestAdapter.LogLevel LOG_LEVEL = logger.isDebugEnabled()
             ? RestAdapter.LogLevel.FULL
@@ -58,11 +57,11 @@ public class TransportClient {
     private final List<CustomHeader> commonHeaders;
     private final HttpClient client;
 
-    public TransportClient(final Credentials credentials) {
+    public RestClient(final Credentials credentials) {
         this(credentials, new HttpClient());
     }
 
-    public TransportClient(Credentials credentials, HttpClient client) {
+    public RestClient(Credentials credentials, HttpClient client) {
         this.commonHeaders = credentials.getHeaders();
         this.client = client;
     }
@@ -72,7 +71,7 @@ public class TransportClient {
         // TODO nothing yet
     }
 
-    public static void shutdown(TransportClient client) {
+    public static void shutdown(RestClient client) {
         client.shutdown();
     }
 

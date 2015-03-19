@@ -16,7 +16,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import com.yandex.disk.rest.ProgressListener;
-import com.yandex.disk.rest.TransportClient;
+import com.yandex.disk.rest.RestClient;
 import com.yandex.disk.rest.exceptions.ServerException;
 
 import java.io.File;
@@ -149,7 +149,7 @@ public class DownloadFileFragment extends IODialogFragment {
             new Thread(new Runnable() {
                 @Override
                 public void run () {
-                    TransportClient client = null;
+                    RestClient client = null;
                     try {
                         client = TransportClientUtil.getInstance(context, credentials);
                         client.downloadFile(item.getPath(), result, null, DownloadFileRetainedFragment.this);

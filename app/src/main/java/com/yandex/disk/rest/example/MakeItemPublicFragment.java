@@ -18,11 +18,10 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.yandex.disk.rest.TransportClient;
+import com.yandex.disk.rest.RestClient;
 import com.yandex.disk.rest.exceptions.NetworkIOException;
 import com.yandex.disk.rest.exceptions.ServerException;
 
-import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
@@ -129,7 +128,7 @@ public class MakeItemPublicFragment extends IODialogFragment {
 
                 @Override
                 protected String doInBackground(Void... params) {
-                    TransportClient client = null;
+                    RestClient client = null;
                     try {
                         client = TransportClientUtil.getInstance(context, credentials);
                         if (makePublicOrExpire) {
@@ -141,7 +140,7 @@ public class MakeItemPublicFragment extends IODialogFragment {
                         Log.d(TAG, "makePublicOrExpire", ex);
                         sendException(ex);
                     } finally {
-                        TransportClient.shutdown(client);
+                        RestClient.shutdown(client);
                     }
                     return null;
                 }

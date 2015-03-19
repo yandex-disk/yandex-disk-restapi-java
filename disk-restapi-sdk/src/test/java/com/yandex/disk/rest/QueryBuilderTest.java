@@ -4,7 +4,9 @@
  *
  */
 
-package com.yandex.disk.rest.util;
+package com.yandex.disk.rest;
+
+import com.yandex.disk.rest.QueryBuilder;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -13,7 +13,7 @@ import android.util.Log;
 
 import com.yandex.disk.rest.ResourcesArgs;
 import com.yandex.disk.rest.ResourcesHandler;
-import com.yandex.disk.rest.TransportClient;
+import com.yandex.disk.rest.RestClient;
 import com.yandex.disk.rest.exceptions.ServerException;
 import com.yandex.disk.rest.json.Resource;
 
@@ -80,7 +80,7 @@ public class ListExampleLoader extends AsyncTaskLoader<List<ListItem>> {
         fileItemList = new ArrayList<>();
         hasCancelled = false;
         int offset = 0;
-        TransportClient client = null;
+        RestClient client = null;
         try {
             client = TransportClientUtil.getInstance(getContext(), credentials);
             int size;
@@ -112,7 +112,7 @@ public class ListExampleLoader extends AsyncTaskLoader<List<ListItem>> {
             Log.d(TAG, "loadInBackground", ex);
             exception = ex;
         } finally {
-            TransportClient.shutdown(client);
+            RestClient.shutdown(client);
         }
         return fileItemList;
     }

@@ -16,7 +16,7 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.yandex.disk.rest.TransportClient;
+import com.yandex.disk.rest.RestClient;
 import com.yandex.disk.rest.exceptions.ServerException;
 
 import java.io.IOException;
@@ -125,7 +125,7 @@ public class DeleteItemFragment extends IODialogFragment {
 
                 @Override
                 protected Void doInBackground(Void... params) {
-                    TransportClient client = null;
+                    RestClient client = null;
                     try {
                         client = TransportClientUtil.getInstance(context, credentials);
                         client.delete(path, false);
@@ -133,7 +133,7 @@ public class DeleteItemFragment extends IODialogFragment {
                         Log.d(TAG, "deleteItem", ex);
                         sendException(ex);
                     } finally {
-                        TransportClient.shutdown(client);
+                        RestClient.shutdown(client);
                     }
                     return null;
                 }

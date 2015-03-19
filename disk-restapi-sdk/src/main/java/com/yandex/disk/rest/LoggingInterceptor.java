@@ -4,7 +4,7 @@
  *
  */
 
-package com.yandex.disk.rest.okhttp;
+package com.yandex.disk.rest;
 
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.Request;
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class LoggingInterceptor implements Interceptor {
+/* package */ class LoggingInterceptor implements Interceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
 

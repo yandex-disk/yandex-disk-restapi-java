@@ -16,7 +16,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.yandex.disk.rest.ProgressListener;
-import com.yandex.disk.rest.TransportClient;
+import com.yandex.disk.rest.RestClient;
 import com.yandex.disk.rest.exceptions.CancelledUploadingException;
 import com.yandex.disk.rest.exceptions.ServerException;
 import com.yandex.disk.rest.json.Link;
@@ -145,7 +145,7 @@ public class UploadFileFragment extends IODialogFragment {
             new Thread(new Runnable() {
                 @Override
                 public void run () {
-                    TransportClient client = null;
+                    RestClient client = null;
                     try {
                         client = TransportClientUtil.getInstance(context, credentials);
                         Link link = client.getUploadLink(serverPath, true, null);
@@ -157,7 +157,7 @@ public class UploadFileFragment extends IODialogFragment {
                         Log.d(TAG, "loadFile", ex);
                         sendException(ex);
                     } finally {
-                        TransportClient.shutdown(client);
+                        RestClient.shutdown(client);
                     }
                 }
             }).start();

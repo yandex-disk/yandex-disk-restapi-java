@@ -23,7 +23,6 @@ import com.yandex.disk.rest.util.Hash;
 import com.yandex.disk.rest.util.ResourcePath;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -58,11 +57,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(JUnit4.class)
-public class TransportClientTest {
+public class RestClientTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(TransportClientTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestClientTest.class);
 
-    private TransportClient client;
+    private RestClient client;
 
     @Before
     public void setUp() throws Exception {
@@ -91,7 +90,7 @@ public class TransportClientTest {
 
         Credentials credentials = new Credentials(user, token);
 
-        client = new TransportClient(credentials);
+        client = new RestClient(credentials);
     }
 
     @Test
@@ -458,7 +457,7 @@ public class TransportClientTest {
         assertThat(operation.getStatus(), not(isEmptyOrNullString()));
     }
 
-    @Test(expected = ServerIOException.class)   // TODO change the exception
+    @Test(expected = ServerIOException.class)
     public void testUploadFileOverwriteFailed() throws Exception {
         String path = "/download-test.jpg";
         client.getUploadLink(path, false, null);
@@ -704,7 +703,6 @@ public class TransportClientTest {
 
             Link savedLink = client.savePublicResource(publicKey[0], null, null);
             logger.info("savedLink: "+savedLink);
-            // TODO check saved file
 
             client.downloadPublicResource(publicKey[0], "", local, null, new ProgressListener() {
                 @Override

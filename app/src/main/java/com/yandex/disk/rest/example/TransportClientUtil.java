@@ -11,7 +11,7 @@ import android.util.Log;
 
 import com.facebook.stetho.okhttp.StethoInterceptor;
 import com.yandex.disk.rest.HttpClient;
-import com.yandex.disk.rest.TransportClient;
+import com.yandex.disk.rest.RestClient;
 import com.yandex.sslpinning.core.CertificateEvaluationPolicy;
 import com.yandex.sslpinning.core.CertificateEvaluatorWithContainer;
 import com.yandex.sslpinning.core.CertificateUtil;
@@ -51,10 +51,10 @@ public class TransportClientUtil {
         initPinning(context);
     }
 
-    public static TransportClient getInstance(final Context context, final Credentials credentials)
+    public static RestClient getInstance(final Context context, final Credentials credentials)
             throws NoSuchAlgorithmException, KeyManagementException {
         TransportClientUtil clientUtil = new TransportClientUtil(context);
-        return new TransportClient(credentials, clientUtil.client);
+        return new RestClient(credentials, clientUtil.client);
     }
 
     private void initPinning(final Context context)

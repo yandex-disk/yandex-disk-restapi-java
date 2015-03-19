@@ -16,11 +16,10 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.yandex.disk.rest.TransportClient;
+import com.yandex.disk.rest.RestClient;
 import com.yandex.disk.rest.exceptions.NetworkIOException;
 import com.yandex.disk.rest.exceptions.ServerException;
 
-import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
@@ -122,7 +121,7 @@ public class RenameMoveItemFragment extends IODialogFragment {
 
                 @Override
                 protected Void doInBackground(Void... params) {
-                    TransportClient client = null;
+                    RestClient client = null;
                     try {
                         client = TransportClientUtil.getInstance(context, credentials);
                         client.move(srcPath, dstPath, false);
@@ -130,7 +129,7 @@ public class RenameMoveItemFragment extends IODialogFragment {
                         Log.d(TAG, "renameMoveItem", ex);
                         sendException(ex);
                     } finally {
-                        TransportClient.shutdown(client);
+                        RestClient.shutdown(client);
                     }
                     return null;
                 }

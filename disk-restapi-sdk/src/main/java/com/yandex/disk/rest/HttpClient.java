@@ -7,7 +7,7 @@
 package com.yandex.disk.rest;
 
 import com.squareup.okhttp.OkHttpClient;
-import com.yandex.disk.rest.okhttp.LoggingInterceptor;
+
 import retrofit.client.OkClient;
 
 import org.slf4j.Logger;
