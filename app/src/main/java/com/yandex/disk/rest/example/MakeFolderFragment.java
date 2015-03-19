@@ -17,11 +17,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.yandex.disk.rest.RestClient;
-import com.yandex.disk.rest.exceptions.NetworkIOException;
 import com.yandex.disk.rest.exceptions.ServerException;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.io.IOException;
 
 public class MakeFolderFragment extends IODialogFragment {
 
@@ -122,9 +120,9 @@ public class MakeFolderFragment extends IODialogFragment {
                 protected Void doInBackground(Void... params) {
                     RestClient client = null;
                     try {
-                        client = TransportClientUtil.getInstance(context, credentials);
+                        client = RestClientUtil.getInstance(credentials);
                         client.makeFolder(path);
-                    } catch (ServerException | NoSuchAlgorithmException | KeyManagementException | NetworkIOException ex) {
+                    } catch (IOException | ServerException ex) {
                         Log.d(TAG, "makeFolder", ex);
                         sendException(ex);
                     } finally {

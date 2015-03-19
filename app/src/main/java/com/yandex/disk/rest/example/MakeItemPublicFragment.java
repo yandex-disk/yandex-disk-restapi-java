@@ -19,11 +19,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.yandex.disk.rest.RestClient;
-import com.yandex.disk.rest.exceptions.NetworkIOException;
 import com.yandex.disk.rest.exceptions.ServerException;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.io.IOException;
 
 public class MakeItemPublicFragment extends IODialogFragment {
 
@@ -130,13 +128,13 @@ public class MakeItemPublicFragment extends IODialogFragment {
                 protected String doInBackground(Void... params) {
                     RestClient client = null;
                     try {
-                        client = TransportClientUtil.getInstance(context, credentials);
+                        client = RestClientUtil.getInstance(credentials);
                         if (makePublicOrExpire) {
                             return client.publish(path).getHref();
                         } else {
                             client.unpublish(path);
                         }
-                    } catch (ServerException | NoSuchAlgorithmException | KeyManagementException | NetworkIOException ex) {
+                    } catch (IOException | ServerException ex) {
                         Log.d(TAG, "makePublicOrExpire", ex);
                         sendException(ex);
                     } finally {

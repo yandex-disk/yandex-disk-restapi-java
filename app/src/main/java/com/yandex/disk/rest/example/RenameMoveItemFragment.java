@@ -17,11 +17,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.yandex.disk.rest.RestClient;
-import com.yandex.disk.rest.exceptions.NetworkIOException;
 import com.yandex.disk.rest.exceptions.ServerException;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.io.IOException;
 
 public class RenameMoveItemFragment extends IODialogFragment {
 
@@ -123,9 +121,9 @@ public class RenameMoveItemFragment extends IODialogFragment {
                 protected Void doInBackground(Void... params) {
                     RestClient client = null;
                     try {
-                        client = TransportClientUtil.getInstance(context, credentials);
+                        client = RestClientUtil.getInstance(credentials);
                         client.move(srcPath, dstPath, false);
-                    } catch (ServerException | NoSuchAlgorithmException | KeyManagementException | NetworkIOException ex) {
+                    } catch (IOException | ServerException ex) {
                         Log.d(TAG, "renameMoveItem", ex);
                         sendException(ex);
                     } finally {

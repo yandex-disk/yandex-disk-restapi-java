@@ -26,7 +26,6 @@ android {
 }
 
 repositories {
-    maven { url 'http://artifactory.yandex.net/artifactory/public/' } // TODO remove from public release
     mavenCentral()
 }
 
@@ -35,6 +34,5 @@ dependencies {
     compile 'org.slf4j:slf4j-android:1.7.10'
     compile 'com.facebook.stetho:stetho:1.0.0'
     compile 'com.facebook.stetho:stetho-okhttp:1.0.0'
-    compile 'com.yandex.android:sslpinning-core:1.03'        // TODO remove from public release
     compile project (':disk-restapi-sdk')
 }

@@ -9,20 +9,19 @@ package com.yandex.disk.rest.example;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
+
 import com.yandex.disk.rest.ProgressListener;
 import com.yandex.disk.rest.RestClient;
 import com.yandex.disk.rest.exceptions.ServerException;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 
 public class DownloadFileFragment extends IODialogFragment {
 
@@ -151,10 +150,10 @@ public class DownloadFileFragment extends IODialogFragment {
                 public void run () {
                     RestClient client = null;
                     try {
-                        client = TransportClientUtil.getInstance(context, credentials);
+                        client = RestClientUtil.getInstance(credentials);
                         client.downloadFile(item.getPath(), result, null, DownloadFileRetainedFragment.this);
                         downloadComplete();
-                    } catch (IOException | ServerException | NoSuchAlgorithmException | KeyManagementException ex) {
+                    } catch (IOException | ServerException ex) {
                         Log.d(TAG, "loadFile", ex);
                         sendException(ex);
                     } finally {

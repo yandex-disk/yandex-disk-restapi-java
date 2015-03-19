@@ -23,8 +23,6 @@ import com.yandex.disk.rest.json.Link;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 
 public class UploadFileFragment extends IODialogFragment {
 
@@ -147,13 +145,13 @@ public class UploadFileFragment extends IODialogFragment {
                 public void run () {
                     RestClient client = null;
                     try {
-                        client = TransportClientUtil.getInstance(context, credentials);
+                        client = RestClientUtil.getInstance(credentials);
                         Link link = client.getUploadLink(serverPath, true, null);
                         client.uploadFile(link, true, new File(localFile), null, UploadFileRetainedFragment.this);
                         uploadComplete();
                     } catch (CancelledUploadingException ex) {
                         // cancelled by user
-                    } catch (IOException | ServerException | NoSuchAlgorithmException | KeyManagementException ex) {
+                    } catch (IOException | ServerException ex) {
                         Log.d(TAG, "loadFile", ex);
                         sendException(ex);
                     } finally {
