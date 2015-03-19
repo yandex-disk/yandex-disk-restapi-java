@@ -1,7 +1,11 @@
+/*
+ * Лицензионное соглашение на использование набора средств разработки
+ * «SDK Яндекс.Диска» доступно по адресу: http://legal.yandex.ru/sdk_agreement
+ *
+ */
 
 package com.yandex.disk.rest.util;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,7 +25,7 @@ public class Hash {
             this.value = value;
         }
 
-        public String getValue() {
+        String getValue() {
             return value;
         }
     }
@@ -40,17 +44,6 @@ public class Hash {
         InputStream is = new FileInputStream(file);
         try {
             return getHash(is, file.length());
-        } finally {
-            close(is);
-        }
-    }
-
-    // TODO make test
-    public static Hash getHash(byte[] buf)
-            throws IOException {
-        InputStream is = new ByteArrayInputStream(buf);
-        try {
-            return getHash(is, buf.length);
         } finally {
             close(is);
         }

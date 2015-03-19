@@ -1,3 +1,9 @@
+/*
+ * Лицензионное соглашение на использование набора средств разработки
+ * «SDK Яндекс.Диска» доступно по адресу: http://legal.yandex.ru/sdk_agreement
+ *
+ */
+
 package com.yandex.disk.rest;
 
 import com.yandex.disk.rest.exceptions.NetworkIOException;
@@ -15,6 +21,7 @@ import com.yandex.disk.rest.retrofit.CloudApi;
 import com.yandex.disk.rest.retrofit.ErrorHandlerImpl;
 import com.yandex.disk.rest.retrofit.RequestInterceptorImpl;
 import com.yandex.disk.rest.util.Hash;
+import com.yandex.disk.rest.util.QueryBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -288,7 +295,7 @@ public class TransportClient {
         long startOffset = 0;
         if (resumeUpload) {
             Hash hash = Hash.getHash(localSource);
-            startOffset = clientIO.headUrl(link.getHref(), hash);
+            startOffset = clientIO.getUploadedSize(link.getHref(), hash);
             logger.debug("head: startOffset=" + startOffset);
         }
         clientIO.uploadFile(link.getHref(), localSource, startOffset, progressListener);

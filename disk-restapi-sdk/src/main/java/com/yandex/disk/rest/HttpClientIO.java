@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HttpClientIO {
+/* package */ class HttpClientIO {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpClientIO.class);
 
@@ -42,10 +42,12 @@ public class HttpClientIO {
     private static final String METHOD_DELETE = "DELETE";
     private static final String METHOD_PUT = "PUT";
 
+    private static final Pattern CONTENT_RANGE_HEADER_PATTERN = Pattern.compile("bytes\\D+(\\d+)-\\d+/(\\d+)");
+
     private OkHttpClient client;
     private List<CustomHeader> commonHeaders;
 
-    public HttpClientIO(HttpClient client, List<CustomHeader> commonHeaders) {
+    /* package */ HttpClientIO(HttpClient client, List<CustomHeader> commonHeaders) {
         this.client = client.getClient();
         this.commonHeaders = commonHeaders;
     }
@@ -58,7 +60,7 @@ public class HttpClientIO {
         return request;
     }
 
-    public void downloadUrl(final String url, final DownloadListener downloadListener)
+    /* package */ void downloadUrl(final String url, final DownloadListener downloadListener)
             throws IOException, CancelledDownloadException, DownloadNoSpaceAvailableException,
             HttpCodeException {
 
@@ -102,8 +104,6 @@ public class HttpClientIO {
             case 416:
                 throw new RangeNotSatisfiableException(code);
             default:
-//                checkStatusCodes(httpResponse, "GET '" + url + "'");
-//                break;
                 throw new HttpCodeException(code);  // TODO XXX
         }
 
@@ -183,13 +183,10 @@ public class HttpClientIO {
         }
     }
 
-    private static Pattern CONTENT_RANGE_HEADER_PATTERN = Pattern.compile("bytes\\D+(\\d+)-\\d+/(\\d+)");
-
     private ContentRangeResponse parseContentRangeHeader(String header) {
         if (header == null) {
             return null;
         }
-//        logger.debug(header.getName()+": "+header.getValue());
         Matcher matcher = CONTENT_RANGE_HEADER_PATTERN.matcher(header);
         if (!matcher.matches()) {
             return null;
@@ -205,12 +202,11 @@ public class HttpClientIO {
         }
     }
 
-    public void uploadFile(final String url, final File file, final long startOffset,
+    /* package */ void uploadFile(final String url, final File file, final long startOffset,
                            final ProgressListener progressListener)
             throws IOException, HttpCodeException {
         logger.debug("uploadFile: put to url: "+url);
-
-        MediaType mediaType = MediaType.parse("application/octet-stream");  // TODO
+        MediaType mediaType = MediaType.parse("application/octet-stream");
         RequestBody requestBody = RequestBodyProgress.create(mediaType, file, startOffset,
                 progressListener);
         Request.Builder requestBuilder = buildRequest()
@@ -246,6 +242,8 @@ public class HttpClientIO {
             case 201:
                 logger.debug("uploadFile: file uploaded successfully: "+file);
                 break;
+//            case 409:
+//                throw new IntermediateFolderNotExistException("Parent folder not exists for folder in url '"+url+"'");
 
             // TODO more codes?
 
@@ -255,9 +253,8 @@ public class HttpClientIO {
         }
     }
 
-    public long headUrl(String url, Hash hash)
-            throws IOException, // NumberFormatException, UserNotInitializedException,
-            HttpCodeException {
+    /* package */ long getUploadedSize(String url, Hash hash)
+            throws IOException {
 
         Request request = buildRequest()
                 .removeHeader(Credentials.AUTHORIZATION_HEADER)
@@ -271,34 +268,19 @@ public class HttpClientIO {
         Response response = client
                 .newCall(request)
                 .execute();
-//        logger.debug("headUrl: networkResponse: "+response.networkResponse());
-//        logger.debug("headUrl: priorResponse: "+response.priorResponse());
-//        logger.debug("headUrl: headers: \n>>>\n"+response.headers()+"<<<");
-
-        String statusLine = response.message();
-        logger.debug("headUrl: " + statusLine + " for url " + url);
 
         int code = response.code();
-
         ResponseBody responseBody = response.body();
         responseBody.close();
-
         switch (code) {
             case 200:
                 return Long.valueOf(response.header(CONTENT_LENGTH_HEADER, "0"));
-            case 404:
-            case 409:
-            case 412:
-                return 0;
-
-            // TODO more codes?
-
             default:
-                throw new HttpCodeException(code);
+                return 0;
         }
     }
 
-    public Operation getOperation(String url)
+    /* package */ Operation getOperation(String url)
             throws IOException, HttpCodeException {
         Response response = call(METHOD_GET, url);
         int code = response.code();
@@ -308,7 +290,7 @@ public class HttpClientIO {
         return parseJson(response, Operation.class);
     }
 
-    public Link delete(String url)
+    /* package */ Link delete(String url)
             throws IOException {
         Response response = call(METHOD_DELETE, url);
         switch (response.code()) {
@@ -323,7 +305,7 @@ public class HttpClientIO {
         return Link.ERROR;
     }
 
-    public Link put(String url)
+    /* package */ Link put(String url)
             throws IOException {
         Response response = call(METHOD_PUT, url);
         switch (response.code()) {
@@ -361,6 +343,24 @@ public class HttpClientIO {
             if (responseBody != null) {
                 responseBody.close();
             }
+        }
+    }
+
+    private static class ContentRangeResponse {
+
+        private final long start, size;
+
+        ContentRangeResponse(long start, long size) {
+            this.start = start;
+            this.size = size;
+        }
+
+        long getStart() {
+            return start;
+        }
+
+        long getSize() {
+            return size;
         }
     }
 }

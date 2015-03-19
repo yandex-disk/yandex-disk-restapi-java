@@ -1,6 +1,10 @@
-package com.yandex.disk.rest.util;
+/*
+ * Лицензионное соглашение на использование набора средств разработки
+ * «SDK Яндекс.Диска» доступно по адресу: http://legal.yandex.ru/sdk_agreement
+ *
+ */
 
-import com.yandex.disk.rest.QueryBuilder;
+package com.yandex.disk.rest.util;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

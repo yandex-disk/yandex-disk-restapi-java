@@ -1,3 +1,9 @@
+/*
+ * Лицензионное соглашение на использование набора средств разработки
+ * «SDK Яндекс.Диска» доступно по адресу: http://legal.yandex.ru/sdk_agreement
+ *
+ */
+
 package com.yandex.disk.rest;
 
 import com.squareup.okhttp.MediaType;
@@ -18,7 +24,7 @@ import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
 
-public abstract class RequestBodyProgress {
+/* package */ abstract class RequestBodyProgress {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestBodyProgress.class);
 
@@ -31,8 +37,8 @@ public abstract class RequestBodyProgress {
      *
      * @see RequestBody#create(com.squareup.okhttp.MediaType, java.io.File)
      */
-    public static RequestBody create(final MediaType contentType, final File file, final long startOffset,
-                                     final ProgressListener listener) {
+    /* package */ static RequestBody create(final MediaType contentType, final File file, final long startOffset,
+                              final ProgressListener listener) {
         if (file == null) {
             throw new NullPointerException("content == null");
         }

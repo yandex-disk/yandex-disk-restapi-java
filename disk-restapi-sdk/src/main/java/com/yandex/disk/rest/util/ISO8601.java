@@ -1,3 +1,9 @@
+/*
+ * Лицензионное соглашение на использование набора средств разработки
+ * «SDK Яндекс.Диска» доступно по адресу: http://legal.yandex.ru/sdk_agreement
+ *
+ */
+
 package com.yandex.disk.rest.util;
 
 import java.text.ParseException;
@@ -7,7 +13,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
- * http://stackoverflow.com/questions/2201925/converting-iso-8601-compliant-string-to-java-util-date
+ * TODO http://stackoverflow.com/questions/2201925/converting-iso-8601-compliant-string-to-java-util-date
  * <br/>
  * Helper class for handling ISO 8601 strings of the following format:
  * "2008-03-01T13:00:00+01:00". It also supports parsing the "Z" timezone.

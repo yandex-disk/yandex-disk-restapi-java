@@ -1,3 +1,8 @@
+/*
+ * Лицензионное соглашение на использование набора средств разработки
+ * «SDK Яндекс.Диска» доступно по адресу: http://legal.yandex.ru/sdk_agreement
+ *
+ */
 
 package com.yandex.disk.rest;
 
@@ -7,8 +12,8 @@ import java.util.List;
 
 public class Credentials {
 
-    public static final String AUTHORIZATION_HEADER = "Authorization";
-    public static final String USER_AGENT_HEADER = "User-Agent";
+    /* package */ static final String AUTHORIZATION_HEADER = "Authorization";
+    /* package */ static final String USER_AGENT_HEADER = "User-Agent";
     private static final String USER_AGENT = "Cloud API Android Client Example/1.0";
 
     protected String user, token;

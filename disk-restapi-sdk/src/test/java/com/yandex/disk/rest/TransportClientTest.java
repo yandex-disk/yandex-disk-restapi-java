@@ -1,3 +1,9 @@
+/*
+ * Лицензионное соглашение на использование набора средств разработки
+ * «SDK Яндекс.Диска» доступно по адресу: http://legal.yandex.ru/sdk_agreement
+ *
+ */
+
 package com.yandex.disk.rest;
 
 import com.google.gson.FieldNamingPolicy;
@@ -448,7 +454,7 @@ public class TransportClientTest {
 
         Link saveLink = client.saveFromUrl(url, path, null);
         Operation operation = client.getOperation(saveLink);
-        logger.info("operation: "+operation);
+        logger.info("operation: " + operation);
         assertThat(operation.getStatus(), not(isEmptyOrNullString()));
     }
 
@@ -465,7 +471,7 @@ public class TransportClientTest {
         String localPath = "/tmp/" + name;
 
         Runtime.getRuntime()
-                .exec("/usr/bin/env dd if=/dev/urandom of=" + localPath + " bs=1M count=1")
+                .exec("/usr/bin/env dd if=/dev/urandom of=" + localPath + " bs=1048576 count=1")
                 .waitFor();
 
         File local = new File(localPath);
@@ -631,7 +637,7 @@ public class TransportClientTest {
         }
 
         Link link = client.publish(path);
-        logger.info("link: "+link);
+        logger.info("link: " + link);
 
         try {
             final String[] publicKey = new String[1];
@@ -718,5 +724,10 @@ public class TransportClientTest {
         } finally {
             client.unpublish(path);
         }
+    }
+
+    @Test(expected = HttpCodeException.class)
+    public void testErrorHandler() throws Exception {
+        client.getOperation("-");
     }
 }

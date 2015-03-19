@@ -1,3 +1,9 @@
+/*
+ * Лицензионное соглашение на использование набора средств разработки
+ * «SDK Яндекс.Диска» доступно по адресу: http://legal.yandex.ru/sdk_agreement
+ *
+ */
+
 package com.yandex.disk.rest.exceptions.http;
 
 import com.yandex.disk.rest.exceptions.ServerIOException;
@@ -12,7 +18,7 @@ import com.yandex.disk.rest.json.ApiError;
  * to <tt>Exception</tt> to get new exception name<br/>
  * New exception must extends <tt>HttpCodeException</tt>
  */
-public class HttpCodeException extends ServerIOException /* TODO change to ServerException? */ {
+public class HttpCodeException extends ServerIOException {
 
     protected final int code;
     protected final ApiError response;
