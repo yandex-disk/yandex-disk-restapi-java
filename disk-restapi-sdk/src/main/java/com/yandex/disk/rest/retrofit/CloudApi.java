@@ -71,8 +71,6 @@ public interface CloudApi {
     /**
      * Flat list of all files
      *
-     * <br/><br/><tt>TODO link to API reference in english is broken</tt>
-     *
      * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/all-files.xml">english</a>,
      * <a href="https://tech.yandex.ru/disk/api/reference/all-files-docpage/">russian</a></p>
      */
@@ -86,8 +84,6 @@ public interface CloudApi {
     /**
      * Latest uploaded files
      *
-     * <br/><br/><tt>TODO link to API reference in english is broken</tt>
-     *
      * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/recent-upload.xml">english</a>,
      * <a href="https://tech.yandex.ru/disk/api/reference/recent-upload-docpage/">russian</a></p>
      */
@@ -100,8 +96,6 @@ public interface CloudApi {
 
     /**
      * Latest uploaded files
-     *
-     * <br/><br/><tt>TODO link to API reference in english is broken</tt>
      *
      * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/meta-add.xml">english</a>,
      * <a href="https://tech.yandex.ru/disk/api/reference/meta-add-docpage/">russian</a></p>
@@ -123,8 +117,6 @@ public interface CloudApi {
 
     /**
      * Uploading a file to Disk from external resource
-     *
-     * <br/><br/><tt>TODO link to API reference in english is broken</tt>
      *
      * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/upload-ext.xml">english</a>,
      * <a href="https://tech.yandex.ru/disk/api/reference/upload-ext-docpage/">russian</a></p>

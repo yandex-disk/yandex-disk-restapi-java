@@ -94,7 +94,7 @@ public class ErrorHandlerImpl implements ErrorHandler {
                     case 423:
                         return new LockedException(httpCode, apiError);
                     case 429:
-                        return new TooManyRequestsException(httpCode, apiError);    // TODO process Retry-After header
+                        return new TooManyRequestsException(httpCode, apiError);
                     case 500:
                         return new InternalServerException(httpCode, apiError);
                     case 501:
