@@ -109,7 +109,6 @@ public class DeleteItemFragment extends IODialogFragment {
     }
 
     private void onCancel() {
-//        workFragment.cancelDownload();
     }
 
     public void onComplete() {

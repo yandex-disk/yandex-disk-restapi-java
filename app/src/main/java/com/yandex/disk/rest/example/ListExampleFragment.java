@@ -35,6 +35,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.List;
 
 public class ListExampleFragment extends ListFragment implements LoaderManager.LoaderCallbacks<List<ListItem>> {
@@ -233,7 +234,7 @@ public class ListExampleFragment extends ListFragment implements LoaderManager.L
     }
 
     private void uploadFile(String path) {
-        UploadFileFragment.newInstance(credentials, currentDir, path).show(getFragmentManager(), "upload");
+        UploadFileFragment.newInstance(credentials, currentDir+new File(path).getName(), path).show(getFragmentManager(), "upload");
     }
 
     private void setDefaultEmptyText() {

@@ -119,6 +119,7 @@ public class ExampleActivity extends FragmentActivity {
                 getAuthToken(account);
             }
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void getAuthToken(Account account) {

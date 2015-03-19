@@ -19,7 +19,7 @@ public class ListItem implements Parcelable {
 
     public ListItem(Resource resource) {
         this.name = resource.getName();
-        this.path = resource.getPath() != null ? resource.getPath().getPath() : null;   // throw checked exception in real life code
+        this.path = resource.getPath() != null ? resource.getPath().getPath() : null;  // Must throw an exception in real life code
         this.etag = resource.getMd5();
         this.contentType = resource.getMimeType();
         this.publicUrl = resource.getPublicUrl();

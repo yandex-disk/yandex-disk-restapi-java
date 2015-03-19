@@ -14,12 +14,17 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.Toast;
-import com.yandex.disk.rest.example.Credentials;
+
 import com.yandex.disk.rest.ProgressListener;
+import com.yandex.disk.rest.TransportClient;
 import com.yandex.disk.rest.exceptions.CancelledUploadingException;
 import com.yandex.disk.rest.exceptions.ServerException;
+import com.yandex.disk.rest.json.Link;
 
+import java.io.File;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 public class UploadFileFragment extends IODialogFragment {
 
@@ -140,26 +145,20 @@ public class UploadFileFragment extends IODialogFragment {
             new Thread(new Runnable() {
                 @Override
                 public void run () {
-/*
-TODO XXX
-
                     TransportClient client = null;
                     try {
-                        client = TransportClient.getInstance(credentials);  // TODO getUploadInstance() ?
-                        client.uploadFile(localFile, serverPath, UploadFileRetainedFragment.this);
+                        client = TransportClientUtil.getInstance(context, credentials);
+                        Link link = client.getUploadLink(serverPath, true, null);
+                        client.uploadFile(link, true, new File(localFile), null, UploadFileRetainedFragment.this);
                         uploadComplete();
                     } catch (CancelledUploadingException ex) {
                         // cancelled by user
-                    } catch (IOException ex) {
-                        Log.d(TAG, "loadFile", ex);
-                        sendException(ex);
-                    } catch (ServerException ex) {
+                    } catch (IOException | ServerException | NoSuchAlgorithmException | KeyManagementException ex) {
                         Log.d(TAG, "loadFile", ex);
                         sendException(ex);
                     } finally {
                         TransportClient.shutdown(client);
                     }
-*/
                 }
             }).start();
         }
