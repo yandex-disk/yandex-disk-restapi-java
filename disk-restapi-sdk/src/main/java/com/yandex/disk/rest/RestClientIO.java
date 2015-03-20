@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/* package */ class HttpClientIO {
+/* package */ class RestClientIO {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpClientIO.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestClientIO.class);
 
     private static final String ETAG_HEADER = "Etag";
     private static final String SHA256_HEADER = "Sha256";
@@ -52,8 +52,8 @@ import java.util.regex.Pattern;
     private OkHttpClient client;
     private List<CustomHeader> commonHeaders;
 
-    /* package */ HttpClientIO(HttpClient client, List<CustomHeader> commonHeaders) {
-        this.client = client.getClient();
+    /* package */ RestClientIO(OkHttpClient client, List<CustomHeader> commonHeaders) {
+        this.client = client;
         this.commonHeaders = commonHeaders;
     }
 

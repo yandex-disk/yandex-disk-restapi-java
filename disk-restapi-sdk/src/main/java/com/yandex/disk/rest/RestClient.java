@@ -6,6 +6,7 @@
 
 package com.yandex.disk.rest;
 
+import com.squareup.okhttp.OkHttpClient;
 import com.yandex.disk.rest.exceptions.NetworkIOException;
 import com.yandex.disk.rest.exceptions.ServerException;
 import com.yandex.disk.rest.exceptions.ServerIOException;
@@ -36,6 +37,7 @@ import java.util.List;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
+import retrofit.client.OkClient;
 
 public class RestClient {
 
@@ -55,13 +57,13 @@ public class RestClient {
     }
 
     private final List<CustomHeader> commonHeaders;
-    private final HttpClient client;
+    private final OkHttpClient client;
 
     public RestClient(final Credentials credentials) {
-        this(credentials, new HttpClient());
+        this(credentials, OkHttpClientFactory.makeClient());
     }
 
-    public RestClient(Credentials credentials, HttpClient client) {
+    public RestClient(final Credentials credentials, final OkHttpClient client) {
         this.commonHeaders = credentials.getHeaders();
         this.client = client;
     }
@@ -90,7 +92,7 @@ public class RestClient {
 
     private RestAdapter.Builder getRestAdapterBuilder(final List<CustomHeader> headerList) {
         return new RestAdapter.Builder()
-                .setClient(client)
+                .setClient(new OkClient(client))
                 .setEndpoint(getUrl())
                 .setRequestInterceptor(new RequestInterceptorImpl(commonHeaders, headerList))
                 .setErrorHandler(new ErrorHandlerImpl())
@@ -103,8 +105,7 @@ public class RestClient {
     }
 
     private CloudApi call() {
-        return getRestAdapterBuilder(null).build()
-                .create(CloudApi.class);
+        return call(null);
     }
 
     public ApiVersion getApiVersion()
@@ -122,7 +123,7 @@ public class RestClient {
         if (!"GET".equalsIgnoreCase(link.getMethod())) {
             throw new WrongMethodException("Method in Link object is not GET");
         }
-        Operation operation = new HttpClientIO(client, getAllHeaders(null))
+        Operation operation = new RestClientIO(client, getAllHeaders(null))
                 .getOperation(link.getHref());
         logger.debug("getOperation: " + operation);
         return operation;
@@ -218,7 +219,7 @@ public class RestClient {
 
     public Link dropTrash(final String path)
             throws IOException, ServerIOException, URISyntaxException {
-        return new HttpClientIO(client, getAllHeaders(null))
+        return new RestClientIO(client, getAllHeaders(null))
                 .delete(new QueryBuilder(getUrl() + "/v1/disk/trash/resources")
                         .add("path", path)
                         .build());
@@ -232,7 +233,7 @@ public class RestClient {
 
     public Link restoreTrash(final String path, final String name, final Boolean overwrite)
             throws IOException, ServerIOException {
-        return new HttpClientIO(client, getAllHeaders(null))
+        return new RestClientIO(client, getAllHeaders(null))
                 .put(new QueryBuilder(getUrl() + "/v1/disk/trash/resources/restore")
                         .add("path", path)
                         .add("name", name)
@@ -269,7 +270,7 @@ public class RestClient {
                              final ProgressListener progressListener)
             throws IOException, ServerException {
         Link link = call(headerList).getDownloadLink(path);
-        new HttpClientIO(client, getAllHeaders(headerList))
+        new RestClientIO(client, getAllHeaders(headerList))
                 .downloadUrl(link.getHref(), new FileDownloadListener(saveTo, progressListener));
     }
 
@@ -290,7 +291,7 @@ public class RestClient {
     public void uploadFile(final Link link, final boolean resumeUpload, final File localSource,
                            final List<CustomHeader> headerList, final ProgressListener progressListener)
             throws IOException, ServerException {
-        HttpClientIO clientIO = new HttpClientIO(client, getAllHeaders(headerList));
+        RestClientIO clientIO = new RestClientIO(client, getAllHeaders(headerList));
         long startOffset = 0;
         if (resumeUpload) {
             Hash hash = Hash.getHash(localSource);
@@ -302,7 +303,7 @@ public class RestClient {
 
     public Link delete(final String path, final boolean permanently)
             throws ServerIOException, IOException {
-        return new HttpClientIO(client, getAllHeaders(null))
+        return new RestClientIO(client, getAllHeaders(null))
                 .delete(new QueryBuilder(getUrl() + "/v1/disk/resources")
                         .add("path", path)
                         .add("permanently", permanently)
@@ -338,7 +339,7 @@ public class RestClient {
                                        final List<CustomHeader> headerList, final ProgressListener progressListener)
             throws IOException, ServerException {
         Link link = call(headerList).getPublicResourceDownloadLink(publicKey, path);
-        new HttpClientIO(client, getAllHeaders(headerList))
+        new RestClientIO(client, getAllHeaders(headerList))
                 .downloadUrl(link.getHref(), new FileDownloadListener(saveTo, progressListener));
     }
 

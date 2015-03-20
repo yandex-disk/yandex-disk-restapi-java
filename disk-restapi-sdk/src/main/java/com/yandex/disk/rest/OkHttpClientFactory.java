@@ -8,24 +8,20 @@ package com.yandex.disk.rest;
 
 import com.squareup.okhttp.OkHttpClient;
 
-import retrofit.client.OkClient;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
-public class HttpClient extends OkClient {
+public class OkHttpClientFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(OkHttpClientFactory.class);
 
     private static final int CONNECT_TIMEOUT_MILLIS = 30 * 1000;
     private static final int READ_TIMEOUT_MILLIS = 30 * 1000;
     private static final int WRITE_TIMEOUT_MILLIS = 30 * 1000;
 
-    protected OkHttpClient client;
-
-    private static OkHttpClient makeClient() {
+    public static OkHttpClient makeClient() {
         OkHttpClient client = new OkHttpClient();
 
         if (logger.isDebugEnabled()) {
@@ -39,19 +35,6 @@ public class HttpClient extends OkClient {
         client.setFollowSslRedirects(true);
         client.setFollowRedirects(true);
 
-        return client;
-    }
-
-    public HttpClient() {
-        this(makeClient());
-    }
-
-    public HttpClient(final OkHttpClient client) {
-        super(client);
-        this.client = client;
-    }
-
-    public OkHttpClient getClient() {
         return client;
     }
 }
