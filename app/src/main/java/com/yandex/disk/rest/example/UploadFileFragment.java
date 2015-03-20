@@ -147,7 +147,7 @@ public class UploadFileFragment extends IODialogFragment {
                     try {
                         client = RestClientUtil.getInstance(credentials);
                         Link link = client.getUploadLink(serverPath, true);
-                        client.uploadFile(link, true, new File(localFile), null, UploadFileRetainedFragment.this);
+                        client.uploadFile(link, true, new File(localFile), UploadFileRetainedFragment.this);
                         uploadComplete();
                     } catch (CancelledUploadingException ex) {
                         // cancelled by user

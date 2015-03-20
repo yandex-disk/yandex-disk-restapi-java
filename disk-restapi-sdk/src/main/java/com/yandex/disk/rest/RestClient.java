@@ -245,6 +245,13 @@ public class RestClient {
                 .downloadUrl(link.getHref(), new FileDownloadListener(saveTo, progressListener));
     }
 
+    public void downloadFile(final String path, final DownloadListener downloadListener)
+            throws IOException, ServerException {
+        Link link = cloudApi.getDownloadLink(path);
+        new RestClientIO(client, credentials.getHeaders())
+                .downloadUrl(link.getHref(), downloadListener);
+    }
+
     public Link saveFromUrl(final String url, final String serverPath)
             throws ServerIOException, NetworkIOException {
         return cloudApi.saveFromUrl(url, serverPath);
@@ -260,7 +267,7 @@ public class RestClient {
     }
 
     public void uploadFile(final Link link, final boolean resumeUpload, final File localSource,
-                           final List<CustomHeader> headerList, final ProgressListener progressListener)
+                           final ProgressListener progressListener)
             throws IOException, ServerException {
         RestClientIO clientIO = new RestClientIO(client, credentials.getHeaders());
         long startOffset = 0;

@@ -9,6 +9,7 @@ package com.yandex.disk.rest;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.yandex.disk.rest.exceptions.CancelledDownloadException;
 import com.yandex.disk.rest.exceptions.CancelledUploadingException;
 import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.exceptions.WrongMethodException;
@@ -32,7 +33,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -432,6 +435,63 @@ public class RestClientTest {
     }
 
     @Test
+    public void testDownloadFileResume() throws Exception {
+        String path = "/download-test.jpg";
+        final File local = new File("/tmp/"+path);
+        local.delete();
+        assertFalse(local.exists());
+
+        final int lastPass = 2;
+        for (int i = 0; i <= lastPass; i++) {
+            final int pass = i;
+            try {
+                client.downloadFile(path, new DownloadListener() {
+                    boolean doCancel = false;
+
+                    @Override
+                    public OutputStream getOutputStream(boolean append) throws IOException {
+                        return new FileOutputStream(local, append);
+                    }
+
+                    @Override
+                    public long getLocalLength() {
+                        return local.length();
+                    }
+
+                    @Override
+                    public void updateProgress(long loaded, long total) {
+                        logger.info("updateProgress: pass=" + pass + ": " + loaded + " / " + total);
+                        if (pass == 0 && loaded >= 10240) {
+                            doCancel = true;
+                        }
+                        if (pass == 1 && loaded >= 102400) {
+                            doCancel = true;
+                        }
+                    }
+
+                    @Override
+                    public boolean hasCancelled() {
+                        if (doCancel) {
+                            logger.info("cancelled");
+                        }
+                        return doCancel;
+                    }
+                });
+            } catch (CancelledDownloadException ex) {
+                logger.info("CancelledDownloadException");
+            } catch (IOException ex) {
+                if (pass >= lastPass) {
+                    throw ex;
+                }
+            }
+        }
+
+        logger.info("length: " + local.length());
+        assertTrue(local.length() == 2031252);
+        assertTrue(local.delete());
+    }
+
+    @Test
     public void testHash() throws Exception {
         File file = new File("../testResources/test-upload-001.bin");
         Hash hash = Hash.getHash(file);
@@ -482,7 +542,7 @@ public class RestClientTest {
         for (int i = 0; i <= lastPass; i++) {
             final int pass = i;
             try {
-                client.uploadFile(link, true, local, null, new ProgressListener() {
+                client.uploadFile(link, true, local, new ProgressListener() {
                     boolean doCancel = false;
 
                     @Override

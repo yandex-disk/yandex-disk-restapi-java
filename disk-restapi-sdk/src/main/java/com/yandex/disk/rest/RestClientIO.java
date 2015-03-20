@@ -138,7 +138,7 @@ import java.util.regex.Pattern;
             downloadListener.setStartPosition(loaded);
             MediaType contentTypeHeader = responseBody.contentType();
             if (contentTypeHeader != null) {
-                downloadListener.setContentType(contentTypeHeader.toString());  // TODO XXX untested
+                downloadListener.setContentType(contentTypeHeader.toString());
             }
             downloadListener.setContentLength(contentLength);
 
@@ -149,7 +149,7 @@ import java.util.regex.Pattern;
             while ((count = content.read(downloadBuffer)) != -1) {
                 if (downloadListener.hasCancelled()) {
                     logger.info("Downloading " + url + " canceled");
-                    client.cancel(request.tag());  // TODO XXX untested
+                    client.cancel(request.tag());
                     throw new CancelledDownloadException();
                 }
                 os.write(downloadBuffer, 0, count);
@@ -160,7 +160,7 @@ import java.util.regex.Pattern;
             throw ex;
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
-            client.cancel(request.tag());  // TODO XXX untested
+            client.cancel(request.tag());
             if (e instanceof IOException) {
                 throw (IOException) e;
             } else if (e instanceof RuntimeException) {
