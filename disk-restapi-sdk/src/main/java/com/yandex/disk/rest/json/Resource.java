@@ -67,7 +67,7 @@ public class Resource {
         return publicKey;
     }
 
-    public ResourceList getItems() {
+    public ResourceList getResourceList() {
         return resourceList;
     }
 

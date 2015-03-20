@@ -98,7 +98,7 @@ public class RestClientTest {
         ApiVersion apiVersion = client.getApiVersion();
         logger.info("apiVersion: " + apiVersion);
         assertThat(apiVersion.getBuild(), not(isEmptyOrNullString()));
-        assertTrue("2.8.26".equalsIgnoreCase(apiVersion.getBuild()));
+        assertTrue("2.9.18".equalsIgnoreCase(apiVersion.getBuild()));
         assertTrue("v1".equalsIgnoreCase(apiVersion.getApiVersion()));
     }
 
@@ -126,7 +126,7 @@ public class RestClientTest {
         assertEquals(resource.getPath(), new ResourcePath("disk", "/"));
         logger.info("self: " + resource);
 
-        ResourceList items = resource.getItems();
+        ResourceList items = resource.getResourceList();
         assertFalse(items == null);
         for (Resource item : items.getItems()) {
             logger.info("item: " + item);
@@ -149,7 +149,7 @@ public class RestClientTest {
             assertTrue("dir".equals(resource.getType()));
             assertEquals(resource.getPath(), new ResourcePath("disk", "/"));
             logger.info("self: " + resource);
-            items = resource.getItems();
+            items = resource.getResourceList();
             assertFalse(items == null);
             for (Resource item : items.getItems()) {
                 logger.info("item: " + item);

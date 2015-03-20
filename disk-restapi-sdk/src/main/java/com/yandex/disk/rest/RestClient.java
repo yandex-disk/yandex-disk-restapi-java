@@ -242,7 +242,7 @@ public class RestClient {
 
     private void parseListResponse(final Resource resource, final ResourcesHandler handler) {
         handler.handleSelf(resource);
-        ResourceList items = resource.getItems();
+        ResourceList items = resource.getResourceList();
         int size = 0;
         if (items != null) {
             size = items.getItems().size();

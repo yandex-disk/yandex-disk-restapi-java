@@ -103,7 +103,7 @@ public class ListExampleLoader extends AsyncTaskLoader<List<ListItem>> {
                         deliverResult(new ArrayList<>(fileItemList));
                     }
                 });
-                size = resource.getItems().getItems().size();
+                size = resource.getResourceList().getItems().size();
             } while (!hasCancelled && size >= ITEMS_PER_REQUEST);
             return fileItemList;
         } catch (IOException | ServerException ex) {
