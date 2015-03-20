@@ -148,18 +148,13 @@ public class DownloadFileFragment extends IODialogFragment {
             new Thread(new Runnable() {
                 @Override
                 public void run () {
-                    RestClient client = null;
                     try {
-                        client = RestClientUtil.getInstance(credentials);
+                        RestClient client = RestClientUtil.getInstance(credentials);
                         client.downloadFile(item.getPath(), result, DownloadFileRetainedFragment.this);
                         downloadComplete();
                     } catch (IOException | ServerException ex) {
                         Log.d(TAG, "loadFile", ex);
                         sendException(ex);
-                    } finally {
-                        if (client != null) {
-                            client.shutdown();
-                        }
                     }
                 }
             }).start();

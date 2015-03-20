@@ -179,7 +179,7 @@ import java.util.regex.Pattern;
             } catch (IOException ex) {
                 // nothing
             }
-            try {   // TODO
+            try {
                 response.body().close();
             } catch (IOException | NullPointerException ex) {
                 logger.warn(ex.getMessage(), ex);
@@ -307,7 +307,7 @@ import java.util.regex.Pattern;
                 return result;
             case 204:
                 return Link.DONE;
-            // TODO 4xx
+            // no exceptions on 4xx and 5xx
         }
         return Link.ERROR;
     }
@@ -324,7 +324,7 @@ import java.util.regex.Pattern;
                 Link inProgress = parseJson(response, Link.class);
                 inProgress.setHttpStatus(Link.HttpStatus.inProgress);
                 return inProgress;
-            // TODO 4xx
+            // no exceptions on 4xx and 5xx
         }
         return Link.ERROR;
     }

@@ -86,7 +86,6 @@ import okio.Source;
                     Buffer buffer = new Buffer();
                     for (long readCount; (readCount = source.read(buffer, SIZE)) != -1; ) {
                         sink.write(buffer, readCount);
-//                        sink.emitCompleteSegments(); TODO XXX
                         loaded += readCount;
                         updateProgress(loaded);
                     }
