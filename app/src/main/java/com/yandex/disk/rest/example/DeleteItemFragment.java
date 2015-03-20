@@ -130,8 +130,6 @@ public class DeleteItemFragment extends IODialogFragment {
                     } catch (IOException | ServerException ex) {
                         Log.d(TAG, "deleteItem", ex);
                         sendException(ex);
-                    } finally {
-                        RestClient.shutdown(client);
                     }
                     return null;
                 }

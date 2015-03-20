@@ -137,8 +137,6 @@ public class MakeItemPublicFragment extends IODialogFragment {
                     } catch (IOException | ServerException ex) {
                         Log.d(TAG, "makePublicOrExpire", ex);
                         sendException(ex);
-                    } finally {
-                        RestClient.shutdown(client);
                     }
                     return null;
                 }

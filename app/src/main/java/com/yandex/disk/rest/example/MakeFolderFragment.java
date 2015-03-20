@@ -125,8 +125,6 @@ public class MakeFolderFragment extends IODialogFragment {
                     } catch (IOException | ServerException ex) {
                         Log.d(TAG, "makeFolder", ex);
                         sendException(ex);
-                    } finally {
-                        RestClient.shutdown(client);
                     }
                     return null;
                 }

@@ -76,15 +76,6 @@ public class RestClient {
                 .create(CloudApi.class);
     }
 
-    public void shutdown() {
-//        client.cancel(cloudApi);
-        // TODO
-    }
-
-    public static void shutdown(RestClient client) {
-        client.shutdown();
-    }
-
     /* package */ String getUrl() {
         return serverURL;
     }

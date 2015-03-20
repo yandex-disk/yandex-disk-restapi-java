@@ -109,8 +109,6 @@ public class ListExampleLoader extends AsyncTaskLoader<List<ListItem>> {
         } catch (IOException | ServerException ex) {
             Log.d(TAG, "loadInBackground", ex);
             exception = ex;
-        } finally {
-            RestClient.shutdown(client);
         }
         return fileItemList;
     }

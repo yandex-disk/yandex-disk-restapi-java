@@ -126,8 +126,6 @@ public class RenameMoveItemFragment extends IODialogFragment {
                     } catch (IOException | ServerException ex) {
                         Log.d(TAG, "renameMoveItem", ex);
                         sendException(ex);
-                    } finally {
-                        RestClient.shutdown(client);
                     }
                     return null;
                 }

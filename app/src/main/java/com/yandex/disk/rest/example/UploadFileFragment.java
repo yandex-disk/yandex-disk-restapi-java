@@ -154,8 +154,6 @@ public class UploadFileFragment extends IODialogFragment {
                     } catch (IOException | ServerException ex) {
                         Log.d(TAG, "loadFile", ex);
                         sendException(ex);
-                    } finally {
-                        RestClient.shutdown(client);
                     }
                 }
             }).start();
