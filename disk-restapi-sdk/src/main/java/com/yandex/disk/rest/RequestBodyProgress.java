@@ -51,10 +51,12 @@ import okio.Source;
 
             private void updateProgress(long loaded)
                     throws CancelledUploadingException {
-                if (listener.hasCancelled()) {
-                    throw new CancelledUploadingException();
+                if (listener != null) {
+                    if (listener.hasCancelled()) {
+                        throw new CancelledUploadingException();
+                    }
+                    listener.updateProgress(loaded + startOffset, file.length());
                 }
-                listener.updateProgress(loaded + startOffset, file.length());
             }
 
             @Override
@@ -75,7 +77,7 @@ import okio.Source;
                     if (startOffset > 0) {
                         long skipped = inputStream.skip(startOffset);
                         if (skipped != startOffset) {
-                            throw new IllegalArgumentException("inputStream.skip() failed"); // TODO XXX
+                            throw new IOException("RequestBodyProgress: inputStream.skip() failed");
                         }
                     }
                     long loaded = 0;

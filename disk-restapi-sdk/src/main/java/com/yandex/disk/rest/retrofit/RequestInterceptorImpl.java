@@ -14,22 +14,16 @@ import retrofit.RequestInterceptor;
 
 public class RequestInterceptorImpl implements RequestInterceptor {
 
-    private final List<CustomHeader> commonHeaders, headerList;
+    private final List<CustomHeader> headers;
 
-    public RequestInterceptorImpl(final List<CustomHeader> commonHeaders, final List<CustomHeader> headerList) {
-        this.commonHeaders = commonHeaders;
-        this.headerList = headerList;
+    public RequestInterceptorImpl(final List<CustomHeader> headers) {
+        this.headers = headers;
     }
 
     @Override
     public void intercept(final RequestFacade request) {
-        for (CustomHeader header : commonHeaders) {
+        for (CustomHeader header : headers) {
             addHeader(request, header);
-        }
-        if (headerList != null) {
-            for (CustomHeader header : headerList) {
-                addHeader(request, header);
-            }
         }
     }
 

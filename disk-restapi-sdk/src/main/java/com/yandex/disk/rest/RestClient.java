@@ -31,8 +31,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import retrofit.Callback;
@@ -47,75 +45,58 @@ public class RestClient {
             ? RestAdapter.LogLevel.FULL
             : RestAdapter.LogLevel.NONE;
 
-    private static URL serverURL;
-    static {
-        try {
-            serverURL = new URL("https://cloud-api.yandex.net");
-        } catch (MalformedURLException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    private final List<CustomHeader> commonHeaders;
+    private final Credentials credentials;
     private final OkHttpClient client;
+    private final String serverURL;
+    private final CloudApi cloudApi;
 
     public RestClient(final Credentials credentials) {
         this(credentials, OkHttpClientFactory.makeClient());
     }
 
     public RestClient(final Credentials credentials, final OkHttpClient client) {
-        this.commonHeaders = credentials.getHeaders();
+        this(credentials, client, "https://cloud-api.yandex.net");
+    }
+
+    public RestClient(final Credentials credentials, final OkHttpClient client, final String serverUrl) {
+        this.credentials = credentials;
         this.client = client;
+        try {
+            this.serverURL = new URL(serverUrl).toExternalForm();
+        } catch (MalformedURLException ex) {
+            throw new RuntimeException(ex);
+        }
+        this.cloudApi = new RestAdapter.Builder()
+                .setClient(new OkClient(client))
+                .setEndpoint(getUrl())
+                .setRequestInterceptor(new RequestInterceptorImpl(credentials.getHeaders()))
+                .setErrorHandler(new ErrorHandlerImpl())
+                .setLogLevel(LOG_LEVEL)
+                .build()
+                .create(CloudApi.class);
     }
 
     public void shutdown() {
-//        client.getClient().cancel()
-        // TODO nothing yet
+//        client.cancel(cloudApi);
+        // TODO
     }
 
     public static void shutdown(RestClient client) {
         client.shutdown();
     }
 
-    private List<CustomHeader> getAllHeaders(final List<CustomHeader> headerList) {
-        if (headerList == null) {
-            return commonHeaders;
-        }
-        List<CustomHeader> list = new ArrayList<>(commonHeaders);
-        list.addAll(headerList);
-        return Collections.unmodifiableList(list);
-    }
-
     /* package */ String getUrl() {
-        return serverURL.toExternalForm();
-    }
-
-    private RestAdapter.Builder getRestAdapterBuilder(final List<CustomHeader> headerList) {
-        return new RestAdapter.Builder()
-                .setClient(new OkClient(client))
-                .setEndpoint(getUrl())
-                .setRequestInterceptor(new RequestInterceptorImpl(commonHeaders, headerList))
-                .setErrorHandler(new ErrorHandlerImpl())
-                .setLogLevel(LOG_LEVEL);
-    }
-
-    private CloudApi call(final List<CustomHeader> headerList) {
-        return getRestAdapterBuilder(headerList).build()
-                .create(CloudApi.class);
-    }
-
-    private CloudApi call() {
-        return call(null);
+        return serverURL;
     }
 
     public ApiVersion getApiVersion()
             throws IOException, ServerIOException {
-        return call().getApiVersion();
+        return cloudApi.getApiVersion();
     }
 
     public Operation getOperation(final String operationId)
             throws IOException, ServerIOException {
-        return call().getOperation(operationId);
+        return cloudApi.getOperation(operationId);
     }
 
     public Operation getOperation(final Link link)
@@ -123,7 +104,7 @@ public class RestClient {
         if (!"GET".equalsIgnoreCase(link.getMethod())) {
             throw new WrongMethodException("Method in Link object is not GET");
         }
-        Operation operation = new RestClientIO(client, getAllHeaders(null))
+        Operation operation = new RestClientIO(client, credentials.getHeaders())
                 .getOperation(link.getHref());
         logger.debug("getOperation: " + operation);
         return operation;
@@ -147,12 +128,12 @@ public class RestClient {
 
     public DiskCapacity getCapacity(final String fields)
             throws IOException, ServerIOException {
-        return call().getCapacity(fields);
+        return cloudApi.getCapacity(fields);
     }
 
     public Resource listResources(final ResourcesArgs args)
             throws IOException, ServerIOException {
-        final Resource resource = call().listResources(args.getPath(), args.getFields(),
+        final Resource resource = cloudApi.listResources(args.getPath(), args.getFields(),
                 args.getLimit(), args.getOffset(), args.getSort(), args.getPreviewSize(),
                 args.getPreviewCrop());
         if (args.getParsingHandler() != null) {
@@ -163,7 +144,7 @@ public class RestClient {
 
     public ResourceList flatListResources(final ResourcesArgs args)
             throws IOException, ServerIOException {
-        final ResourceList resourceList = call().flatListResources(args.getLimit(), args.getMediaType(),
+        final ResourceList resourceList = cloudApi.flatListResources(args.getLimit(), args.getMediaType(),
                 args.getOffset(), args.getFields(), args.getPreviewSize(), args.getPreviewCrop());
         if (args.getParsingHandler() != null) {
             parseListResponse(resourceList, args.getParsingHandler());
@@ -173,7 +154,7 @@ public class RestClient {
 
     public ResourceList uploadedListResources(final ResourcesArgs args)
             throws IOException, ServerIOException {
-        final ResourceList resourceList = call().uploadedListResources(args.getLimit(), args.getMediaType(),
+        final ResourceList resourceList = cloudApi.uploadedListResources(args.getLimit(), args.getMediaType(),
                 args.getOffset(), args.getFields(), args.getPreviewSize(), args.getPreviewCrop());
         if (args.getParsingHandler() != null) {
             parseListResponse(resourceList, args.getParsingHandler());
@@ -183,7 +164,7 @@ public class RestClient {
 
     public Resource patchResource(final ResourcesArgs args)
             throws ServerIOException, NetworkIOException {
-        final Resource resource = call().patchResource(args.getPath(), args.getFields(), args.getBody());
+        final Resource resource = cloudApi.patchResource(args.getPath(), args.getFields(), args.getBody());
         if (args.getParsingHandler() != null) {
             parseListResponse(resource, args.getParsingHandler());
         }
@@ -192,7 +173,7 @@ public class RestClient {
 
     public Resource listPublicResources(final ResourcesArgs args)
             throws IOException, ServerIOException {
-        final Resource resource = call().listPublicResources(args.getPublicKey(), args.getPath(),
+        final Resource resource = cloudApi.listPublicResources(args.getPublicKey(), args.getPath(),
                 args.getFields(), args.getLimit(), args.getOffset(), args.getSort(),
                 args.getPreviewSize(), args.getPreviewCrop());
         if (args.getParsingHandler() != null) {
@@ -203,7 +184,7 @@ public class RestClient {
 
     public Resource listTrash(final ResourcesArgs args)
             throws IOException, ServerIOException {
-        final Resource resource = call().listTrash(args.getPath(), args.getFields(),
+        final Resource resource = cloudApi.listTrash(args.getPath(), args.getFields(),
                 args.getLimit(), args.getOffset(), args.getSort(), args.getPreviewSize(),
                 args.getPreviewCrop());
         if (args.getParsingHandler() != null) {
@@ -214,12 +195,12 @@ public class RestClient {
 
     public void dropTrash(final String path, final Callback<Link> callback)
             throws IOException, ServerIOException {
-        call().dropTrash(path, callback);
+        cloudApi.dropTrash(path, callback);
     }
 
     public Link dropTrash(final String path)
             throws IOException, ServerIOException, URISyntaxException {
-        return new RestClientIO(client, getAllHeaders(null))
+        return new RestClientIO(client, credentials.getHeaders())
                 .delete(new QueryBuilder(getUrl() + "/v1/disk/trash/resources")
                         .add("path", path)
                         .build());
@@ -228,12 +209,12 @@ public class RestClient {
     public void restoreTrash(final String path, final String name, final Boolean overwrite,
                              final Callback<Link> callback)
             throws IOException, ServerIOException {
-        call().restoreTrash(path, name, overwrite, callback);
+        cloudApi.restoreTrash(path, name, overwrite, callback);
     }
 
     public Link restoreTrash(final String path, final String name, final Boolean overwrite)
             throws IOException, ServerIOException {
-        return new RestClientIO(client, getAllHeaders(null))
+        return new RestClientIO(client, credentials.getHeaders())
                 .put(new QueryBuilder(getUrl() + "/v1/disk/trash/resources/restore")
                         .add("path", path)
                         .add("name", name)
@@ -266,22 +247,21 @@ public class RestClient {
         handler.onFinished(size);
     }
 
-    public void downloadFile(final String path, final File saveTo, final List<CustomHeader> headerList,
-                             final ProgressListener progressListener)
+    public void downloadFile(final String path, final File saveTo, final ProgressListener progressListener)
             throws IOException, ServerException {
-        Link link = call(headerList).getDownloadLink(path);
-        new RestClientIO(client, getAllHeaders(headerList))
+        Link link = cloudApi.getDownloadLink(path);
+        new RestClientIO(client, credentials.getHeaders())
                 .downloadUrl(link.getHref(), new FileDownloadListener(saveTo, progressListener));
     }
 
-    public Link saveFromUrl(final String url, final String serverPath, final List<CustomHeader> headerList)
+    public Link saveFromUrl(final String url, final String serverPath)
             throws ServerIOException, NetworkIOException {
-        return call(headerList).saveFromUrl(url, serverPath);
+        return cloudApi.saveFromUrl(url, serverPath);
     }
 
-    public Link getUploadLink(final String serverPath, final boolean overwrite, final List<CustomHeader> headerList)
+    public Link getUploadLink(final String serverPath, final boolean overwrite)
             throws ServerIOException, WrongMethodException, NetworkIOException {
-        Link link = call(headerList).getUploadLink(serverPath, overwrite);
+        Link link = cloudApi.getUploadLink(serverPath, overwrite);
         if (!"PUT".equalsIgnoreCase(link.getMethod())) {
             throw new WrongMethodException("Method in Link object is not PUT");
         }
@@ -291,7 +271,7 @@ public class RestClient {
     public void uploadFile(final Link link, final boolean resumeUpload, final File localSource,
                            final List<CustomHeader> headerList, final ProgressListener progressListener)
             throws IOException, ServerException {
-        RestClientIO clientIO = new RestClientIO(client, getAllHeaders(headerList));
+        RestClientIO clientIO = new RestClientIO(client, credentials.getHeaders());
         long startOffset = 0;
         if (resumeUpload) {
             Hash hash = Hash.getHash(localSource);
@@ -303,7 +283,7 @@ public class RestClient {
 
     public Link delete(final String path, final boolean permanently)
             throws ServerIOException, IOException {
-        return new RestClientIO(client, getAllHeaders(null))
+        return new RestClientIO(client, credentials.getHeaders())
                 .delete(new QueryBuilder(getUrl() + "/v1/disk/resources")
                         .add("path", path)
                         .add("permanently", permanently)
@@ -312,39 +292,39 @@ public class RestClient {
 
     public Link makeFolder(final String path)
             throws ServerIOException, NetworkIOException {
-        return call().makeFolder(path);
+        return cloudApi.makeFolder(path);
     }
 
     public Link copy(final String from, final String path, final boolean overwrite)
             throws ServerIOException, NetworkIOException {
-        return call().copy(from, path, overwrite);
+        return cloudApi.copy(from, path, overwrite);
     }
 
     public Link move(final String from, final String path, final boolean overwrite)
             throws ServerIOException, NetworkIOException {
-        return call().move(from, path, overwrite);
+        return cloudApi.move(from, path, overwrite);
     }
 
     public Link publish(final String path)
             throws ServerIOException, NetworkIOException {
-        return call().publish(path);
+        return cloudApi.publish(path);
     }
 
     public Link unpublish(final String path)
             throws ServerIOException, NetworkIOException {
-        return call().unpublish(path);
+        return cloudApi.unpublish(path);
     }
 
     public void downloadPublicResource(final String publicKey, final String path, final File saveTo,
-                                       final List<CustomHeader> headerList, final ProgressListener progressListener)
+                                       final ProgressListener progressListener)
             throws IOException, ServerException {
-        Link link = call(headerList).getPublicResourceDownloadLink(publicKey, path);
-        new RestClientIO(client, getAllHeaders(headerList))
+        Link link = cloudApi.getPublicResourceDownloadLink(publicKey, path);
+        new RestClientIO(client, credentials.getHeaders())
                 .downloadUrl(link.getHref(), new FileDownloadListener(saveTo, progressListener));
     }
 
     public Link savePublicResource(final String publicKey, final String path, final String name)
             throws IOException, ServerException {
-        return call().savePublicResource(publicKey, path, name);
+        return cloudApi.savePublicResource(publicKey, path, name);
     }
 }

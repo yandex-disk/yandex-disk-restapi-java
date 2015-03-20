@@ -415,7 +415,7 @@ public class RestClientTest {
         File local = new File("/tmp/"+path);
         local.delete();
         assertFalse(local.exists());
-        client.downloadFile(path, local, null, new ProgressListener() {
+        client.downloadFile(path, local, new ProgressListener() {
             @Override
             public void updateProgress(long loaded, long total) {
                 logger.info("updateProgress: " + loaded + " / " + total);
@@ -451,7 +451,7 @@ public class RestClientTest {
             ex.printStackTrace();
         }
 
-        Link saveLink = client.saveFromUrl(url, path, null);
+        Link saveLink = client.saveFromUrl(url, path);
         Operation operation = client.getOperation(saveLink);
         logger.info("operation: " + operation);
         assertThat(operation.getStatus(), not(isEmptyOrNullString()));
@@ -460,7 +460,7 @@ public class RestClientTest {
     @Test(expected = ServerIOException.class)
     public void testUploadFileOverwriteFailed() throws Exception {
         String path = "/download-test.jpg";
-        client.getUploadLink(path, false, null);
+        client.getUploadLink(path, false);
     }
 
     @Test
@@ -477,7 +477,7 @@ public class RestClientTest {
         assertTrue(local.exists());
         assertTrue(local.length() == 1048576);
 
-        Link link = client.getUploadLink(serverPath, true, null);
+        Link link = client.getUploadLink(serverPath, true);
         final int lastPass = 2;
         for (int i = 0; i <= lastPass; i++) {
             final int pass = i;
@@ -704,7 +704,7 @@ public class RestClientTest {
             Link savedLink = client.savePublicResource(publicKey[0], null, null);
             logger.info("savedLink: "+savedLink);
 
-            client.downloadPublicResource(publicKey[0], "", local, null, new ProgressListener() {
+            client.downloadPublicResource(publicKey[0], "", local, new ProgressListener() {
                 @Override
                 public void updateProgress(long loaded, long total) {
                     logger.info("updateProgress: " + loaded + " / " + total);
