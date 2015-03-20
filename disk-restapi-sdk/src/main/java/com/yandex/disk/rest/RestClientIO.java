@@ -149,7 +149,7 @@ import java.util.regex.Pattern;
             while ((count = content.read(downloadBuffer)) != -1) {
                 if (downloadListener.hasCancelled()) {
                     logger.info("Downloading " + url + " canceled");
-                    client.cancel(req);  // TODO XXX untested get.abort();
+                    client.cancel(request.tag());  // TODO XXX untested
                     throw new CancelledDownloadException();
                 }
                 os.write(downloadBuffer, 0, count);
@@ -160,7 +160,7 @@ import java.util.regex.Pattern;
             throw ex;
         } catch (Exception e) {
             logger.warn(e.getMessage(), e);
-            client.cancel(req);  // TODO XXX untested get.abort();
+            client.cancel(request.tag());  // TODO XXX untested
             if (e instanceof IOException) {
                 throw (IOException) e;
             } else if (e instanceof RuntimeException) {
@@ -179,11 +179,10 @@ import java.util.regex.Pattern;
             } catch (IOException ex) {
                 // nothing
             }
-            try {
-                // TODO not needed ?
+            try {   // TODO
                 response.body().close();
-            } catch (IOException e) {
-                logger.warn(e.getMessage(), e);
+            } catch (IOException | NullPointerException ex) {
+                logger.warn(ex.getMessage(), ex);
             }
         }
     }
