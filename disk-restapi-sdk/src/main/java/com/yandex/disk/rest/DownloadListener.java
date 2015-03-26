@@ -54,7 +54,7 @@ public abstract class DownloadListener implements ProgressListener {
         return false;
     }
 
-    public void setEtag(String etag) {
+    public void setETag(String etag) {
     }
 
     public void setContentType(String contentType) {

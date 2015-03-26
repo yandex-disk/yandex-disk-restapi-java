@@ -28,6 +28,11 @@ public class FileDownloadListener extends DownloadListener {
     }
 
     @Override
+    public long getLocalLength() {
+        return saveTo.length();
+    }
+
+    @Override
     public void updateProgress(long loaded, long total) {
         if (progressListener != null) {
             progressListener.updateProgress(loaded, total);
