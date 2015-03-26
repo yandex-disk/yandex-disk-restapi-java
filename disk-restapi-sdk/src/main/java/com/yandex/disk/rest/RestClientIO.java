@@ -306,10 +306,13 @@ import java.util.regex.Pattern;
                 result.setHttpStatus(Link.HttpStatus.inProgress);
                 return result;
             case 204:
+                close(response);
                 return Link.DONE;
-            // no exceptions on 4xx and 5xx
+            default:
+                // no exceptions on 4xx and 5xx
+                close(response);
+                return Link.ERROR;
         }
-        return Link.ERROR;
     }
 
     /* package */ Link put(String url)
@@ -324,9 +327,19 @@ import java.util.regex.Pattern;
                 Link inProgress = parseJson(response, Link.class);
                 inProgress.setHttpStatus(Link.HttpStatus.inProgress);
                 return inProgress;
-            // no exceptions on 4xx and 5xx
+            default:
+                // no exceptions on 4xx and 5xx
+                close(response);
+                return Link.ERROR;
         }
-        return Link.ERROR;
+    }
+
+    private void close(Response response)
+            throws IOException {
+        ResponseBody responseBody = response.body();
+        if (responseBody != null) {
+            responseBody.close();
+        }
     }
 
     private Response call(String method, String url)
