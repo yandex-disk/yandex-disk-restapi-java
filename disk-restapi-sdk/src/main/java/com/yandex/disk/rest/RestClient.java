@@ -184,23 +184,12 @@ public class RestClient {
         return resource;
     }
 
-    public void dropTrash(final String path, final Callback<Link> callback)
-            throws IOException, ServerIOException {
-        cloudApi.dropTrash(path, callback);
-    }
-
     public Link dropTrash(final String path)
             throws IOException, ServerIOException, URISyntaxException {
         return new RestClientIO(client, credentials.getHeaders())
                 .delete(new QueryBuilder(getUrl() + "/v1/disk/trash/resources")
                         .add("path", path)
                         .build());
-    }
-
-    public void restoreTrash(final String path, final String name, final Boolean overwrite,
-                             final Callback<Link> callback)
-            throws IOException, ServerIOException {
-        cloudApi.restoreTrash(path, name, overwrite, callback);
     }
 
     public Link restoreTrash(final String path, final String name, final Boolean overwrite)
