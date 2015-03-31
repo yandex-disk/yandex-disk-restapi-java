@@ -83,7 +83,7 @@ public class ListExampleLoader extends AsyncTaskLoader<List<ListItem>> {
             client = RestClientUtil.getInstance(credentials);
             int size;
             do {
-                Resource resource = client.listResources(new ResourcesArgs.Builder()
+                Resource resource = client.getResources(new ResourcesArgs.Builder()
                         .setPath(dir)
                         .setSort(ResourcesArgs.Sort.name)
                         .setLimit(ITEMS_PER_REQUEST)

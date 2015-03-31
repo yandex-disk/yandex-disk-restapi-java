@@ -79,16 +79,31 @@ public class RestClient {
         return serverURL;
     }
 
+    /**
+     * Server API version and build
+     */
     public ApiVersion getApiVersion()
             throws IOException, ServerIOException {
         return cloudApi.getApiVersion();
     }
 
+    /**
+     * Operation status
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/operations.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/operations-docpage/">russian</a></p>
+     */
     public Operation getOperation(final String operationId)
             throws IOException, ServerIOException {
         return cloudApi.getOperation(operationId);
     }
 
+    /**
+     * Operation status
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/operations.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/operations-docpage/">russian</a></p>
+     */
     public Operation getOperation(final Link link)
             throws IOException, WrongMethodException, HttpCodeException {
         if (!"GET".equalsIgnoreCase(link.getMethod())) {
@@ -100,6 +115,12 @@ public class RestClient {
         return operation;
     }
 
+    /**
+     * Waiting operation to stop
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/operations.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/operations-docpage/">russian</a></p>
+     */
     public Operation waitProgress(final Link link, final Runnable waiting)
             throws IOException, WrongMethodException, HttpCodeException {
         while (true) {
@@ -111,19 +132,37 @@ public class RestClient {
         }
     }
 
+    /**
+     * Data about a user's Disk
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/capacity.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/capacity-docpage/">russian</a></p>
+     */
     public DiskInfo getDiskInfo()
             throws IOException, ServerIOException {
         return getDiskInfo(null);
     }
 
+    /**
+     * Data about a user's Disk
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/capacity.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/capacity-docpage/">russian</a></p>
+     */
     public DiskInfo getDiskInfo(final String fields)
             throws IOException, ServerIOException {
         return cloudApi.getDiskInfo(fields);
     }
 
-    public Resource listResources(final ResourcesArgs args)
+    /**
+     * Metainformation about a file or folder
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/meta.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/meta-docpage/">russian</a></p>
+     */
+    public Resource getResources(final ResourcesArgs args)
             throws IOException, ServerIOException {
-        final Resource resource = cloudApi.listResources(args.getPath(), args.getFields(),
+        final Resource resource = cloudApi.getResources(args.getPath(), args.getFields(),
                 args.getLimit(), args.getOffset(), args.getSort(), args.getPreviewSize(),
                 args.getPreviewCrop());
         if (args.getParsingHandler() != null) {
@@ -132,9 +171,15 @@ public class RestClient {
         return resource;
     }
 
-    public ResourceList flatListResources(final ResourcesArgs args)
+    /**
+     * Flat list of all files
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/all-files.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/all-files-docpage/">russian</a></p>
+     */
+    public ResourceList getFlatResourceList(final ResourcesArgs args)
             throws IOException, ServerIOException {
-        final ResourceList resourceList = cloudApi.flatListResources(args.getLimit(), args.getMediaType(),
+        final ResourceList resourceList = cloudApi.getFlatResourceList(args.getLimit(), args.getMediaType(),
                 args.getOffset(), args.getFields(), args.getPreviewSize(), args.getPreviewCrop());
         if (args.getParsingHandler() != null) {
             parseListResponse(resourceList, args.getParsingHandler());
@@ -142,9 +187,15 @@ public class RestClient {
         return resourceList;
     }
 
-    public ResourceList uploadedListResources(final ResourcesArgs args)
+    /**
+     * Latest uploaded files
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/recent-upload.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/recent-upload-docpage/">russian</a></p>
+     */
+    public ResourceList getLastUploadedResources(final ResourcesArgs args)
             throws IOException, ServerIOException {
-        final ResourceList resourceList = cloudApi.uploadedListResources(args.getLimit(), args.getMediaType(),
+        final ResourceList resourceList = cloudApi.getLastUploadedResources(args.getLimit(), args.getMediaType(),
                 args.getOffset(), args.getFields(), args.getPreviewSize(), args.getPreviewCrop());
         if (args.getParsingHandler() != null) {
             parseListResponse(resourceList, args.getParsingHandler());
@@ -152,6 +203,12 @@ public class RestClient {
         return resourceList;
     }
 
+    /**
+     * Latest uploaded files
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/meta-add.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/meta-add-docpage/">russian</a></p>
+     */
     public Resource patchResource(final ResourcesArgs args)
             throws ServerIOException, NetworkIOException {
         final Resource resource = cloudApi.patchResource(args.getPath(), args.getFields(), args.getBody());
@@ -161,6 +218,12 @@ public class RestClient {
         return resource;
     }
 
+    /**
+     * Metainformation about a public resource
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/public.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/public-docpage/">russian</a></p>
+     */
     public Resource listPublicResources(final ResourcesArgs args)
             throws IOException, ServerIOException {
         final Resource resource = cloudApi.listPublicResources(args.getPublicKey(), args.getPath(),
@@ -172,9 +235,15 @@ public class RestClient {
         return resource;
     }
 
-    public Resource listTrash(final ResourcesArgs args)
+    /**
+     * Metainformation about a file or folder in the Trash
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/meta.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/meta-docpage/">russian</a></p>
+     */
+    public Resource getTrashResources(final ResourcesArgs args)
             throws IOException, ServerIOException {
-        final Resource resource = cloudApi.listTrash(args.getPath(), args.getFields(),
+        final Resource resource = cloudApi.getTrashResources(args.getPath(), args.getFields(),
                 args.getLimit(), args.getOffset(), args.getSort(), args.getPreviewSize(),
                 args.getPreviewCrop());
         if (args.getParsingHandler() != null) {
@@ -183,7 +252,13 @@ public class RestClient {
         return resource;
     }
 
-    public Link dropTrash(final String path)
+    /**
+     * Cleaning the Trash
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/trash-delete.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/trash-delete-docpage/">russian</a></p>
+     */
+    public Link deleteFromTrash(final String path)
             throws IOException, ServerIOException, URISyntaxException {
         return new RestClientIO(client, credentials.getHeaders())
                 .delete(new QueryBuilder(getUrl() + "/v1/disk/trash/resources")
@@ -191,7 +266,13 @@ public class RestClient {
                         .build());
     }
 
-    public Link restoreTrash(final String path, final String name, final Boolean overwrite)
+    /**
+     * Restoring a file or folder from the Trash
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/trash-restore.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/trash-restore-docpage/">russian</a></p>
+     */
+    public Link restoreFromTrash(final String path, final String name, final Boolean overwrite)
             throws IOException, ServerIOException {
         return new RestClientIO(client, credentials.getHeaders())
                 .put(new QueryBuilder(getUrl() + "/v1/disk/trash/resources/restore")
@@ -226,6 +307,12 @@ public class RestClient {
         handler.onFinished(size);
     }
 
+    /**
+     * Downloading a file from Disk
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/content.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/content-docpage/">russian</a></p>
+     */
     public void downloadFile(final String path, final File saveTo, final ProgressListener progressListener)
             throws IOException, ServerException {
         Link link = cloudApi.getDownloadLink(path);
@@ -233,6 +320,12 @@ public class RestClient {
                 .downloadUrl(link.getHref(), new FileDownloadListener(saveTo, progressListener));
     }
 
+    /**
+     * Downloading a file from Disk
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/content.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/content-docpage/">russian</a></p>
+     */
     public void downloadFile(final String path, final DownloadListener downloadListener)
             throws IOException, ServerException {
         Link link = cloudApi.getDownloadLink(path);
@@ -240,11 +333,23 @@ public class RestClient {
                 .downloadUrl(link.getHref(), downloadListener);
     }
 
+    /**
+     * Uploading a file to Disk from external resource
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/upload-ext.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/upload-ext-docpage/">russian</a></p>
+     */
     public Link saveFromUrl(final String url, final String serverPath)
             throws ServerIOException, NetworkIOException {
         return cloudApi.saveFromUrl(url, serverPath);
     }
 
+    /**
+     * Uploading a file to Disk: get Link to upload
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/upload.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/upload-docpage/">russian</a></p>
+     */
     public Link getUploadLink(final String serverPath, final boolean overwrite)
             throws ServerIOException, WrongMethodException, NetworkIOException {
         Link link = cloudApi.getUploadLink(serverPath, overwrite);
@@ -254,6 +359,12 @@ public class RestClient {
         return link;
     }
 
+    /**
+     * Uploading a file to Disk: upload a file
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/upload.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/upload-docpage/">russian</a></p>
+     */
     public void uploadFile(final Link link, final boolean resumeUpload, final File localSource,
                            final ProgressListener progressListener)
             throws IOException, ServerException {
@@ -267,6 +378,12 @@ public class RestClient {
         clientIO.uploadFile(link.getHref(), localSource, startOffset, progressListener);
     }
 
+    /**
+     * Deleting a file or folder
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/delete.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/delete-docpage/">russian</a></p>
+     */
     public Link delete(final String path, final boolean permanently)
             throws ServerIOException, IOException {
         return new RestClientIO(client, credentials.getHeaders())
@@ -276,31 +393,67 @@ public class RestClient {
                         .build());
     }
 
+    /**
+     * Creating a folder
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/create-folder.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/create-folder-docpage/">russian</a></p>
+     */
     public Link makeFolder(final String path)
             throws ServerIOException, NetworkIOException {
         return cloudApi.makeFolder(path);
     }
 
+    /**
+     * Copying a file or folder
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/copy.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/copy-docpage/">russian</a></p>
+     */
     public Link copy(final String from, final String path, final boolean overwrite)
             throws ServerIOException, NetworkIOException {
         return cloudApi.copy(from, path, overwrite);
     }
 
+    /**
+     * Moving a file or folder
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/move.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/move-docpage/">russian</a></p>
+     */
     public Link move(final String from, final String path, final boolean overwrite)
             throws ServerIOException, NetworkIOException {
         return cloudApi.move(from, path, overwrite);
     }
 
+    /**
+     * Publishing a file or folder
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/publish.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/publish-docpage/">russian</a></p>
+     */
     public Link publish(final String path)
             throws ServerIOException, NetworkIOException {
         return cloudApi.publish(path);
     }
 
+    /**
+     * Closing access to a resource
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/publish.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/publish-docpage/">russian</a></p>
+     */
     public Link unpublish(final String path)
             throws ServerIOException, NetworkIOException {
         return cloudApi.unpublish(path);
     }
 
+    /**
+     * Downloading a public file or folder
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/public.xml#download">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/public-docpage/#download">russian</a></p>
+     */
     public void downloadPublicResource(final String publicKey, final String path, final File saveTo,
                                        final ProgressListener progressListener)
             throws IOException, ServerException {
@@ -309,6 +462,12 @@ public class RestClient {
                 .downloadUrl(link.getHref(), new FileDownloadListener(saveTo, progressListener));
     }
 
+    /**
+     * Saving a public file in "Downloads"
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/public.xml#save">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/public-docpage/#save">russian</a></p>
+     */
     public Link savePublicResource(final String publicKey, final String path, final String name)
             throws IOException, ServerException {
         return cloudApi.savePublicResource(publicKey, path, name);

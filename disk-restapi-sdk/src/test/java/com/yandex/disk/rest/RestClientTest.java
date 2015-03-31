@@ -120,7 +120,7 @@ public class RestClientTest {
     @Test
     public void testListResources() throws Exception {
         int limit = 50;
-        Resource resource = client.listResources(new ResourcesArgs.Builder()
+        Resource resource = client.getResources(new ResourcesArgs.Builder()
                 .setPath("/")
                 .setLimit(limit)
                 .setOffset(2)
@@ -144,7 +144,7 @@ public class RestClientTest {
         int offset = 0;
         ResourceList items;
         do {
-            Resource resource = client.listResources(new ResourcesArgs.Builder()
+            Resource resource = client.getResources(new ResourcesArgs.Builder()
                     .setPath("/")
                     .setLimit(limit)
                     .setOffset(offset)
@@ -184,7 +184,7 @@ public class RestClientTest {
                 assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
             }
         };
-        client.listResources(new ResourcesArgs.Builder()
+        client.getResources(new ResourcesArgs.Builder()
                 .setPath("/")
                 .setParsingHandler(parsingHandler)
                 .build());
@@ -193,7 +193,7 @@ public class RestClientTest {
     @Test
     public void testFlatListResources() throws Exception {
         int limit = 50;
-        ResourceList resourceList = client.flatListResources(new ResourcesArgs.Builder()
+        ResourceList resourceList = client.getFlatResourceList(new ResourcesArgs.Builder()
                 .setMediaType("video")
                 .setLimit(limit)
                 .setOffset(0)
@@ -233,16 +233,16 @@ public class RestClientTest {
                 assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
             }
         };
-        client.flatListResources(new ResourcesArgs.Builder()
+        client.getFlatResourceList(new ResourcesArgs.Builder()
                 .setMediaType("audio")
                 .setParsingHandler(parsingHandler)
                 .build());
     }
 
     @Test
-    public void testUploadedListResources() throws Exception {
+    public void testGetLastUploadedResources() throws Exception {
         int limit = 50;
-        ResourceList resourceList = client.uploadedListResources(new ResourcesArgs.Builder()
+        ResourceList resourceList = client.getLastUploadedResources(new ResourcesArgs.Builder()
                 .setMediaType("video")
                 .setLimit(limit)
                 .setOffset(0)
@@ -282,7 +282,7 @@ public class RestClientTest {
                 assertThat(items.get(0).getName(), not(isEmptyOrNullString()));
             }
         };
-        client.uploadedListResources(new ResourcesArgs.Builder()
+        client.getLastUploadedResources(new ResourcesArgs.Builder()
                 .setMediaType("audio")
                 .setParsingHandler(parsingHandler)
                 .build());
@@ -332,7 +332,7 @@ public class RestClientTest {
                 }
             }
         };
-        client.listTrash(new ResourcesArgs.Builder()
+        client.getTrashResources(new ResourcesArgs.Builder()
                 .setPath("/")
                 .setParsingHandler(parsingHandler)
                 .build());
@@ -369,7 +369,7 @@ public class RestClientTest {
     }
 
     @Test
-    public void testDropTrash() throws Exception {
+    public void testDeleteFromTrash() throws Exception {
         String name = "/drop-trash-test";
         String path = "/0-test"+name;
 
@@ -390,11 +390,11 @@ public class RestClientTest {
                 + URLEncoder.encode("disk:" + sub, "UTF-8")));
 
         checkResult(client.delete(path, false));
-        checkResult(client.dropTrash(name));
+        checkResult(client.deleteFromTrash(name));
     }
 
     @Test
-    public void testRestoreTrash() throws Exception {
+    public void testRestoreFromTrash() throws Exception {
         String name = "/restore-trash-test";
         String path = "/0-test"+name;
 
@@ -409,7 +409,7 @@ public class RestClientTest {
                 + URLEncoder.encode("disk:" + path, "UTF-8")));
 
         checkResult(client.delete(path, false));
-        checkResult(client.restoreTrash(name, null, null));
+        checkResult(client.restoreFromTrash(name, null, null));
     }
 
     @Test
@@ -649,7 +649,7 @@ public class RestClientTest {
         client.makeFolder(path);
 
         client.publish(path);
-        client.listResources(new ResourcesArgs.Builder()
+        client.getResources(new ResourcesArgs.Builder()
                 .setPath(path)
                 .setParsingHandler(new ResourcesHandler() {
                     @Override
@@ -661,7 +661,7 @@ public class RestClientTest {
                 .build());
 
         client.unpublish(path);
-        client.listResources(new ResourcesArgs.Builder()
+        client.getResources(new ResourcesArgs.Builder()
                 .setPath(path)
                 .setParsingHandler(new ResourcesHandler() {
                     @Override
@@ -700,7 +700,7 @@ public class RestClientTest {
 
         try {
             final String[] publicKey = new String[1];
-            client.listResources(new ResourcesArgs.Builder()
+            client.getResources(new ResourcesArgs.Builder()
                     .setPath(path)
                     .setParsingHandler(new ResourcesHandler() {
                         @Override
@@ -751,7 +751,7 @@ public class RestClientTest {
         logger.info("link: "+link);
         try {
             final String[] publicKey = new String[1];
-            client.listResources(new ResourcesArgs.Builder()
+            client.getResources(new ResourcesArgs.Builder()
                     .setPath(path)
                     .setParsingHandler(new ResourcesHandler() {
                         @Override
