@@ -14,7 +14,7 @@ import java.util.Map;
  * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/response-objects.xml#disk">english</a>,
  * <a href="https://tech.yandex.ru/disk/api/reference/response-objects-docpage/#disk">russian</a></p>
  */
-public class DiskCapacity {
+public class DiskInfo {
 
     @SerializedName("trash_size")
     long trashSize;

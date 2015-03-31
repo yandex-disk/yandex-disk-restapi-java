@@ -9,7 +9,7 @@ package com.yandex.disk.rest.retrofit;
 import com.yandex.disk.rest.exceptions.NetworkIOException;
 import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.json.ApiVersion;
-import com.yandex.disk.rest.json.DiskCapacity;
+import com.yandex.disk.rest.json.DiskInfo;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
@@ -52,7 +52,7 @@ public interface CloudApi {
      * <a href="https://tech.yandex.ru/disk/api/reference/capacity-docpage/">russian</a></p>
      */
     @GET("/v1/disk")
-    DiskCapacity getCapacity(@Query("fields") String fields)
+    DiskInfo getDiskInfo(@Query("fields") String fields)
             throws NetworkIOException, ServerIOException;
 
     /**

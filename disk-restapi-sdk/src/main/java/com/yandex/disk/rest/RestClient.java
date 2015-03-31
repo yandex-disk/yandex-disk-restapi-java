@@ -13,7 +13,7 @@ import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.exceptions.WrongMethodException;
 import com.yandex.disk.rest.exceptions.http.HttpCodeException;
 import com.yandex.disk.rest.json.ApiVersion;
-import com.yandex.disk.rest.json.DiskCapacity;
+import com.yandex.disk.rest.json.DiskInfo;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
@@ -33,7 +33,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.client.OkClient;
 
@@ -112,14 +111,14 @@ public class RestClient {
         }
     }
 
-    public DiskCapacity getCapacity()
+    public DiskInfo getDiskInfo()
             throws IOException, ServerIOException {
-        return getCapacity(null);
+        return getDiskInfo(null);
     }
 
-    public DiskCapacity getCapacity(final String fields)
+    public DiskInfo getDiskInfo(final String fields)
             throws IOException, ServerIOException {
-        return cloudApi.getCapacity(fields);
+        return cloudApi.getDiskInfo(fields);
     }
 
     public Resource listResources(final ResourcesArgs args)

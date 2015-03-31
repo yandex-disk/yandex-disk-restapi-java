@@ -15,7 +15,7 @@ import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.exceptions.WrongMethodException;
 import com.yandex.disk.rest.exceptions.http.HttpCodeException;
 import com.yandex.disk.rest.json.ApiVersion;
-import com.yandex.disk.rest.json.DiskCapacity;
+import com.yandex.disk.rest.json.DiskInfo;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
@@ -106,15 +106,15 @@ public class RestClientTest {
     }
 
     @Test
-    public void testCapacity() throws Exception {
-        DiskCapacity capacity = client.getCapacity();
-        logger.info("capacity: " + capacity);
-        assertThat(capacity.getTotalSpace(), greaterThan(0L));
-        assertThat(capacity.getTrashSize(), greaterThanOrEqualTo(0L));
-        assertThat(capacity.getUsedSpace(), greaterThanOrEqualTo(0L));
-        assertThat(capacity.getSystemFolders(), isA(Map.class));
-        assertThat(capacity.getSystemFolders(), hasKey("applications"));
-        assertThat(capacity.getSystemFolders(), hasKey("downloads"));
+    public void testDiskInfo() throws Exception {
+        DiskInfo diskInfo = client.getDiskInfo();
+        logger.info("diskInfo: " + diskInfo);
+        assertThat(diskInfo.getTotalSpace(), greaterThan(0L));
+        assertThat(diskInfo.getTrashSize(), greaterThanOrEqualTo(0L));
+        assertThat(diskInfo.getUsedSpace(), greaterThanOrEqualTo(0L));
+        assertThat(diskInfo.getSystemFolders(), isA(Map.class));
+        assertThat(diskInfo.getSystemFolders(), hasKey("applications"));
+        assertThat(diskInfo.getSystemFolders(), hasKey("downloads"));
     }
 
     @Test
