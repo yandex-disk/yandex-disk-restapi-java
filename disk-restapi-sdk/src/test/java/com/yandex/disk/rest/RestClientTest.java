@@ -101,7 +101,7 @@ public class RestClientTest {
         ApiVersion apiVersion = client.getApiVersion();
         logger.info("apiVersion: " + apiVersion);
         assertThat(apiVersion.getBuild(), not(isEmptyOrNullString()));
-        assertTrue("2.9.18".equalsIgnoreCase(apiVersion.getBuild()));
+        assertTrue("2.10.12".equalsIgnoreCase(apiVersion.getBuild()));
         assertTrue("v1".equalsIgnoreCase(apiVersion.getApiVersion()));
     }
 
