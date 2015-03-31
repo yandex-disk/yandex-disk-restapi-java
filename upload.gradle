@@ -1,0 +1,133 @@
+//
+// +------------------------------------------------------------+
+// | Upload archives setup                                      |
+// +------------------------------------------------------------+
+// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+project.afterEvaluate {
+
+    if (!isMavenCentralBuild) {
+
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    if (isTeamcityBuild) {
+
+                        ext.auth = {
+                            authentication(userName: teamcity['maven.username'], password: teamcity['maven.password'])
+                        }
+
+                        repository(url: 'http://artifactory.yandex.net/artifactory/yandex_mobile_releases/', auth)
+                        snapshotRepository(url: 'http://artifactory.yandex.net/artifactory/yandex_mobile_snapshots/', auth)
+                    } else {
+                        repository(url: "file://${System.env.HOME}/.metrica-repo/")
+                    }
+                }
+            }
+        }
+
+        uploadArchives.doFirst {
+            configurations.archives.artifacts.each {
+                it.name = 'mobmetricalib-internal'
+            }
+        }
+
+    } else {
+
+        if (isTeamcityBuild) {
+            signing {
+                project.ext["signing.keyId"] = teamcity['signing.keyId']
+                project.ext["signing.password"] = teamcity['signing.password']
+                project.ext["signing.secretKeyRingFile"] = teamcity['signing.secretKeyRingFile']
+
+                sign configurations.archives
+            }
+        } else {
+            task signArchives {
+                // do nothing
+            }
+        }
+
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    pom.project {
+
+                        parent {
+                            groupId 'org.sonatype.oss'
+                            artifactId 'oss-parent'
+                            version '7'
+                        }
+
+                        modelVersion '4.0.0'
+                        name 'Yandex.Metrica for Apps'
+                        description 'Yandex.Metrica for Apps is a free analytics tool for developers of mobile apps for Android'
+                        url 'http://appmetrica.yandex.com/'
+
+                        licenses {
+                            license {
+                                name 'Terms of Use of Yandex.Metrica service'
+                                url 'http://legal.yandex.com/metrica_termsofuse/'
+                                distribution 'repo'
+                            }
+                        }
+
+                        scm {
+                            connection 'scm:git://github.com/yandexmobile/metrica-sdk-android.git'
+                            developerConnection 'scm:git:git@github.com/yandexmobile/metrica-sdk-android.git'
+                            url 'https://github.com/yandexmobile/metrica-sdk-android.git'
+                        }
+
+                        developers {
+                            developer {
+                                name 'Yandex'
+                                url 'http://appmetrica.yandex.com/'
+                                roles {
+                                    role 'Developer'
+                                    role 'Contributor'
+                                }
+                            }
+                        }
+                    }
+
+                    if (isTeamcityBuild) {
+                        beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+
+                        ext.auth = {
+                            authentication(userName: teamcity['maven.username'], password: teamcity['maven.password'])
+                        }
+
+                        repository(url: teamcity['maven.repository'], auth)
+                        snapshotRepository(url: teamcity['maven.snapshotRepository'], auth)
+                    } else {
+                        repository(url: "file://${System.env.HOME}/.metrica-repo/")
+                    }
+                }
+            }
+        }
+    }
+
+    uploadArchives.doFirst {
+        // Debug printing all artifacts
+        configurations.archives.artifacts.each {
+            println "-------"
+            println "name: $it.name"
+            println "file: $it.file"
+            println "type: $it.type"
+            println "extension: $it.extension"
+            println "classifier: $it.classifier"
+        }
+    }
+
+    // Make 'uploadArchives' depend on 'prepareArchives'
+    android.libraryVariants.all { variant ->
+        def prepareArchivesTaskName = "prepare${variant.name.capitalize()}Archives"
+
+        if (project.hasProperty(prepareArchivesTaskName)) {
+            uploadArchives.dependsOn prepareArchivesTaskName
+        }
+    }
+
+}
