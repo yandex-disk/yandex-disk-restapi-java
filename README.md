@@ -1,6 +1,7 @@
-mobile-disk-restapi-java
-========================
 
+The Yandex.Disk SDK is intended for applications that work with the files of Yandex.Disk users or store
+their own files and settings on Yandex.Disk.
+Please follow the rules and recommendations in the REST API Terms of Use and brand guide.
 
 Usage:
 
@@ -11,5 +12,5 @@ Usage:
 
 Links:
 
-    https://tech.yandex.ru/disk/rest/
-
+    https://api.yandex.com/disk/api/concepts/about.xml
+    http://legal.yandex.ru/disk_api/
