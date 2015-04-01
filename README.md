@@ -1,4 +1,4 @@
-Java SDK for Yandex.Disk’s REST API
+Java SDK for Yandex.Disk REST API
 ===================================
 
 
