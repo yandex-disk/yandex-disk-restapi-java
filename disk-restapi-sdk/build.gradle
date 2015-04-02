@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
 buildscript {
     repositories {
@@ -26,24 +27,126 @@ dependencies {
 }
 
 group = 'com.yandex.android'
-version = '1.0'
+version = '1.0-SNAPSHOT'
 
-uploadArchives {
-    repositories {
-        if (project.properties.containsKey('teamcity')) {
+ext.getBooleanWithDefault = { String propertyName, boolean defaultValue ->
+    boolean result = defaultValue
+    if (project.hasProperty(propertyName)) {
+        result = (project[propertyName] == 'true')
+    }
+    return result
+}
+
+def isMavenCentralBuild = getBooleanWithDefault('mavenCentral', false)
+def isTeamcityBuild = project.properties.containsKey('teamcity')
+
+if (isMavenCentralBuild) {
+
+    if (isTeamcityBuild) {
+        signing {
+            project.ext["signing.keyId"] = teamcity['signing.keyId']
+            project.ext["signing.password"] = teamcity['signing.password']
+            project.ext["signing.secretKeyRingFile"] = teamcity['signing.secretKeyRingFile']
+
+            sign configurations.archives
+        }
+    } else {
+        task signArchives {
+            // do nothing
+        }
+    }
+
+    uploadArchives {
+        repositories {
             mavenDeployer {
-                ext.auth = {
-                    authentication(userName: teamcity['maven.username'], password: teamcity['maven.password'])
+                pom.project {
+
+                    parent {
+                        groupId 'org.sonatype.oss'
+                        artifactId 'oss-parent'
+                        version '7'
+                    }
+
+                    modelVersion '4.0.0'
+                    name 'Yandex.Disk Java SDK for REST API'
+                    description 'The Java SDK for Yandex.Disk REST API is intended for applications that work with the files of Yandex.Disk users or store their own files and settings on Yandex.Disk.'
+                    url 'http://disk.yandex.com/'
+
+                    licenses {
+                        license {
+                            name 'Terms of Use of Yandex.Disk service'
+                            url 'http://legal.yandex.com/disk_termsofuse/'
+                            distribution 'repo'
+                        }
+                    }
+
+                    scm {
+                        connection 'scm:git://github.com/yandex-disk/yandex-disk-restapi-java.git'
+                        developerConnection 'scm:git:git@github.com/yandex-disk/yandex-disk-restapi-java.git'
+                        url 'https://github.com/yandex-disk/yandex-disk-restapi-java.git'
+                    }
+
+                    developers {
+                        developer {
+                            name 'Yandex'
+                            url 'http://api.yandex.com/disk/'
+                            roles {
+                                role 'Developer'
+                                role 'Contributor'
+                            }
+                        }
+                    }
                 }
-                repository(url: 'http://artifactory.yandex.net/artifactory/yandex_mobile_releases/', auth)
-                snapshotRepository(url: 'http://artifactory.yandex.net/artifactory/yandex_mobile_snapshots/', auth)
-            }
-        } else {
-            mavenDeployer {
-                def userHome = System.properties['user.home']
-                repository(url: "file:///$userHome/.m2/repository/")
+
+                if (isTeamcityBuild) {
+                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                    ext.auth = {
+                        authentication(userName: teamcity['maven.username'], password: teamcity['maven.password'])
+                    }
+
+                    repository(url: teamcity['maven.repository'], auth)
+                    snapshotRepository(url: teamcity['maven.snapshotRepository'], auth)
+                } else {
+                    def userHome = System.properties['user.home']
+                    repository(url: "file:///$userHome/.m2/repository/")
+                }
             }
         }
+    }
+
+} else {
+
+    uploadArchives {
+        repositories {
+            if (isTeamcityBuild) {
+                mavenDeployer {
+                    ext.auth = {
+                        authentication(userName: teamcity['maven.username'], password: teamcity['maven.password'])
+                    }
+                    repository(url: 'http://artifactory.yandex.net/artifactory/yandex_mobile_releases/', auth)
+                    snapshotRepository(url: 'http://artifactory.yandex.net/artifactory/yandex_mobile_snapshots/', auth)
+                }
+            } else {
+                mavenDeployer {
+                    def userHome = System.properties['user.home']
+                    repository(url: "file:///$userHome/.m2/repository/")
+                }
+            }
+        }
+    }
+
+}
+
+uploadArchives.doFirst {
+    // Debug printing all artifacts
+    configurations.archives.artifacts.each {
+        println "-------"
+        println "name: $it.name"
+        println "file: $it.file"
+        println "type: $it.type"
+        println "extension: $it.extension"
+        println "classifier: $it.classifier"
     }
 }
 
@@ -52,6 +155,12 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
 artifacts {
     archives sourcesJar
+    archives javadocJar
 }
