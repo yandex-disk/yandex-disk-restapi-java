@@ -73,7 +73,7 @@ if (isMavenCentralBuild) {
 
                     licenses {
                         license {
-                            name 'Terms of Use of Yandex.Metrica service'
+                            name 'Terms of Use of Yandex.Disk service'
                             url 'http://legal.yandex.com/disk_termsofuse/'
                             distribution 'repo'
                         }
