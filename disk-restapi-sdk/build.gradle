@@ -99,7 +99,7 @@ if (isMavenCentralBuild) {
                 }
 
                 if (isTeamcityBuild) {
-                    beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                     ext.auth = {
                         authentication(userName: teamcity['maven.username'], password: teamcity['maven.password'])
