@@ -37,7 +37,8 @@ ext.getBooleanWithDefault = { String propertyName, boolean defaultValue ->
     return result
 }
 
-ext.isMavenCentralBuild = getBooleanWithDefault('mavenCentral', false)
+def isMavenCentralBuild = getBooleanWithDefault('mavenCentral', false)
+def isTeamcityBuild = project.properties.containsKey('teamcity')
 
 if (isMavenCentralBuild) {
 
@@ -107,6 +108,7 @@ if (isMavenCentralBuild) {
                     repository(url: teamcity['maven.repository'], auth)
                     snapshotRepository(url: teamcity['maven.snapshotRepository'], auth)
                 } else {
+                    def userHome = System.properties['user.home']
                     repository(url: "file:///$userHome/.m2/repository/")
                 }
             }
@@ -117,7 +119,7 @@ if (isMavenCentralBuild) {
 
     uploadArchives {
         repositories {
-            if (project.properties.containsKey('teamcity')) {
+            if (isTeamcityBuild) {
                 mavenDeployer {
                     ext.auth = {
                         authentication(userName: teamcity['maven.username'], password: teamcity['maven.password'])
@@ -147,15 +149,6 @@ uploadArchives.doFirst {
         println "classifier: $it.classifier"
     }
 }
-
-// Make 'uploadArchives' depend on 'prepareArchives'
-//android.libraryVariants.all { variant ->
-//    def prepareArchivesTaskName = "prepare${variant.name.capitalize()}Archives"
-//
-//    if (project.hasProperty(prepareArchivesTaskName)) {
-//        uploadArchives.dependsOn prepareArchivesTaskName
-//    }
-//}
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
