@@ -41,17 +41,16 @@ import com.yandex.disk.rest.exceptions.http.UnauthorizedException;
 import com.yandex.disk.rest.exceptions.http.UnprocessableEntityException;
 import com.yandex.disk.rest.exceptions.http.UnsupportedMediaTypeException;
 import com.yandex.disk.rest.json.ApiError;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-
 import retrofit.ErrorHandler;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 public class ErrorHandlerImpl implements ErrorHandler {
 
@@ -68,58 +67,13 @@ public class ErrorHandlerImpl implements ErrorHandler {
                 return new RetrofitConversionException(retrofitError.getCause());
 
             case HTTP:
-                Response response = retrofitError.getResponse();
-                int httpCode = response.getStatus();
-                logger.debug("getStatus=" + httpCode);
-                Reader reader;
                 try {
-                    reader = new InputStreamReader(response.getBody().in());
+                    Response response = retrofitError.getResponse();
+                    int httpCode = response.getStatus();
+                    return createHttpCodeException(httpCode, response.getBody().in());
                 } catch (IOException ex) {
                     logger.debug("errorHandler", retrofitError);
                     return new NetworkIOException(ex);
-                }
-                ApiError apiError = new Gson().fromJson(reader, ApiError.class);
-                switch (httpCode) {
-                    case 400:
-                        return new BadRequestException(httpCode, apiError);
-                    case 401:
-                        return new UnauthorizedException(httpCode, apiError);
-                    case 403:
-                        return new ForbiddenException(httpCode, apiError);
-                    case 404:
-                        return new NotFoundException(httpCode, apiError);
-                    case 405:
-                        return new MethodNotAllowedException(httpCode, apiError);
-                    case 406:
-                        return new NotAcceptableException(httpCode, apiError);
-                    case 409:
-                        return new ConflictException(httpCode, apiError);
-                    case 410:
-                        return new GoneException(httpCode, apiError);
-                    case 412:
-                        return new PreconditionFailedException(httpCode, apiError);
-                    case 413:
-                        return new FileTooBigException(httpCode, apiError);
-                    case 415:
-                        return new UnsupportedMediaTypeException(httpCode, apiError);
-                    case 422:
-                        return new UnprocessableEntityException(httpCode, apiError);
-                    case 423:
-                        return new LockedException(httpCode, apiError);
-                    case 429:
-                        return new TooManyRequestsException(httpCode, apiError);
-                    case 500:
-                        return new InternalServerException(httpCode, apiError);
-                    case 501:
-                        return new NotImplementedException(httpCode, apiError);
-                    case 502:
-                        return new BadGatewayException(httpCode, apiError);
-                    case 503:
-                        return new ServiceUnavailableException(httpCode, apiError);
-                    case 507:
-                        return new InsufficientStorageException(httpCode, apiError);
-                    default:
-                        return new HttpCodeException(httpCode, apiError);
                 }
 
             case UNEXPECTED:
@@ -127,6 +81,61 @@ public class ErrorHandlerImpl implements ErrorHandler {
 
             default:
                 return new ServerIOException("ErrorHandler: unhandled error " + kind.name());
+        }
+    }
+
+    public static HttpCodeException createHttpCodeException(int httpCode, InputStream in) {
+        return createHttpCodeException(httpCode, readApiError(in));
+    }
+
+    private static ApiError readApiError(InputStream in) {
+        Reader reader = new InputStreamReader(in);
+        return new Gson().fromJson(reader, ApiError.class);
+    }
+
+    private static HttpCodeException createHttpCodeException(int httpCode, ApiError apiError) {
+        logger.debug("getStatus=" + httpCode);
+        switch (httpCode) {
+            case 400:
+                return new BadRequestException(httpCode, apiError);
+            case 401:
+                return new UnauthorizedException(httpCode, apiError);
+            case 403:
+                return new ForbiddenException(httpCode, apiError);
+            case 404:
+                return new NotFoundException(httpCode, apiError);
+            case 405:
+                return new MethodNotAllowedException(httpCode, apiError);
+            case 406:
+                return new NotAcceptableException(httpCode, apiError);
+            case 409:
+                return new ConflictException(httpCode, apiError);
+            case 410:
+                return new GoneException(httpCode, apiError);
+            case 412:
+                return new PreconditionFailedException(httpCode, apiError);
+            case 413:
+                return new FileTooBigException(httpCode, apiError);
+            case 415:
+                return new UnsupportedMediaTypeException(httpCode, apiError);
+            case 422:
+                return new UnprocessableEntityException(httpCode, apiError);
+            case 423:
+                return new LockedException(httpCode, apiError);
+            case 429:
+                return new TooManyRequestsException(httpCode, apiError);
+            case 500:
+                return new InternalServerException(httpCode, apiError);
+            case 501:
+                return new NotImplementedException(httpCode, apiError);
+            case 502:
+                return new BadGatewayException(httpCode, apiError);
+            case 503:
+                return new ServiceUnavailableException(httpCode, apiError);
+            case 507:
+                return new InsufficientStorageException(httpCode, apiError);
+            default:
+                return new HttpCodeException(httpCode, apiError);
         }
     }
 }

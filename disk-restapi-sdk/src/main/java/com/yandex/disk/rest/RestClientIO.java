@@ -25,6 +25,7 @@ import com.squareup.okhttp.Response;
 import com.squareup.okhttp.ResponseBody;
 import com.yandex.disk.rest.exceptions.CancelledDownloadException;
 import com.yandex.disk.rest.exceptions.DownloadNoSpaceAvailableException;
+import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.exceptions.http.ConflictException;
 import com.yandex.disk.rest.exceptions.http.FileNotModifiedException;
 import com.yandex.disk.rest.exceptions.http.FileTooBigException;
@@ -36,8 +37,8 @@ import com.yandex.disk.rest.exceptions.http.RangeNotSatisfiableException;
 import com.yandex.disk.rest.exceptions.http.ServiceUnavailableException;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Operation;
+import com.yandex.disk.rest.retrofit.ErrorHandlerImpl;
 import com.yandex.disk.rest.util.Hash;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -314,48 +315,60 @@ import java.util.regex.Pattern;
     }
 
     /* package */ Link delete(String url)
-            throws IOException {
-        Response response = call(METHOD_DELETE, url);
-        switch (response.code()) {
-            case 202:
-                Link result = parseJson(response, Link.class);
-                result.setHttpStatus(Link.HttpStatus.inProgress);
-                return result;
-            case 204:
-                close(response);
-                return Link.DONE;
-            default:
-                // no exceptions on 4xx and 5xx
-                close(response);
-                return Link.ERROR;
+            throws IOException, ServerIOException {
+        Response response = null;
+        try {
+            response = call(METHOD_DELETE, url);
+            switch (response.code()) {
+                case 202:
+                    Link result = parseJson(response, Link.class);
+                    result.setHttpStatus(Link.HttpStatus.inProgress);
+                    return result;
+                case 204:
+                    close(response);
+                    return Link.DONE;
+                default:
+                    throw ErrorHandlerImpl.createHttpCodeException(response.code(),
+                            response.body().byteStream());
+            }
+        } finally {
+            close(response);
         }
     }
 
     /* package */ Link put(String url)
-            throws IOException {
-        Response response = call(METHOD_PUT, url);
-        switch (response.code()) {
-            case 201:
-                Link done = parseJson(response, Link.class);
-                done.setHttpStatus(Link.HttpStatus.done);
-                return done;
-            case 202:
-                Link inProgress = parseJson(response, Link.class);
-                inProgress.setHttpStatus(Link.HttpStatus.inProgress);
-                return inProgress;
-            default:
-                // no exceptions on 4xx and 5xx
-                close(response);
-                return Link.ERROR;
+            throws IOException, ServerIOException {
+        Response response = null;
+        try {
+            response = call(METHOD_PUT, url);
+            switch (response.code()) {
+                case 201:
+                    Link done = parseJson(response, Link.class);
+                    done.setHttpStatus(Link.HttpStatus.done);
+                    return done;
+                case 202:
+                    Link inProgress = parseJson(response, Link.class);
+                    inProgress.setHttpStatus(Link.HttpStatus.inProgress);
+                    return inProgress;
+                default:
+                    throw ErrorHandlerImpl.createHttpCodeException(response.code(),
+                            response.body().byteStream());
+            }
+        } finally {
+            close(response);
         }
     }
 
-    private void close(Response response)
-            throws IOException {
-        ResponseBody responseBody = response.body();
-        if (responseBody != null) {
-            responseBody.close();
+    private void close(Response response) throws IOException {
+        if (response == null) {
+            return;
         }
+        ResponseBody responseBody = response.body();
+        if (responseBody == null) {
+            return;
+        }
+
+        responseBody.close();
     }
 
     private Response call(String method, String url)

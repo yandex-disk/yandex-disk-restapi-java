@@ -33,13 +33,7 @@ import java.util.Map;
         this.queryMap = new LinkedHashMap<>();
     }
 
-    /* package */ String build()
-            throws UnsupportedEncodingException {
-        return build(UTF8);
-    }
-
-    /* package */ String build(final String encoding)
-            throws UnsupportedEncodingException {
+    /* package */ String build() {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, Object> entry : queryMap.entrySet()) {
             Object value = entry.getValue();
@@ -47,12 +41,20 @@ import java.util.Map;
                 if (sb.length() > 0) {
                     sb.append("&");
                 }
-                sb.append(URLEncoder.encode(entry.getKey(), encoding))
+                sb.append(encode(entry.getKey()))
                         .append("=")
-                        .append(URLEncoder.encode(value.toString(), encoding));
+                        .append(encode(value.toString()));
             }
         }
         return url + "?" + sb.toString();
+    }
+
+    private static String encode(String key) {
+        try {
+            return URLEncoder.encode(key, UTF8);
+        } catch (UnsupportedEncodingException e) {
+            throw new UnsupportedOperationException(e);
+        }
     }
 
     /* package */ QueryBuilder add(String key, String value) {

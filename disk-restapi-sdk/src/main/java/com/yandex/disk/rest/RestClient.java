@@ -32,19 +32,16 @@ import com.yandex.disk.rest.retrofit.CloudApi;
 import com.yandex.disk.rest.retrofit.ErrorHandlerImpl;
 import com.yandex.disk.rest.retrofit.RequestInterceptorImpl;
 import com.yandex.disk.rest.util.Hash;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import retrofit.RestAdapter;
+import retrofit.client.OkClient;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-
-import retrofit.RestAdapter;
-import retrofit.client.OkClient;
 
 public class RestClient {
 
@@ -269,7 +266,7 @@ public class RestClient {
      * <a href="https://tech.yandex.ru/disk/api/reference/trash-delete-docpage/">russian</a></p>
      */
     public Link deleteFromTrash(final String path)
-            throws IOException {
+            throws IOException, ServerIOException {
         return new RestClientIO(client, credentials.getHeaders())
                 .delete(new QueryBuilder(getUrl() + "/v1/disk/trash/resources")
                         .add("path", path)
@@ -283,7 +280,7 @@ public class RestClient {
      * <a href="https://tech.yandex.ru/disk/api/reference/trash-restore-docpage/">russian</a></p>
      */
     public Link restoreFromTrash(final String path, final String name, final Boolean overwrite)
-            throws IOException {
+            throws IOException, ServerIOException {
         return new RestClientIO(client, credentials.getHeaders())
                 .put(new QueryBuilder(getUrl() + "/v1/disk/trash/resources/restore")
                         .add("path", path)
