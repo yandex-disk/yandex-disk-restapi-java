@@ -17,7 +17,6 @@
 package com.yandex.disk.rest;
 
 import com.squareup.okhttp.OkHttpClient;
-import com.yandex.disk.rest.exceptions.NetworkIOException;
 import com.yandex.disk.rest.exceptions.ServerException;
 import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.exceptions.WrongMethodException;
@@ -217,7 +216,7 @@ public class RestClient {
      * <a href="https://tech.yandex.ru/disk/api/reference/meta-add-docpage/">russian</a></p>
      */
     public Resource patchResource(final ResourcesArgs args)
-            throws ServerIOException, NetworkIOException {
+            throws ServerIOException, IOException {
         final Resource resource = cloudApi.patchResource(args.getPath(), args.getFields(), args.getBody());
         if (args.getParsingHandler() != null) {
             parseListResponse(resource, args.getParsingHandler());
@@ -347,7 +346,7 @@ public class RestClient {
      * <a href="https://tech.yandex.ru/disk/api/reference/upload-ext-docpage/">russian</a></p>
      */
     public Link saveFromUrl(final String url, final String serverPath)
-            throws ServerIOException, NetworkIOException {
+            throws ServerIOException, IOException {
         return cloudApi.saveFromUrl(url, serverPath);
     }
 
@@ -358,7 +357,7 @@ public class RestClient {
      * <a href="https://tech.yandex.ru/disk/api/reference/upload-docpage/">russian</a></p>
      */
     public Link getUploadLink(final String serverPath, final boolean overwrite)
-            throws ServerIOException, WrongMethodException, NetworkIOException {
+            throws ServerIOException, WrongMethodException, IOException {
         Link link = cloudApi.getUploadLink(serverPath, overwrite);
         if (!"PUT".equalsIgnoreCase(link.getMethod())) {
             throw new WrongMethodException("Method in Link object is not PUT");
@@ -407,7 +406,7 @@ public class RestClient {
      * <a href="https://tech.yandex.ru/disk/api/reference/create-folder-docpage/">russian</a></p>
      */
     public Link makeFolder(final String path)
-            throws ServerIOException, NetworkIOException {
+            throws ServerIOException, IOException {
         return cloudApi.makeFolder(path);
     }
 
@@ -418,7 +417,7 @@ public class RestClient {
      * <a href="https://tech.yandex.ru/disk/api/reference/copy-docpage/">russian</a></p>
      */
     public Link copy(final String from, final String path, final boolean overwrite)
-            throws ServerIOException, NetworkIOException {
+            throws ServerIOException, IOException {
         return cloudApi.copy(from, path, overwrite);
     }
 
@@ -429,7 +428,7 @@ public class RestClient {
      * <a href="https://tech.yandex.ru/disk/api/reference/move-docpage/">russian</a></p>
      */
     public Link move(final String from, final String path, final boolean overwrite)
-            throws ServerIOException, NetworkIOException {
+            throws ServerIOException, IOException {
         return cloudApi.move(from, path, overwrite);
     }
 
@@ -440,7 +439,7 @@ public class RestClient {
      * <a href="https://tech.yandex.ru/disk/api/reference/publish-docpage/">russian</a></p>
      */
     public Link publish(final String path)
-            throws ServerIOException, NetworkIOException {
+            throws ServerIOException, IOException {
         return cloudApi.publish(path);
     }
 
@@ -451,7 +450,7 @@ public class RestClient {
      * <a href="https://tech.yandex.ru/disk/api/reference/publish-docpage/">russian</a></p>
      */
     public Link unpublish(final String path)
-            throws ServerIOException, NetworkIOException {
+            throws ServerIOException, IOException {
         return cloudApi.unpublish(path);
     }
 
