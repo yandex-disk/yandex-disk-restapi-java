@@ -17,7 +17,6 @@
 package com.yandex.disk.rest.retrofit;
 
 import com.google.gson.Gson;
-import com.yandex.disk.rest.exceptions.NetworkIOException;
 import com.yandex.disk.rest.exceptions.RetrofitConversionException;
 import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.exceptions.http.BadGatewayException;
@@ -61,7 +60,8 @@ public class ErrorHandlerImpl implements ErrorHandler {
         RetrofitError.Kind kind = retrofitError.getKind();
         switch (kind) {
             case NETWORK:
-                return new NetworkIOException(retrofitError.getCause());
+                Throwable th = retrofitError.getCause();
+                return th instanceof IOException ? th : new IOException(th);
 
             case CONVERSION:
                 return new RetrofitConversionException(retrofitError.getCause());
@@ -73,7 +73,7 @@ public class ErrorHandlerImpl implements ErrorHandler {
                     return createHttpCodeException(httpCode, response.getBody().in());
                 } catch (IOException ex) {
                     logger.debug("errorHandler", retrofitError);
-                    return new NetworkIOException(ex);
+                    return ex;
                 }
 
             case UNEXPECTED:
