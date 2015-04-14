@@ -24,10 +24,8 @@ import com.yandex.disk.rest.json.Operation;
 import com.yandex.disk.rest.json.Resource;
 import com.yandex.disk.rest.json.ResourceList;
 
-import retrofit.Callback;
-import retrofit.http.Body;
-import retrofit.http.DELETE;
 import retrofit.http.GET;
+import retrofit.http.Body;
 import retrofit.http.PATCH;
 import retrofit.http.POST;
 import retrofit.http.PUT;
