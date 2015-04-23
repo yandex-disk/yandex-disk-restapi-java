@@ -85,6 +85,10 @@ public class RestClient {
         return serverURL;
     }
 
+    /* package */ OkHttpClient getClient() {
+        return client;
+    }
+
     /**
      * Server API version and build
      */

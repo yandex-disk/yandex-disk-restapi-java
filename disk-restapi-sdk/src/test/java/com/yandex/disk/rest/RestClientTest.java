@@ -105,6 +105,7 @@ public class RestClientTest {
         Credentials credentials = new Credentials(user, token);
 
         client = new RestClient(credentials);
+        client.getClient().networkInterceptors().add(new LoggingInterceptor(true));
     }
 
     @Ignore @Test
