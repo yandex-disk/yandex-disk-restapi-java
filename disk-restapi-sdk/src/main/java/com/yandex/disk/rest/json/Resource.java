@@ -49,6 +49,9 @@ public class Resource {
     @SerializedName("modified")
     String modified;
 
+    @SerializedName("deleted")
+    String deleted;
+
     @SerializedName("path")
     String path;
 
@@ -101,6 +104,10 @@ public class Resource {
         return modified != null ? ISO8601.parse(modified) : null;
     }
 
+    public Date getDeleted() {
+        return deleted != null ? ISO8601.parse(deleted) : null;
+    }
+
     public ResourcePath getPath() {
         return path != null ? new ResourcePath(path) : null;
     }
@@ -147,6 +154,7 @@ public class Resource {
                 ", publicUrl='" + publicUrl + '\'' +
                 ", originPath='" + getOriginPath() + '\'' +
                 ", modified='" + getModified() + '\'' +
+                ", deleted='" + getDeleted() + '\'' +
                 ", path='" + getPath() + '\'' +
                 ", md5='" + md5 + '\'' +
                 ", type='" + type + '\'' +
