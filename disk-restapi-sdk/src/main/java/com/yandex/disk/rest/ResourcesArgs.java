@@ -21,7 +21,7 @@ import retrofit.mime.TypedOutput;
 public class ResourcesArgs {
 
     public enum Sort {
-        name, path, created, modified, size
+        name, path, created, modified, size, deleted
     }
 
     private String path, fields, sort, previewSize, publicKey, mediaType;

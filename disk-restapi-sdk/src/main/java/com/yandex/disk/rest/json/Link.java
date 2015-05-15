@@ -36,18 +36,6 @@ public class Link {
         }
     };
 
-    public final static Link IN_PROGRESS = new Link() {
-        {
-            httpStatus = HttpStatus.inProgress;
-        }
-    };
-
-    public final static Link ERROR = new Link() {
-        {
-            httpStatus = HttpStatus.error;
-        }
-    };
-
     @SerializedName("href")
     String href;
 
