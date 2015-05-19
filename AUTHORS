@@ -1,7 +1,17 @@
 Maintainer
 ----------
-Yandex LLC https://yandex.com
+YANDEX LLC https://yandex.com
 
 Authors
 -------
+
+The following authors have created the source code of
+"Java SDK for Yandex.Disk" published and distributed
+by YANDEX LLC as the owner:
 Oleg Okhotnikov <oleg@yandex-team.ru>
+
+The following authors have licensed their contributions
+to YANDEX LLC and everyone who uses "Java SDK for Yandex.Disk"
+under the licensing terms detailed in LICENSE available
+at http://www.apache.org/licenses/LICENSE-2.0.
+no one yet
