@@ -46,6 +46,7 @@ public class RestClient {
     private final OkHttpClient client;
     private final String serverURL;
     private final CloudApi cloudApi;
+    protected final RestAdapter.Builder builder;
 
     public RestClient(final Credentials credentials) {
         this(credentials, OkHttpClientFactory.makeClient());
@@ -63,12 +64,15 @@ public class RestClient {
         } catch (MalformedURLException ex) {
             throw new RuntimeException(ex);
         }
-        this.cloudApi = new RestAdapter.Builder()
+
+        this.builder = new RestAdapter.Builder()
                 .setClient(new OkClient(client))
                 .setEndpoint(getUrl())
                 .setRequestInterceptor(new RequestInterceptorImpl(credentials.getHeaders()))
                 .setErrorHandler(new ErrorHandlerImpl())
-                .setLogLevel(LOG_LEVEL)
+                .setLogLevel(LOG_LEVEL);
+
+        this.cloudApi = builder
                 .build()
                 .create(CloudApi.class);
     }
