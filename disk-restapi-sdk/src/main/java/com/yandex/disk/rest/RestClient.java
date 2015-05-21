@@ -65,7 +65,7 @@ public class RestClient {
             throw new RuntimeException(ex);
         }
 
-        builder = new RestAdapter.Builder()
+        this.builder = new RestAdapter.Builder()
                 .setClient(new OkClient(client))
                 .setEndpoint(getUrl())
                 .setRequestInterceptor(new RequestInterceptorImpl(credentials.getHeaders()))
