@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.ListFragment;
@@ -37,6 +38,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.yandex.disk.rest.exceptions.http.HttpCodeException;
+import com.yandex.disk.rest.exceptions.http.UnauthorizedException;
+
 import java.io.File;
 import java.util.List;
 
@@ -54,6 +58,7 @@ public class ListExampleFragment extends ListFragment implements LoaderManager.L
     private String currentDir;
 
     private ListExampleAdapter adapter;
+    private Handler handler;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -69,6 +74,7 @@ public class ListExampleFragment extends ListFragment implements LoaderManager.L
         String username = preferences.getString(ExampleActivity.USERNAME, null);
         String token = preferences.getString(ExampleActivity.TOKEN, null);
 
+        handler = new Handler();
         credentials = new Credentials(username, token);
 
         Bundle args = getArguments();
@@ -105,7 +111,7 @@ public class ListExampleFragment extends ListFragment implements LoaderManager.L
         ListItem listItem = getListItem(item.getMenuInfo());
         switch (item.getItemId()) {
             case R.id.example_context_publish:
-                Log.d(TAG, "onContextItemSelected: publish: listItem="+listItem);
+                Log.d(TAG, "onContextItemSelected: publish: listItem=" + listItem);
                 if (listItem.getPublicUrl() != null) {
                     ShowPublicUrlDialogFragment.newInstance(credentials, listItem).show(getFragmentManager(), "showPublicUrlDialog");
                 } else {
@@ -193,12 +199,29 @@ public class ListExampleFragment extends ListFragment implements LoaderManager.L
         if (data.isEmpty()) {
             Exception ex = ((ListExampleLoader) loader).getException();
             if (ex != null) {
-                setEmptyText(((ListExampleLoader) loader).getException().getMessage());
+                handleException(ex);
             } else {
                 setDefaultEmptyText();
             }
         } else {
             adapter.setData(data);
+        }
+    }
+
+    private void handleException(Exception ex) {
+        if (ex instanceof HttpCodeException) {
+            setEmptyText(((HttpCodeException)ex).getResponse().getDescription());
+            if (ex instanceof UnauthorizedException) {
+                final ExampleActivity activity = ((ExampleActivity) getActivity());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        activity.startLogin();
+                    }
+                });
+            }
+        } else {
+            setEmptyText(ex.getMessage());
         }
     }
 

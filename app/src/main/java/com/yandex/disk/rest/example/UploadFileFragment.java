@@ -21,6 +21,7 @@ import com.yandex.disk.rest.ProgressListener;
 import com.yandex.disk.rest.RestClient;
 import com.yandex.disk.rest.exceptions.CancelledUploadingException;
 import com.yandex.disk.rest.exceptions.ServerException;
+import com.yandex.disk.rest.exceptions.http.HttpCodeException;
 import com.yandex.disk.rest.json.Link;
 
 import java.io.File;
@@ -73,7 +74,7 @@ public class UploadFileFragment extends IODialogFragment {
         if (workFragment == null || workFragment.getTargetFragment() == null) {
             workFragment = new UploadFileRetainedFragment();
             fragmentManager.beginTransaction().add(workFragment, WORK_FRAGMENT_TAG).commit();
-            workFragment.uploadFile(getActivity(), credentials, serverPath, localFile);
+            workFragment.uploadFile(credentials, serverPath, localFile);
         }
         workFragment.setTargetFragment(this, 0);
     }
@@ -140,21 +141,23 @@ public class UploadFileFragment extends IODialogFragment {
 
         private boolean cancelled;
 
-        public void uploadFile(final Context context, final Credentials credentials, final String serverPath, final String localFile) {
+        public void uploadFile(final Credentials credentials, final String serverPath, final String localFile) {
 
             new Thread(new Runnable() {
                 @Override
                 public void run () {
-                    RestClient client = null;
                     try {
-                        client = RestClientUtil.getInstance(credentials);
+                        RestClient client = RestClientUtil.getInstance(credentials);
                         Link link = client.getUploadLink(serverPath, true);
                         client.uploadFile(link, true, new File(localFile), UploadFileRetainedFragment.this);
                         uploadComplete();
                     } catch (CancelledUploadingException ex) {
                         // cancelled by user
+                    } catch (HttpCodeException ex) {
+                        Log.d(TAG, "uploadFile", ex);
+                        sendException(ex.getResponse().getDescription());
                     } catch (IOException | ServerException ex) {
-                        Log.d(TAG, "loadFile", ex);
+                        Log.d(TAG, "uploadFile", ex);
                         sendException(ex);
                     }
                 }

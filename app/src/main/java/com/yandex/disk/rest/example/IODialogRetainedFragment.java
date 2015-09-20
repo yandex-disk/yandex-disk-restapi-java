@@ -25,12 +25,16 @@ public class IODialogRetainedFragment extends Fragment {
     }
 
     protected void sendException(final Exception ex) {
+        sendException(ex.getMessage());
+    }
+
+    protected void sendException(final String message) {
         handler.post(new Runnable() {
             @Override
             public void run () {
                 IODialogFragment targetFragment = (IODialogFragment) getTargetFragment();
                 if (targetFragment != null) {
-                    targetFragment.sendException(ex);
+                    targetFragment.sendException(message);
                 }
             }
         });
