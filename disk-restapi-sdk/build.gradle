@@ -29,7 +29,7 @@ dependencies {
 }
 
 group = 'com.yandex.android'
-version = '1.0-SNAPSHOT'
+version = '1.03'
 
 ext.getBooleanWithDefault = { String propertyName, boolean defaultValue ->
     boolean result = defaultValue
