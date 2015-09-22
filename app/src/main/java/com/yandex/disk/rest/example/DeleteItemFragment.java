@@ -10,7 +10,6 @@ package com.yandex.disk.rest.example;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,6 +19,7 @@ import android.widget.Toast;
 
 import com.yandex.disk.rest.RestClient;
 import com.yandex.disk.rest.exceptions.ServerException;
+import com.yandex.disk.rest.exceptions.http.HttpCodeException;
 
 import java.io.IOException;
 
@@ -71,7 +71,7 @@ public class DeleteItemFragment extends IODialogFragment {
         if (workFragment == null || workFragment.getTargetFragment() == null) {
             workFragment = new DeleteItemRetainedFragment();
             fragmentManager.beginTransaction().add(workFragment, WORK_FRAGMENT_TAG).commit();
-            workFragment.deleteItem(getActivity(), credentials, path);
+            workFragment.deleteItem(credentials, path);
         }
         workFragment.setTargetFragment(this, 0);
     }
@@ -119,16 +119,18 @@ public class DeleteItemFragment extends IODialogFragment {
 
     public static class DeleteItemRetainedFragment extends IODialogRetainedFragment {
 
-        public void deleteItem(final Context context, final Credentials credentials, final String path) {
+        public void deleteItem(final Credentials credentials, final String path) {
 
             new AsyncTask<Void, Void, Void>() {
 
                 @Override
                 protected Void doInBackground(Void... params) {
-                    RestClient client = null;
                     try {
-                        client = RestClientUtil.getInstance(credentials);
+                        RestClient client = RestClientUtil.getInstance(credentials);
                         client.delete(path, false);
+                    } catch (HttpCodeException ex) {
+                        Log.d(TAG, "deleteItem", ex);
+                        sendException(ex.getResponse().getDescription());
                     } catch (IOException | ServerException ex) {
                         Log.d(TAG, "deleteItem", ex);
                         sendException(ex);

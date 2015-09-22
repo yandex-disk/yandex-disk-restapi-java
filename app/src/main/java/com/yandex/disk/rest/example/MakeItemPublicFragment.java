@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.yandex.disk.rest.RestClient;
 import com.yandex.disk.rest.exceptions.ServerException;
+import com.yandex.disk.rest.exceptions.http.HttpCodeException;
 
 import java.io.IOException;
 
@@ -70,7 +71,7 @@ public class MakeItemPublicFragment extends IODialogFragment {
         if (workFragment == null || workFragment.getTargetFragment() == null) {
             workFragment = new MakeItemPublicRetainedFragment();
             fragmentManager.beginTransaction().add(workFragment, WORK_FRAGMENT_TAG).commit();
-            workFragment.changePublicState(getActivity(), credentials, path, makePublicOrExpire);
+            workFragment.changePublicState(credentials, path, makePublicOrExpire);
         }
         workFragment.setTargetFragment(this, 0);
     }
@@ -122,20 +123,22 @@ public class MakeItemPublicFragment extends IODialogFragment {
 
     public static class MakeItemPublicRetainedFragment extends IODialogRetainedFragment {
 
-        public void changePublicState(final Context context, final Credentials credentials, final String path, final boolean makePublicOrExpire) {
+        public void changePublicState(final Credentials credentials, final String path, final boolean makePublicOrExpire) {
 
             new AsyncTask<Void, Void, String>() {
 
                 @Override
                 protected String doInBackground(Void... params) {
-                    RestClient client = null;
                     try {
-                        client = RestClientUtil.getInstance(credentials);
+                        RestClient client = RestClientUtil.getInstance(credentials);
                         if (makePublicOrExpire) {
                             return client.publish(path).getHref();
                         } else {
                             client.unpublish(path);
                         }
+                    } catch (HttpCodeException ex) {
+                        Log.d(TAG, "makePublicOrExpire", ex);
+                        sendException(ex.getResponse().getDescription());
                     } catch (IOException | ServerException ex) {
                         Log.d(TAG, "makePublicOrExpire", ex);
                         sendException(ex);
