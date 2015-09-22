@@ -21,6 +21,7 @@ import android.util.Log;
 import com.yandex.disk.rest.ProgressListener;
 import com.yandex.disk.rest.RestClient;
 import com.yandex.disk.rest.exceptions.ServerException;
+import com.yandex.disk.rest.exceptions.http.HttpCodeException;
 
 import java.io.File;
 import java.io.IOException;
@@ -91,7 +92,7 @@ public class DownloadFileFragment extends IODialogFragment {
         dialog.setIndeterminate(true);
         dialog.setButton(ProgressDialog.BUTTON_NEUTRAL, getString(R.string.example_loading_file_cancel_button), new DialogInterface.OnClickListener() {
             @Override
-            public void onClick (DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 onCancel();
             }
@@ -154,6 +155,9 @@ public class DownloadFileFragment extends IODialogFragment {
                         RestClient client = RestClientUtil.getInstance(credentials);
                         client.downloadFile(item.getPath(), result, DownloadFileRetainedFragment.this);
                         downloadComplete();
+                    } catch (HttpCodeException ex) {
+                        Log.d(TAG, "loadFile", ex);
+                        sendException(ex.getResponse().getDescription());
                     } catch (IOException | ServerException ex) {
                         Log.d(TAG, "loadFile", ex);
                         sendException(ex);
@@ -166,7 +170,7 @@ public class DownloadFileFragment extends IODialogFragment {
         public void updateProgress (final long loaded, final long total) {
             handler.post(new Runnable() {
                 @Override
-                public void run () {
+                public void run() {
                     DownloadFileFragment targetFragment = (DownloadFileFragment) getTargetFragment();
                     if (targetFragment != null) {
                         targetFragment.setDownloadProgress(loaded, total);
@@ -183,7 +187,7 @@ public class DownloadFileFragment extends IODialogFragment {
         public void downloadComplete() {
             handler.post(new Runnable() {
                 @Override
-                public void run () {
+                public void run() {
                     DownloadFileFragment targetFragment = (DownloadFileFragment) getTargetFragment();
                     if (targetFragment != null) {
                         targetFragment.onDownloadComplete(result);

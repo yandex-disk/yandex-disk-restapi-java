@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.yandex.disk.rest.RestClient;
 import com.yandex.disk.rest.exceptions.ServerException;
+import com.yandex.disk.rest.exceptions.http.HttpCodeException;
 
 import java.io.IOException;
 
@@ -67,7 +68,7 @@ public class RenameMoveItemFragment extends IODialogFragment {
         if (workFragment == null || workFragment.getTargetFragment() == null) {
             workFragment = new RenameMoveItemRetainedFragment();
             fragmentManager.beginTransaction().add(workFragment, WORK_FRAGMENT_TAG).commit();
-            workFragment.renameMoveItem(getActivity(), credentials, srcPath, dstPath);
+            workFragment.renameMoveItem(credentials, srcPath, dstPath);
         }
         workFragment.setTargetFragment(this, 0);
     }
@@ -115,7 +116,7 @@ public class RenameMoveItemFragment extends IODialogFragment {
 
     public static class RenameMoveItemRetainedFragment extends IODialogRetainedFragment {
 
-        public void renameMoveItem(final Context context, final Credentials credentials, final String srcPath, final String dstPath) {
+        public void renameMoveItem(final Credentials credentials, final String srcPath, final String dstPath) {
 
             new AsyncTask<Void, Void, Void>() {
 
@@ -125,6 +126,9 @@ public class RenameMoveItemFragment extends IODialogFragment {
                     try {
                         client = RestClientUtil.getInstance(credentials);
                         client.move(srcPath, dstPath, false);
+                    } catch (HttpCodeException ex) {
+                        Log.d(TAG, "renameMoveItem", ex);
+                        sendException(ex.getResponse().getDescription());
                     } catch (IOException | ServerException ex) {
                         Log.d(TAG, "renameMoveItem", ex);
                         sendException(ex);

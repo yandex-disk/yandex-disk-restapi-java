@@ -18,8 +18,8 @@ public class IODialogFragment extends DialogFragment {
 
     protected ProgressDialog dialog;
 
-    public void sendException(final Exception ex) {
+    public void sendException(final String message) {
         dialog.dismiss();
-        Toast.makeText(getActivity(), ex.getMessage(), Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
     }
 }
