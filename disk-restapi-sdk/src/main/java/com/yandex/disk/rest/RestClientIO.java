@@ -215,7 +215,7 @@ import java.util.regex.Pattern;
         }
     }
 
-    /* package */ void uploadFile(final String url, final File file, final long startOffset,
+    /* package */ void uploadFile(final String url, final SourceFile file, final long startOffset,
                            final ProgressListener progressListener)
             throws IOException, HttpCodeException {
         logger.debug("uploadFile: put to url: "+url);
@@ -228,8 +228,8 @@ import java.util.regex.Pattern;
                 .put(requestBody);
         if (startOffset > 0) {
             StringBuilder contentRange = new StringBuilder();
-            contentRange.append("bytes ").append(startOffset).append("-").append(file.length() - 1)
-                    .append("/").append(file.length());
+            contentRange.append("bytes ").append(startOffset).append("-").append(file.getContentSize() - 1)
+                    .append("/").append(file.getContentSize());
             logger.debug(CONTENT_RANGE_HEADER + ": " + contentRange);
             requestBuilder.addHeader(CONTENT_RANGE_HEADER, contentRange.toString());
         }

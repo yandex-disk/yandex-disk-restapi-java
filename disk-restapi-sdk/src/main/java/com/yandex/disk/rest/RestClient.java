@@ -30,6 +30,7 @@ import retrofit.client.OkClient;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -371,18 +372,40 @@ public class RestClient {
      * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/upload.xml">english</a>,
      * <a href="https://tech.yandex.ru/disk/api/reference/upload-docpage/">russian</a></p>
      */
-    public void uploadFile(final Link link, final boolean resumeUpload, final File localSource,
+    public void uploadFile(final Link link, final boolean resumeUpload, final File file,
                            final ProgressListener progressListener)
             throws IOException, ServerException {
         RestClientIO clientIO = new RestClientIO(client, credentials.getHeaders());
         long startOffset = 0;
         if (resumeUpload) {
-            Hash hash = Hash.getHash(localSource);
+            Hash hash = Hash.getHash(file);
             startOffset = clientIO.getUploadedSize(link.getHref(), hash);
             logger.debug("head: startOffset=" + startOffset);
         }
-        clientIO.uploadFile(link.getHref(), localSource, startOffset, progressListener);
+        LocalSourceFile localSourceFile = new LocalSourceFile(file);
+        clientIO.uploadFile(link.getHref(), localSourceFile, startOffset, progressListener);
     }
+
+
+    /**
+     * Uploading an abstract source file to Disk
+     *
+     * @see <p>API reference <a href="http://api.yandex.com/disk/api/reference/upload.xml">english</a>,
+     * <a href="https://tech.yandex.ru/disk/api/reference/upload-docpage/">russian</a></p>
+     */
+    public void uploadFile(final Link link, final boolean resumeUpload, final SourceFile sourceFile,
+                           final ProgressListener progressListener)
+            throws IOException, ServerException {
+        RestClientIO clientIO = new RestClientIO(client, credentials.getHeaders());
+        long startOffset = 0;
+        if (resumeUpload) {
+            Hash hash = sourceFile.getHash();
+            startOffset = clientIO.getUploadedSize(link.getHref(), hash);
+            logger.debug("head: startOffset=" + startOffset);
+        }
+        clientIO.uploadFile(link.getHref(), sourceFile, startOffset, progressListener);
+    }
+
 
     /**
      * Deleting a file or folder
