@@ -39,14 +39,10 @@ import okio.Source;
      *
      * @see RequestBody#create(com.squareup.okhttp.MediaType, java.io.File)
      */
-    /* package */ static RequestBody create(final MediaType contentType, final File file, final long startOffset,
+    /* package */ static RequestBody create(final MediaType contentType, final SourceFile file, final long startOffset,
                               final ProgressListener listener) {
         if (file == null) {
             throw new NullPointerException("content == null");
-        }
-
-        if (listener == null && startOffset == 0) {
-            return RequestBody.create(contentType, file);
         }
 
         return new RequestBody() {
@@ -57,7 +53,7 @@ import okio.Source;
                     if (listener.hasCancelled()) {
                         throw new CancelledUploadingException();
                     }
-                    listener.updateProgress(loaded + startOffset, file.length());
+                    listener.updateProgress(loaded + startOffset, file.getContentSize());
                 }
             }
 
@@ -68,20 +64,14 @@ import okio.Source;
 
             @Override
             public long contentLength() {
-                return file.length() - startOffset;
+                return file.getContentSize() - startOffset;
             }
 
             @Override
             public void writeTo(BufferedSink sink) throws IOException {
                 Source source = null;
-                InputStream inputStream = new FileInputStream(file);
+                InputStream inputStream = file.getInputStream(startOffset);
                 try {
-                    if (startOffset > 0) {
-                        long skipped = inputStream.skip(startOffset);
-                        if (skipped != startOffset) {
-                            throw new IOException("RequestBodyProgress: inputStream.skip() failed");
-                        }
-                    }
                     long loaded = 0;
                     updateProgress(loaded);
                     source = Okio.source(inputStream);
